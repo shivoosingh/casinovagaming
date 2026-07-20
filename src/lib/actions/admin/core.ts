@@ -55,3 +55,13 @@ export function adminDb() {
   }
   return client;
 }
+
+/** True when a Postgres error means the table/function doesn't exist yet. */
+export function isMissingRelation(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  if (error.code === "42P01" || error.code === "42883") return true;
+  const message = error.message ?? "";
+  return /relation .* does not exist/i.test(message) || /function .* does not exist/i.test(message);
+}
+
+export const RUN_ADMIN_SQL_HINT = "Run supabase/admin-essentials-casinova.sql in the Supabase SQL editor.";

@@ -17,7 +17,7 @@ export const ADMIN_MODULES = [
   { href: "/admin/reviews", label: "Reviews", icon: "Star", permission: "cms.manage", group: "Content" },
   { href: "/admin/notifications", label: "Broadcasts", icon: "Megaphone", permission: "notifications.broadcast", group: "Content" },
   { href: "/admin/newsletters", label: "Newsletters", icon: "Mail", permission: "newsletters.manage", group: "Content" },
-  { href: "/admin/requests", label: "Deposit Requests", icon: "Inbox", permission: "requests.manage", group: "Operations" },
+  { href: "/admin/requests", label: "Game Requests", icon: "Inbox", permission: "requests.manage", group: "Operations" },
   { href: "/admin/payments", label: "Payment Methods", icon: "Wallet", permission: "cms.manage", group: "Operations" },
   { href: "/admin/provision-jobs", label: "Bot Jobs", icon: "Bot", permission: "requests.manage", group: "Operations" },
   { href: "/admin/payouts", label: "Cash-out Payouts", icon: "Banknote", permission: "requests.manage", group: "Operations" },

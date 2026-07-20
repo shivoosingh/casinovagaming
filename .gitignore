@@ -47,3 +47,4 @@ workers/juwa-bot/chrome-bot-profile/
 next-env.d.ts
 
 .vercel
+.env*
