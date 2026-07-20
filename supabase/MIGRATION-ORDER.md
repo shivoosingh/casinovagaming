@@ -38,6 +38,14 @@ Run it once, in order, right after `CASINOVA-FULL-SCHEMA.sql`:
 -- 2) admin-essentials-casinova.sql   (Phase 2 admin modules)
 ```
 
+## Phase 2b — Payments + Settings upgrade (run after essentials)
+
+**[`admin-payments-settings-upgrade.sql`](./admin-payments-settings-upgrade.sql)**
+
+Widens `payment_methods` (QR, pay link, kind), seeds default methods + site settings
+(maintenance, registration, telegram promo, social links), and creates
+`telegram_promo_messages`.
+
 ## Split files (optional)
 
 Numbered pieces still live in [`fresh-migrations/`](./fresh-migrations/) if you prefer running step-by-step.
