@@ -15,7 +15,7 @@ export function DashboardShell({ children, sidebar }: DashboardShellProps) {
 
   useEffect(() => {
     if (searchParams.get("verified") === "1") {
-      toast.success("Welcome to Spinora! Your email is verified.");
+      toast.success("Welcome to Casinova Gaming! Your email is verified.");
     }
   }, [searchParams]);
 

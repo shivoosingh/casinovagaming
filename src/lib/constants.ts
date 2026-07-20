@@ -1,20 +1,20 @@
-export const SITE_NAME = "Spinora";
+export const SITE_NAME = "Casinova Gaming";
 
 /** Daily spin wheel is live (win rates capped server-side in prize-engine). */
 export const DAILY_SPIN_ENABLED = true;
 
 /** VIP points awarded per successful referral */
 export const REFERRAL_REWARD_POINTS = 10;
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://spinoracasinos.com";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://casinovagaming.com";
 export const SITE_DESCRIPTION =
-  "Spinora is your hub for Juwa casino, Game Vault, slot games, and fish games. Create game accounts fast, claim bonuses, earn VIP rewards, and get 24/7 live support.";
+  "Casinova Gaming is your premium hub for Juwa casino, Game Vault, slot games, and fish games. Create game accounts fast, claim bonuses, earn VIP rewards, and get 24/7 live support.";
 
 export const VIP_TIERS = [
   {
     id: "bronze",
     name: "Bronze",
     minPoints: 0,
-    color: "from-amber-700 to-amber-500",
+    color: "from-amber-700 to-[#0099cc]",
     benefits: ["Basic support", "5% referral bonus", "Weekly promotions"],
   },
   {
@@ -58,17 +58,17 @@ export const PUBLIC_ROUTES = [
   { path: "/register", priority: 0.5 },
 ] as const;
 
-/** Official Spinora social profile URLs — used in footer, tasks, and share buttons */
+/** Official Casinova Gaming social profile URLs — used in footer, tasks, and share buttons */
 export const SOCIAL_LINKS = {
   telegram:
     process.env.NEXT_PUBLIC_TELEGRAM_URL ||
-    "https://t.me/+Y80HSM0UiZw5ODdh",
+    "https://t.me/casinovagaming",
   facebook:
     process.env.NEXT_PUBLIC_FACEBOOK_URL ||
-    "https://www.facebook.com/share/19ea1cSC5W/",
+    "https://www.facebook.com/share/18mJGKyMNq/?mibextid=wwXIfr",
   instagram:
     process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
-    "https://www.instagram.com/spinora09?igsh=MXhtM3gxZmRlNnR5Zw==",
+    "https://www.instagram.com/casinovagaming/",
   tiktok:
     process.env.NEXT_PUBLIC_TIKTOK_URL ||
     "https://www.tiktok.com/@spinora09",

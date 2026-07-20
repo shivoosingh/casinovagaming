@@ -71,7 +71,7 @@ export function ReviewsPageClient() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-3xl font-bold gradient-text">{stats.average || "—"}</p>
-            <p className="text-sm text-muted-foreground mb-2">Average rating</p>
+            <p className="text-sm text-[#6b6d8f] mb-2">Average rating</p>
             {stats.average > 0 && (
               <StarRating value={Math.round(stats.average)} readonly size="sm" className="justify-center" />
             )}
@@ -80,7 +80,7 @@ export function ReviewsPageClient() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-3xl font-bold gradient-text">{stats.count}</p>
-            <p className="text-sm text-muted-foreground">Total reviews</p>
+            <p className="text-sm text-[#6b6d8f]">Total reviews</p>
           </CardContent>
         </Card>
         <Card>
@@ -88,7 +88,7 @@ export function ReviewsPageClient() {
             <p className="text-3xl font-bold gradient-text">
               {reviews.filter((r) => r.admin_liked).length}
             </p>
-            <p className="text-sm text-muted-foreground">Team picks</p>
+            <p className="text-sm text-[#6b6d8f]">Team picks</p>
           </CardContent>
         </Card>
       </div>
@@ -118,7 +118,7 @@ export function ReviewsPageClient() {
             ))
           ) : (
             <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
+              <CardContent className="py-12 text-center text-[#6b6d8f]">
                 No reviews yet. Be the first to share your experience!
               </CardContent>
             </Card>

@@ -85,20 +85,20 @@ export function ChatComposer({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={previewUrl} alt="Preview" className="h-14 w-14 rounded-lg object-cover border border-border" />
           ) : (
-            <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-[10px] text-muted-foreground px-1 text-center">
+            <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-[10px] text-[#6b6d8f] px-1 text-center">
               PDF
             </div>
           )}
           <div className="flex-1 min-w-0 pt-0.5">
             <p className="text-xs font-medium truncate">{pendingFile.name}</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-[10px] text-[#6b6d8f]">
               {(pendingFile.size / 1024).toFixed(0)} KB
             </p>
           </div>
           <button
             type="button"
             onClick={clearFile}
-            className="p-1 rounded-md hover:bg-muted text-muted-foreground"
+            className="p-1 rounded-md hover:bg-muted text-[#6b6d8f]"
             aria-label="Remove attachment"
           >
             <X className="h-4 w-4" />

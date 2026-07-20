@@ -49,17 +49,17 @@ export function DepositProofImage({
   if (!src) {
     return (
       <div
-        className={`h-40 w-full max-w-sm rounded-lg bg-white/5 animate-pulse border border-white/10 ${className ?? ""}`}
+        className={`h-40 w-full max-w-sm rounded-lg bg-[rgba(255,255,255,0.03)] animate-pulse border border-[rgba(0, 229, 255,0.1)] ${className ?? ""}`}
       />
     );
   }
 
   return (
     <a href={src} target="_blank" rel="noopener noreferrer" className={`block max-w-sm ${className ?? ""}`}>
-      <div className="relative h-40 w-full rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/40 transition-colors">
+      <div className="relative h-40 w-full rounded-lg overflow-hidden border border-[rgba(0, 229, 255,0.1)] hover:border-[rgba(0, 229, 255,0.25)] transition-colors">
         <Image src={src} alt={alt} fill className="object-contain bg-black/40" unoptimized />
       </div>
-      <span className="text-[10px] text-orange-400 mt-1 inline-block hover:underline">
+      <span className="text-[10px] text-[#00E5FF] mt-1 inline-block hover:underline">
         Open full screenshot
       </span>
     </a>

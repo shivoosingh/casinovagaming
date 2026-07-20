@@ -36,7 +36,7 @@ function ChatAttachmentPreview({
   }, [supabase, path]);
 
   if (!url) {
-    return <div className="mt-1 h-24 w-full max-w-[200px] rounded-lg bg-white/10 animate-pulse" />;
+    return <div className="mt-1 h-24 w-full max-w-[200px] rounded-lg bg-[rgba(0, 229, 255,0.06)] animate-pulse" />;
   }
 
   if (type === "image") {
@@ -46,7 +46,7 @@ function ChatAttachmentPreview({
         <img
           src={url}
           alt={name}
-          className="rounded-lg max-w-full max-h-48 object-cover border border-white/10"
+          className="rounded-lg max-w-full max-h-48 object-cover border border-[rgba(0, 229, 255,0.1)]"
         />
       </a>
     );

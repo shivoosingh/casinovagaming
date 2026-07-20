@@ -42,7 +42,7 @@ export default async function AdminAnalyticsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Analytics</h1>
-        <p className="text-muted-foreground">Platform performance and activity tracking</p>
+        <p className="text-[#6b6d8f]">Platform performance and activity tracking</p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -57,7 +57,7 @@ export default async function AdminAnalyticsPage() {
           <Card key={stat.label}>
             <CardContent className="p-6 text-center">
               <p className="text-3xl font-bold gradient-text">{stat.value}</p>
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              <p className="text-sm text-[#6b6d8f] mt-1">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -72,7 +72,7 @@ export default async function AdminAnalyticsPage() {
             {["bronze", "silver", "gold", "platinum"].map((tier) => (
               <div key={tier} className="text-center p-4 rounded-lg bg-muted/50">
                 <p className="text-2xl font-bold">{tiers[tier] || 0}</p>
-                <p className="text-sm text-muted-foreground capitalize">{tier}</p>
+                <p className="text-sm text-[#6b6d8f] capitalize">{tier}</p>
               </div>
             ))}
           </div>

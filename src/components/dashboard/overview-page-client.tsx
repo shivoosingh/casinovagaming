@@ -98,17 +98,17 @@ export function OverviewPageClient() {
         {statCards.map((stat) => {
           const Icon = stat.icon;
           const inner = (
-            <Card className={stat.href ? "hover:glow-purple transition-all cursor-pointer" : ""}>
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              className={`rounded-xl border border-[rgba(255,255,255,0.07)] bg-[#13131a] p-4 flex items-center gap-4 transition-all ${stat.href ? "hover:border-[rgba(201,168,76,0.25)] hover:bg-[#16161e] cursor-pointer" : ""}`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)] flex items-center justify-center">
+                <Icon className="h-5 w-5 text-[#c9a84c]" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[#f0f0f5]">{stat.value}</p>
+                <p className="text-xs text-[#6b6d8f]">{stat.label}</p>
+              </div>
+            </div>
           );
           return stat.href ? (
             <Link key={stat.label} href={stat.href} prefetch={false}>
@@ -130,11 +130,11 @@ export function OverviewPageClient() {
           <CardContent>
             <div className="flex items-center justify-between mb-2">
               <Badge>{currentTier?.name}</Badge>
-              <span className="text-sm text-muted-foreground">{stats.vipPoints} points</span>
+              <span className="text-sm text-[#6b6d8f]">{stats.vipPoints} points</span>
             </div>
             <Progress value={Math.min(progress, 100)} className="mb-2" />
             {nextTier && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-[#6b6d8f]">
                 {nextTier.minPoints - stats.vipPoints} points to {nextTier.name}
               </p>
             )}

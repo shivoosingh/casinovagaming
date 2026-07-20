@@ -80,6 +80,6 @@ export function RequestActions({ requestId, currentStatus }: RequestActionsProps
 
 function Badge({ status }: { status: string }) {
   return (
-    <span className="text-sm text-muted-foreground capitalize">Status: {status}</span>
+    <span className="text-sm text-[#6b6d8f] capitalize">Status: {status}</span>
   );
 }

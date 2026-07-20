@@ -29,14 +29,14 @@ export function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] p-3 sm:p-4 pointer-events-none">
-      <div className="mx-auto max-w-4xl rounded-xl border border-purple-500/30 bg-[#1a1a1a]/95 backdrop-blur-sm p-3 sm:px-4 sm:py-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl pointer-events-auto">
-        <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left leading-snug">
+      <div className="mx-auto max-w-4xl rounded-xl border border-purple-500/30 bg-[#0d0d1f]/95 backdrop-blur-sm p-3 sm:px-4 sm:py-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xl pointer-events-auto">
+        <p className="text-xs sm:text-sm text-[#6b6d8f] text-center sm:text-left leading-snug">
           We use cookies. See{" "}
-          <Link href="/about" className="text-primary hover:underline">
+          <Link href="/about" className="text-[#00E5FF] hover:underline">
             Terms
           </Link>{" "}
           &{" "}
-          <Link href="/about" className="text-primary hover:underline">
+          <Link href="/about" className="text-[#00E5FF] hover:underline">
             Privacy
           </Link>
           .

@@ -65,13 +65,13 @@ export function ReferralsPageClient() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-3xl font-bold gradient-text">{referrals.length}</p>
-            <p className="text-sm text-muted-foreground">Total Referrals</p>
+            <p className="text-sm text-[#6b6d8f]">Total Referrals</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-3xl font-bold gradient-text">{totalPoints}</p>
-            <p className="text-sm text-muted-foreground">Points Earned</p>
+            <p className="text-sm text-[#6b6d8f]">Points Earned</p>
           </CardContent>
         </Card>
         <Card>
@@ -87,7 +87,7 @@ export function ReferralsPageClient() {
         </CardHeader>
         <CardContent>
           {referrals.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
+            <p className="text-sm text-[#6b6d8f] text-center py-8">
               No referrals yet. Share your link to start earning points!
             </p>
           ) : (
@@ -101,9 +101,9 @@ export function ReferralsPageClient() {
                     <p className="font-medium text-sm">
                       {ref.referred?.full_name || ref.referred?.email || "User"}
                     </p>
-                    <p className="text-xs text-muted-foreground">{formatDate(ref.created_at)}</p>
+                    <p className="text-xs text-[#6b6d8f]">{formatDate(ref.created_at)}</p>
                   </div>
-                  <p className="text-sm font-semibold text-primary">+{ref.reward_points} pts</p>
+                  <p className="text-sm font-semibold text-[#00E5FF]">+{ref.reward_points} pts</p>
                 </div>
               ))}
             </div>

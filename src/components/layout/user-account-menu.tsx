@@ -118,7 +118,7 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "flex items-center rounded-full bg-[#1e1e1e] border border-white/10 hover:border-orange-500/40 transition-colors",
+          "flex items-center rounded-full bg-[#0d0d1f] border border-[rgba(0, 229, 255,0.1)] hover:border-[rgba(0, 229, 255,0.25)] transition-colors",
           compact ? "p-0.5" : "gap-2 pl-1 pr-2 py-1"
         )}
         aria-expanded={open}
@@ -126,7 +126,7 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
       >
         <span
           className={cn(
-            "flex items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 font-bold text-gray-900",
+            "flex items-center justify-center rounded-full bg-gradient-to-br from-[#00E5FF] to-[#0099cc] font-bold text-gray-900",
             compact ? "h-7 w-7 text-[10px]" : "h-8 w-8 text-xs"
           )}
         >
@@ -137,7 +137,7 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
         </span>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform hidden sm:block",
+            "h-4 w-4 text-[#6b6d8f] transition-transform hidden sm:block",
             open && "rotate-180"
           )}
         />
@@ -145,12 +145,12 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
 
       {open && (
         <div
-          className="absolute right-0 top-[calc(100%+8px)] z-[9999] w-60 rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/60 overflow-hidden"
+          className="absolute right-0 top-[calc(100%+8px)] z-[9999] w-60 rounded-xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] shadow-2xl shadow-black/60 overflow-hidden"
           role="menu"
         >
-          <div className="px-4 py-3 border-b border-white/10">
+          <div className="px-4 py-3 border-b border-[rgba(0, 229, 255,0.1)]">
             <p className="text-sm font-semibold text-white capitalize truncate">{name}</p>
-            {email && <p className="text-xs text-muted-foreground truncate">{email}</p>}
+            {email && <p className="text-xs text-[#6b6d8f] truncate">{email}</p>}
           </div>
           <nav className="py-1">
             {MENU_LINKS.map(({ href, label, icon: Icon }) => (
@@ -158,7 +158,7 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6b6d8f] hover:text-white hover:bg-[rgba(0, 229, 255,0.04)] transition-colors"
                 role="menuitem"
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -167,7 +167,7 @@ export function UserAccountMenu({ compact = false }: { compact?: boolean }) {
               </Link>
             ))}
           </nav>
-          <div className="border-t border-white/10 p-1">
+          <div className="border-t border-[rgba(0, 229, 255,0.1)] p-1">
             <button
               type="button"
               disabled={loggingOut}

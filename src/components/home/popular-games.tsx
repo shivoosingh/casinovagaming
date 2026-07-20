@@ -22,7 +22,7 @@ export function PopularGames() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
             Popular <span className="gradient-text">Games</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[#6b6d8f] max-w-2xl mx-auto">
             Access the most popular gaming platforms with instant account setup and premium support.
           </p>
         </motion.div>
@@ -51,7 +51,7 @@ export function PopularGames() {
               </div>
               <div className="p-4">
                 <h3 className="font-semibold mb-1">{game.name}</h3>
-                <p className="text-xs text-muted-foreground">{game.provider}</p>
+                <p className="text-xs text-[#6b6d8f]">{game.provider}</p>
               </div>
             </motion.div>
           ))}

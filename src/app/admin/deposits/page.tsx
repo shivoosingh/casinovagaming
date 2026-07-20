@@ -50,7 +50,7 @@ export default async function AdminDepositsPage({
       <DepositsLiveRefresh />
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Deposit Requests</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
+        <p className="text-[#6b6d8f] text-sm sm:text-base">
           Review payment screenshots and confirm deposits — confirming credits the user&apos;s Total Deposit wallet
         </p>
       </div>
@@ -63,8 +63,8 @@ export default async function AdminDepositsPage({
             className={cn(
               "rounded-lg border px-3 py-1.5 text-sm transition-colors",
               activeFilter === tab.id
-                ? "border-primary bg-primary/15 text-primary"
-                : "border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "border-primary bg-primary/15 text-[#00E5FF]"
+                : "border-border text-[#6b6d8f] hover:text-foreground hover:bg-muted"
             )}
           >
             {tab.label}
@@ -75,7 +75,7 @@ export default async function AdminDepositsPage({
       <div className="space-y-4">
         {!deposits?.length ? (
           <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
+            <CardContent className="p-8 text-center text-[#6b6d8f]">
               No deposit requests{status && status !== "all" ? ` with status "${status}"` : ""}.
             </CardContent>
           </Card>
@@ -93,7 +93,7 @@ export default async function AdminDepositsPage({
                         <Badge variant={statusVariant[dep.status as RequestStatus]}>{dep.status}</Badge>
                         <Badge variant="outline">{method?.label ?? dep.payment_method}</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#6b6d8f]">
                         {user?.full_name} ({user?.email})
                         {dep.amount != null && dep.amount > 0 && (
                           <span className="text-emerald-400 font-semibold"> · ${Number(dep.amount).toFixed(2)}</span>
@@ -101,9 +101,9 @@ export default async function AdminDepositsPage({
                       </p>
                       <DepositProofImage path={dep.proof_url} />
                       {dep.admin_notes && (
-                        <p className="text-sm text-primary">Admin: {dep.admin_notes}</p>
+                        <p className="text-sm text-[#00E5FF]">Admin: {dep.admin_notes}</p>
                       )}
-                      <p className="text-xs text-muted-foreground">{formatDate(dep.created_at)}</p>
+                      <p className="text-xs text-[#6b6d8f]">{formatDate(dep.created_at)}</p>
                     </div>
                     <DepositActions
                       depositId={dep.id}

@@ -1,9 +1,10 @@
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminBroadcastNotice } from "@/components/admin/admin-broadcast-notice";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Users, MessageSquare, Star, Banknote, History, Wallet, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AdminBroadcastNotice } from "@/components/admin/admin-broadcast-notice";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -38,24 +39,9 @@ export default async function AdminPage() {
 
   const stats = [
     { icon: Users, label: "Total Users", value: userCount || 0, href: "/admin/users" },
-    {
-      icon: ShieldAlert,
-      label: "Flagged Users",
-      value: flaggedUsers || 0,
-      href: "/admin/fraud",
-    },
-    {
-      icon: Banknote,
-      label: "Wallet Loads",
-      value: pendingLoads || 0,
-      href: "/admin/game-loads",
-    },
-    {
-      icon: History,
-      label: "Transactions",
-      value: transactionCount || 0,
-      href: "/admin/transactions",
-    },
+    { icon: ShieldAlert, label: "Flagged Users", value: flaggedUsers || 0, href: "/admin/fraud" },
+    { icon: Banknote, label: "Wallet Loads", value: pendingLoads || 0, href: "/admin/game-loads" },
+    { icon: History, label: "Transactions", value: transactionCount || 0, href: "/admin/transactions" },
     {
       icon: Wallet,
       label: "Pending Deposits",
@@ -68,12 +54,12 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold">Admin Panel</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">Platform overview and management</p>
-      </div>
+      <AdminPageHeader
+        title="Admin Overview"
+        description="Casinova platform overview — new Spinora-style admin shell"
+      />
 
-      <div className="mb-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
+      <div className="mb-6 flex flex-col flex-wrap gap-2 sm:flex-row sm:gap-3">
         <Button asChild className="w-full sm:w-auto">
           <Link href="/admin/chat">Open Customer Chat</Link>
         </Button>
@@ -81,47 +67,31 @@ export default async function AdminPage() {
           <Link href="/admin/game-loads">Wallet Loads</Link>
         </Button>
         <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link href="/admin/users">Manage Users</Link>
-        </Button>
-        <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link href="/admin/fraud">Fraud / Flags</Link>
-        </Button>
-        <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link href="/admin/transactions">View Transactions</Link>
-        </Button>
-        <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link href="/admin/deposits">Deposits</Link>
-        </Button>
-        <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link href="/admin/reviews">Manage Reviews</Link>
+          <Link href="/admin/deposits?status=pending">Pending Deposits</Link>
         </Button>
       </div>
 
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-6">
         <AdminBroadcastNotice />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+        {stats.map((s) => {
+          const Icon = s.icon;
           return (
             <Link
-              key={stat.label}
-              href={stat.href}
+              key={s.label}
+              href={s.href}
               className={cn(
-                "group rounded-xl border border-white/10 bg-[#161616] p-3 sm:p-4",
-                "transition-all hover:border-orange-500/40 hover:bg-white/5 active:scale-[0.98]"
+                "rounded-2xl border border-violet-400/20 bg-[rgba(18,14,34,0.72)] p-4 transition-all",
+                "hover:-translate-y-0.5 hover:border-fuchsia-400/40 hover:shadow-[0_0_24px_rgba(168,85,247,0.25)]"
               )}
             >
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{stat.label}</p>
-                </div>
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/20 text-violet-200">
+                <Icon className="h-4 w-4" />
               </div>
+              <p className="text-2xl font-black text-white">{s.value}</p>
+              <p className="mt-1 text-xs font-medium text-slate-400">{s.label}</p>
             </Link>
           );
         })}

@@ -7,21 +7,22 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary/20 text-primary border border-primary/30",
-        secondary: "bg-secondary text-secondary-foreground",
-        success: "bg-green-500/20 text-green-400 border border-green-500/30",
-        warning: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
-        destructive: "bg-red-500/20 text-red-400 border border-red-500/30",
-        outline: "border border-border text-foreground",
+        default:   "bg-[rgba(0, 229, 255,0.12)] text-[#00E5FF] border border-[rgba(0, 229, 255,0.3)]",
+        secondary: "bg-[rgba(255,255,255,0.07)] text-[#c8caef] border border-[rgba(255,255,255,0.1)]",
+        success:   "bg-[rgba(16,185,129,0.12)] text-emerald-400 border border-[rgba(16,185,129,0.25)]",
+        warning:   "bg-[rgba(255,215,0,0.12)] text-yellow-400 border border-[rgba(255,215,0,0.25)]",
+        destructive:"bg-[rgba(239,68,68,0.12)] text-red-400 border border-[rgba(239,68,68,0.25)]",
+        outline:   "border border-[rgba(0, 229, 255,0.2)] text-[#e8eaf6]",
+        teal:      "bg-[rgba(13,148,136,0.12)] text-teal-400 border border-[rgba(13,148,136,0.3)]",
+        purple:    "bg-[rgba(255, 45, 120,0.12)] text-pink-400 border border-[rgba(255, 45, 120,0.3)]",
+        gold:      "bg-[rgba(255,215,0,0.12)] text-yellow-300 border border-[rgba(255,215,0,0.3)]",
       },
     },
     defaultVariants: { variant: "default" },
   }
 );
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant }), className)} {...props} />;

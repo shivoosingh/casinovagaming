@@ -63,7 +63,7 @@ export function ReviewForm({ existingReview }: ReviewFormProps) {
           <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-white">Review submitted</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-[#6b6d8f] mt-1">
               Thanks for sharing your feedback with the community.
             </p>
           </div>
@@ -72,14 +72,14 @@ export function ReviewForm({ existingReview }: ReviewFormProps) {
         <div className="space-y-2">
           <Label>Your rating</Label>
           <StarRating value={existingReview.rating} readonly />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6b6d8f]">
             {existingReview.rating} out of 5 stars
           </p>
         </div>
 
         <div className="space-y-2">
           <Label>Your review</Label>
-          <p className="text-sm text-foreground/90 leading-relaxed rounded-lg border border-white/10 bg-[#1e1e1e] p-3 whitespace-pre-wrap break-words">
+          <p className="text-sm text-foreground/90 leading-relaxed rounded-lg border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] p-3 whitespace-pre-wrap break-words">
             {existingReview.comment}
           </p>
         </div>
@@ -102,7 +102,7 @@ export function ReviewForm({ existingReview }: ReviewFormProps) {
       <div className="space-y-2">
         <Label>Your rating</Label>
         <StarRating value={rating} onChange={setRating} />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-[#6b6d8f]">
           {rating > 0 ? `${rating} out of 5 stars` : "Tap a star to rate"}
         </p>
       </div>
@@ -118,7 +118,7 @@ export function ReviewForm({ existingReview }: ReviewFormProps) {
           required
           minLength={3}
           maxLength={1000}
-          className="bg-[#1e1e1e] border-white/10 resize-none"
+          className="bg-[#0d0d1f] border-[rgba(0, 229, 255,0.1)] resize-none"
         />
       </div>
 

@@ -64,7 +64,7 @@ export function AdminFraudList({ users }: AdminFraudListProps) {
   return (
     <div className="space-y-4">
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f] pointer-events-none" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -73,7 +73,7 @@ export function AdminFraudList({ users }: AdminFraudListProps) {
         />
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-[#6b6d8f]">
         {filtered.length} flagged user{filtered.length === 1 ? "" : "s"}
       </p>
 
@@ -81,7 +81,7 @@ export function AdminFraudList({ users }: AdminFraudListProps) {
         <Card className="p-8 text-center">
           <ShieldCheck className="h-10 w-10 text-green-500 mx-auto mb-3" />
           <p className="font-medium">No flagged users</p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-[#6b6d8f] mt-1">
             Users appear here when multi-account or freeplay rules trigger.
           </p>
         </Card>
@@ -104,11 +104,11 @@ export function AdminFraudList({ users }: AdminFraudListProps) {
                         {user.manual_review && <Badge variant="secondary">Review</Badge>}
                         {user.is_suspended && <Badge variant="destructive">Suspended</Badge>}
                       </div>
-                      <p className="text-sm text-muted-foreground break-all">{user.email}</p>
+                      <p className="text-sm text-[#6b6d8f] break-all">{user.email}</p>
                       {user.phone && (
-                        <p className="text-sm text-muted-foreground">{user.phone}</p>
+                        <p className="text-sm text-[#6b6d8f]">{user.phone}</p>
                       )}
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-[#6b6d8f] mt-2">
                         Joined {formatDate(user.created_at)} · {user.device_count} linked device
                         {user.device_count === 1 ? "" : "s"} · Updated{" "}
                         {formatDate(user.last_calculated_at)}

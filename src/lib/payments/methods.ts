@@ -66,7 +66,7 @@ export const DEPOSIT_PAYMENT_METHODS: DepositPaymentMethod[] = [
       "1L2GidwNBzXKcnrpdHYaVGpZSrhvQcSbKV",
     copyLabel: "BTC address",
     qrImage: depositQr("/payments/bitcoin-qr.png"),
-    accent: "from-orange-500/20 to-amber-600/10 border-orange-500/30",
+    accent: "from-[#00E5FF]/20 to-amber-600/10 border-[rgba(0, 229, 255,0.2)]",
   },
   {
     id: "usdt",

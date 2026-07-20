@@ -78,8 +78,8 @@ function UserChatPanel({
     return (
       <div className="flex-1 flex items-center justify-center p-8 text-center">
         <div>
-          <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Select a chat from the list to start messaging.</p>
+          <MessageCircle className="h-12 w-12 text-[#6b6d8f] mx-auto mb-3" />
+          <p className="text-sm text-[#6b6d8f]">Select a chat from the list to start messaging.</p>
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ function UserChatPanel({
 
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-white/10 flex items-center gap-2 sm:gap-3 bg-[#121212] shrink-0">
+      <div className="p-3 sm:p-4 border-b border-[rgba(0, 229, 255,0.1)] flex items-center gap-2 sm:gap-3 bg-[#050510] shrink-0">
         {showMobileBack && (
           <Button
             variant="ghost"
@@ -99,12 +99,12 @@ function UserChatPanel({
             <ArrowLeft className="h-4 w-4" />
           </Button>
         )}
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-[#0099cc] flex items-center justify-center shrink-0">
           <Headphones className="h-5 w-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-white truncate">{selectedConversation.title}</h2>
-          <p className="text-xs text-muted-foreground truncate">{selectedConversation.subtitle}</p>
+          <p className="text-xs text-[#6b6d8f] truncate">{selectedConversation.subtitle}</p>
         </div>
         <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shrink-0">
           Live
@@ -114,12 +114,12 @@ function UserChatPanel({
       <div
         ref={scrollRef}
         onScroll={onScrollMessages}
-        className={`${CHAT_SCROLL_CLASS} p-3 sm:p-4 pb-4 space-y-3 bg-[#0f0f0f]`}
+        className={`${CHAT_SCROLL_CLASS} p-3 sm:p-4 pb-4 space-y-3 bg-[#050510]`}
       >
         {messages.length === 0 ? (
           <div className="text-center py-12">
-            <MessageCircle className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">
+            <MessageCircle className="h-10 w-10 text-[#6b6d8f] mx-auto mb-3" />
+            <p className="text-sm text-[#6b6d8f]">
               Say hello — our team typically replies in minutes.
             </p>
           </div>
@@ -133,11 +133,11 @@ function UserChatPanel({
                     "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-sm break-words",
                     isOwn
                       ? "gradient-bg text-white rounded-br-md"
-                      : "bg-[#1e1e1e] text-foreground border border-white/5 rounded-bl-md"
+                      : "bg-[#0d0d1f] text-foreground border border-[rgba(0, 229, 255,0.07)] rounded-bl-md"
                   )}
                 >
                   {!isOwn && (
-                    <p className="text-[10px] font-semibold text-orange-400 mb-1">Support</p>
+                    <p className="text-[10px] font-semibold text-[#00E5FF] mb-1">Support</p>
                   )}
                   <ChatMessageContent message={msg} />
                   <p className="text-[10px] opacity-60 mt-1.5">
@@ -158,7 +158,7 @@ function UserChatPanel({
         disabled={!selectedId}
         placeholder="Type a message..."
         showSendLabel
-        className="bg-[#121212] border-white/10 shrink-0"
+        className="bg-[#050510] border-[rgba(0, 229, 255,0.1)] shrink-0"
       />
     </div>
   );
@@ -471,7 +471,7 @@ export function UserMessagesInbox({
   if (initLoading) {
     return (
       <Card className={`${CHAT_INBOX_CARD_CLASS} items-center justify-center`}>
-        <p className="text-sm text-muted-foreground">Loading messages...</p>
+        <p className="text-sm text-[#6b6d8f]">Loading messages...</p>
       </Card>
     );
   }
@@ -479,9 +479,9 @@ export function UserMessagesInbox({
   if (!supabase || !userId) {
     return (
       <Card className="p-12 text-center">
-        <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <MessageCircle className="h-12 w-12 text-[#6b6d8f] mx-auto mb-4" />
         <h3 className="font-semibold mb-2">Please log in</h3>
-        <p className="text-sm text-muted-foreground">Sign in to message our support team.</p>
+        <p className="text-sm text-[#6b6d8f]">Sign in to message our support team.</p>
       </Card>
     );
   }
@@ -492,19 +492,19 @@ export function UserMessagesInbox({
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 flex-1 min-h-0 h-full overflow-hidden">
           <div
             className={cn(
-              "border-r border-white/10 flex flex-col min-h-0 h-full overflow-hidden bg-[#141414]",
+              "border-r border-[rgba(0, 229, 255,0.1)] flex flex-col min-h-0 h-full overflow-hidden bg-[#0a0a1e]",
               mobileChatOpen ? "hidden md:flex" : "flex"
             )}
           >
             <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-              <div className="p-4 border-b border-white/10 shrink-0">
+              <div className="p-4 border-b border-[rgba(0, 229, 255,0.1)] shrink-0">
                 <h2 className="font-semibold text-white">Chats</h2>
-                <p className="text-xs text-muted-foreground">Your conversations</p>
+                <p className="text-xs text-[#6b6d8f]">Your conversations</p>
               </div>
 
               <div className={`${CHAT_SCROLL_CLASS} p-2 space-y-1`}>
               {conversations.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8 px-4">
+                <p className="text-sm text-[#6b6d8f] text-center py-8 px-4">
                   No chats yet. Start one with our support team below.
                 </p>
               ) : (
@@ -516,25 +516,25 @@ export function UserMessagesInbox({
                     className={cn(
                       "w-full text-left p-3 rounded-xl transition-colors border",
                       selectedId === conv.id
-                        ? "bg-white/10 border-orange-500/30"
-                        : "border-transparent hover:bg-white/5"
+                        ? "bg-[rgba(0, 229, 255,0.06)] border-[rgba(0, 229, 255,0.2)]"
+                        : "border-transparent hover:bg-[rgba(0, 229, 255,0.04)]"
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center shrink-0">
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-[#0099cc] flex items-center justify-center shrink-0">
                         <Headphones className="h-5 w-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
                           <span className="font-semibold text-sm text-white truncate">{conv.title}</span>
                           {conv.lastMessageAt && (
-                            <span className="text-[10px] text-muted-foreground shrink-0">
+                            <span className="text-[10px] text-[#6b6d8f] shrink-0">
                               {formatRelativeTime(conv.lastMessageAt)}
                             </span>
                           )}
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs text-muted-foreground truncate flex-1">{conv.lastMessage}</p>
+                          <p className="text-xs text-[#6b6d8f] truncate flex-1">{conv.lastMessage}</p>
                           <UnreadBadge count={conv.unreadCount} />
                         </div>
                       </div>

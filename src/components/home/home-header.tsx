@@ -8,17 +8,27 @@ import { AnimatedLogo } from "@/components/ui/animated-logo";
 import { createClient } from "@/lib/supabase/client";
 
 const NotificationDropdown = dynamic(
-  () =>
-    import("@/components/notifications/notification-dropdown").then(
-      (m) => m.NotificationDropdown
-    ),
+  () => import("@/components/notifications/notification-dropdown").then((m) => m.NotificationDropdown),
   { ssr: false, loading: () => null }
 );
-
 const UserAccountMenu = dynamic(
   () => import("@/components/layout/user-account-menu").then((m) => m.UserAccountMenu),
-  { ssr: false, loading: () => <div className="hidden sm:block w-9 h-9 rounded-lg bg-white/5" aria-hidden /> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="hidden h-9 w-9 rounded-lg border border-violet-500/20 bg-violet-500/10 sm:block" aria-hidden />
+    ),
+  }
 );
+
+const navLinks = [
+  { href: "/#games", label: "Games" },
+  { href: "/blog", label: "Blog" },
+  { href: "/promotions", label: "Promotions" },
+  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/vip", label: "VIP" },
+  { href: "/support", label: "Support" },
+];
 
 interface HomeHeaderProps {
   onSearchClick: () => void;
@@ -31,64 +41,67 @@ export function HomeHeader({ onSearchClick, onMenuClick, assumeLoggedIn = false 
 
   useEffect(() => {
     if (assumeLoggedIn) return;
-
     const supabase = createClient();
     if (!supabase) return;
-
-    void supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session?.user);
-    });
-
+    void supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session?.user));
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-
+    } = supabase.auth.onAuthStateChange((_e, session) => setIsLoggedIn(!!session?.user));
     return () => subscription.unsubscribe();
   }, [assumeLoggedIn]);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 py-3 bg-[#121212]/95 backdrop-blur-md border-b border-white/5 overflow-visible">
-      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-2 overflow-visible border-b border-violet-500/20 bg-[#09090F]/88 px-3 py-3 backdrop-blur-xl sm:gap-4 sm:px-6">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400/70 to-transparent" />
+
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         {onMenuClick && (
           <button
             type="button"
             onClick={onMenuClick}
-            className="lg:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-colors shrink-0"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-violet-400/30 bg-violet-500/10 text-fuchsia-300 transition-colors hover:bg-violet-500/20 lg:hidden"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </button>
         )}
         <AnimatedLogo
-          textClassName="inline-flex text-xs sm:text-xl"
+          textClassName="inline-flex text-xs sm:text-lg"
           imageSize={28}
-          className="min-w-0 overflow-hidden [&_img]:sm:w-9 [&_img]:sm:h-9"
-          href={isLoggedIn ? "/" : "/"}
+          className="min-w-0 overflow-hidden [&_img]:sm:h-9 [&_img]:sm:w-9"
         />
       </div>
 
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="hidden items-center gap-5 lg:flex">
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-sm font-medium text-slate-400 transition-colors hover:text-fuchsia-300"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <button
           type="button"
           onClick={onSearchClick}
-          className="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 hover:opacity-90 transition-opacity shrink-0"
+          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-violet-400/30 bg-violet-500/10 text-fuchsia-300 transition-all hover:bg-violet-500/20 sm:flex"
           aria-label="Search games"
         >
           <Search className="h-5 w-5" />
         </button>
 
-        {isLoggedIn && (
-          <NotificationDropdown buttonClassName="w-9 h-9 sm:w-10 sm:h-10" />
-        )}
+        {isLoggedIn && <NotificationDropdown buttonClassName="w-9 h-9 sm:w-10 sm:h-10" />}
 
         {isLoggedIn ? (
           <>
             <Link
               href="/dashboard/deposit"
               prefetch={false}
-              className="inline-flex px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 text-[10px] sm:text-sm font-bold hover:opacity-90 transition-opacity shrink-0 whitespace-nowrap"
+              className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-gradient-to-r from-orange-500 via-fuchsia-500 to-violet-600 px-3 py-1.5 text-[10px] font-bold text-white shadow-[0_0_18px_rgba(232,121,249,0.35)] transition-transform hover:scale-[1.03] sm:px-4 sm:py-2 sm:text-sm"
             >
               Deposit
             </Link>
@@ -98,13 +111,13 @@ export function HomeHeader({ onSearchClick, onMenuClick, assumeLoggedIn = false 
           <>
             <Link
               href="/login"
-              className="inline text-xs sm:text-sm font-medium text-muted-foreground hover:text-white transition-colors px-1.5 sm:px-2 shrink-0 whitespace-nowrap"
+              className="inline shrink-0 whitespace-nowrap px-1.5 text-xs font-medium text-slate-400 transition-colors hover:text-fuchsia-300 sm:px-2 sm:text-sm"
             >
               Sign In
             </Link>
             <Link
               href="/register"
-              className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 text-xs sm:text-sm font-bold hover:opacity-90 transition-opacity shrink-0 whitespace-nowrap"
+              className="shrink-0 whitespace-nowrap rounded-full bg-gradient-to-r from-orange-500 via-fuchsia-500 to-violet-600 px-3 py-2 text-xs font-bold text-white shadow-[0_0_18px_rgba(232,121,249,0.35)] transition-transform hover:scale-[1.03] sm:px-4 sm:text-sm"
             >
               Sign Up
             </Link>

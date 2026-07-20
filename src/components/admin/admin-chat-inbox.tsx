@@ -104,7 +104,7 @@ function AdminChatPanel({
 
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-white/10 flex items-center gap-2 sm:gap-3 bg-[#121212] shrink-0">
+      <div className="p-3 sm:p-4 border-b border-[rgba(0, 229, 255,0.1)] flex items-center gap-2 sm:gap-3 bg-[#050510] shrink-0">
         {showMobileBack && (
           <Button
             variant="ghost"
@@ -120,13 +120,13 @@ function AdminChatPanel({
           <h2 className="font-semibold truncate text-white">
             {selected?.user?.full_name || "Customer"}
           </h2>
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="text-xs text-[#6b6d8f] truncate">
             {displayContact(selected?.user)}
             {selected?.user && (
               <span
                 className={cn(
                   "ml-2",
-                  isUserOnline(selected.user.last_seen_at) ? "text-emerald-400" : "text-muted-foreground"
+                  isUserOnline(selected.user.last_seen_at) ? "text-emerald-400" : "text-[#6b6d8f]"
                 )}
               >
                 · {isUserOnline(selected.user.last_seen_at) ? "Online" : "Offline"}
@@ -139,7 +139,7 @@ function AdminChatPanel({
             "shrink-0",
             isUserOnline(selected?.user?.last_seen_at)
               ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-              : "bg-white/5 text-muted-foreground border-white/10"
+              : "bg-[rgba(255,255,255,0.03)] text-[#6b6d8f] border-[rgba(0, 229, 255,0.1)]"
           )}
         >
           {isUserOnline(selected?.user?.last_seen_at) ? "Online" : "Offline"}
@@ -149,10 +149,10 @@ function AdminChatPanel({
       <div
         ref={scrollRef}
         onScroll={onScrollMessages}
-        className={`${CHAT_SCROLL_CLASS} p-3 sm:p-4 pb-4 space-y-3 bg-[#0f0f0f]`}
+        className={`${CHAT_SCROLL_CLASS} p-3 sm:p-4 pb-4 space-y-3 bg-[#050510]`}
       >
         {messages.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">
+          <p className="text-sm text-[#6b6d8f] text-center py-8">
             No messages yet. Send a reply to start the conversation.
           </p>
         ) : (
@@ -168,11 +168,11 @@ function AdminChatPanel({
                     "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm break-words",
                     isAdminMsg
                       ? "gradient-bg text-white rounded-br-md"
-                      : "bg-[#1e1e1e] text-foreground border border-white/5 rounded-bl-md"
+                      : "bg-[#0d0d1f] text-foreground border border-[rgba(0, 229, 255,0.07)] rounded-bl-md"
                   )}
                 >
                   {!isAdminMsg && (
-                    <p className="text-[10px] font-semibold text-orange-400 mb-1">Customer</p>
+                    <p className="text-[10px] font-semibold text-[#00E5FF] mb-1">Customer</p>
                   )}
                   <ChatMessageContent message={msg} />
                   <p className="text-[10px] opacity-60 mt-1.5">
@@ -193,7 +193,7 @@ function AdminChatPanel({
         disabled={!selectedId}
         placeholder="Type a message..."
         showSendLabel
-        className="bg-[#121212] border-white/10 shrink-0"
+        className="bg-[#050510] border-[rgba(0, 229, 255,0.1)] shrink-0"
       />
     </div>
   );
@@ -545,10 +545,10 @@ export function AdminChatInbox({
 
   const customerList = (
     <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-white/10 shrink-0 space-y-3">
+      <div className="p-3 sm:p-4 border-b border-[rgba(0, 229, 255,0.1)] shrink-0 space-y-3">
         <div>
           <h2 className="font-semibold text-white">Customers</h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6b6d8f]">
             {conversations.length} active chat(s)
             {onlineCount > 0 && (
               <span className="text-emerald-400"> · {onlineCount} online now</span>
@@ -559,7 +559,7 @@ export function AdminChatInbox({
       </div>
       <div className={`${CHAT_SCROLL_CLASS} p-2 space-y-1`}>
         {conversations.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8 px-3">
+          <p className="text-sm text-[#6b6d8f] text-center py-8 px-3">
             Search for a user above to start a conversation.
           </p>
         ) : (
@@ -576,8 +576,8 @@ export function AdminChatInbox({
                 className={cn(
                   "w-full text-left p-3 rounded-xl transition-colors border",
                   isActive
-                    ? "bg-white/10 border-orange-500/30"
-                    : "border-transparent hover:bg-white/5"
+                    ? "bg-[rgba(0, 229, 255,0.06)] border-[rgba(0, 229, 255,0.2)]"
+                    : "border-transparent hover:bg-[rgba(0, 229, 255,0.04)]"
                 )}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -595,18 +595,18 @@ export function AdminChatInbox({
                     <span className="text-[10px] text-emerald-400 shrink-0 font-medium">Online</span>
                   )}
                   {meta?.lastMessageAt && (
-                    <span className="text-[10px] text-muted-foreground shrink-0">
+                    <span className="text-[10px] text-[#6b6d8f] shrink-0">
                       {formatRelativeTime(meta.lastMessageAt)}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs text-muted-foreground truncate flex-1">
+                  <p className="text-xs text-[#6b6d8f] truncate flex-1">
                     {meta?.lastMessage ?? displayContact(user)}
                   </p>
                   <UnreadBadge count={meta?.unreadCount ?? 0} />
                 </div>
-                <p className="text-[10px] text-muted-foreground/70 truncate mt-0.5">
+                <p className="text-[10px] text-[#6b6d8f]/70 truncate mt-0.5">
                   {displayContact(user)}
                 </p>
               </button>
@@ -623,7 +623,7 @@ export function AdminChatInbox({
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-1 flex-1 min-h-0 h-full overflow-hidden">
           <div
             className={cn(
-              "border-r border-white/10 flex flex-col min-h-0 h-full overflow-hidden bg-[#141414]",
+              "border-r border-[rgba(0, 229, 255,0.1)] flex flex-col min-h-0 h-full overflow-hidden bg-[#0a0a1e]",
               mobileChatOpen ? "hidden md:flex" : "flex"
             )}
           >
@@ -637,8 +637,8 @@ export function AdminChatInbox({
             ) : (
               <div className="flex-1 flex items-center justify-center p-8 text-center">
                 <div>
-                  <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground">
+                  <MessageCircle className="h-12 w-12 text-[#6b6d8f] mx-auto mb-3" />
+                  <p className="text-sm text-[#6b6d8f]">
                     Search for a user or pick a chat to start messaging.
                   </p>
                 </div>

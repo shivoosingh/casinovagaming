@@ -21,7 +21,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
     <>
       <BreadcrumbSchema items={schemaItems} />
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-muted-foreground mb-6">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-[#6b6d8f] mb-6">
         {items.map((item, i) => (
           <span key={item.name} className="flex items-center gap-1">
             {i > 0 && <ChevronRight className="h-3 w-3" />}

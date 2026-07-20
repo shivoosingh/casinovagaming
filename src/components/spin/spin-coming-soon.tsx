@@ -18,17 +18,17 @@ export function SpinComingSoon() {
           Coming Soon
         </p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Daily Spin Wheel</h1>
-        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-8">
+        <p className="text-[#6b6d8f] text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-8">
           We&apos;re building a new daily spin experience for {SITE_NAME} members — free spins,
           Total Deposit prizes, and VIP rewards. Check back soon.
         </p>
 
-        <div className="rounded-2xl border border-white/10 bg-[#12121f]/80 backdrop-blur-sm p-6 text-left mb-8">
+        <div className="rounded-2xl border border-[rgba(0, 229, 255,0.1)] bg-[#12121f]/80 backdrop-blur-sm p-6 text-left mb-8">
           <div className="flex items-start gap-3">
             <Clock className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-white text-sm">Spin is temporarily unavailable</p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-[#6b6d8f] mt-1">
                 Make a deposit and load your favorite games while we finish the new spin wheel.
               </p>
             </div>
@@ -38,13 +38,13 @@ export function SpinComingSoon() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/#games"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3 text-sm font-bold text-black hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#0099cc] px-6 py-3 text-sm font-bold text-black hover:opacity-90 transition-opacity"
           >
             Browse Games
           </Link>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-[rgba(255,255,255,0.03)] px-6 py-3 text-sm font-medium text-white hover:bg-[rgba(0, 229, 255,0.08)] transition-colors"
           >
             Go to Dashboard
           </Link>

@@ -21,7 +21,7 @@ export function DepositPageClient() {
 
   if (!game) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
+      <div className="text-center py-12 text-[#6b6d8f]">
         No games available for deposits yet.
       </div>
     );
@@ -34,9 +34,9 @@ export function DepositPageClient() {
         description="Choose a payment method, send your deposit, then upload a screenshot. We credit your game account after verification."
       />
 
-      <div className="mb-4 rounded-xl border border-white/10 bg-[#161616] p-4">
-        <label htmlFor="deposit-game" className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <Gamepad2 className="h-3.5 w-3.5" />
+      <div className="mb-4 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[#0d0d1f] p-4">
+        <label htmlFor="deposit-game" className="flex items-center gap-2 text-xs text-[#6b6d8f] mb-2">
+          <Gamepad2 className="h-3.5 w-3.5 text-[#c9a84c]" />
           Deposit for game
         </label>
         <select
@@ -44,8 +44,8 @@ export function DepositPageClient() {
           value={game.slug}
           onChange={(e) => setGameSlug(e.target.value)}
           className={cn(
-            "w-full rounded-xl border border-white/10 bg-[#242424] px-4 py-3 text-sm text-white",
-            "focus:outline-none focus:border-orange-500/40"
+            "w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#13131a] px-4 py-3 text-sm text-[#f0f0f5]",
+            "focus:outline-none focus:border-[rgba(201,168,76,0.4)]"
           )}
         >
           {PLAYABLE_GAMES.map((g) => (
@@ -54,13 +54,13 @@ export function DepositPageClient() {
             </option>
           ))}
         </select>
-        <p className="text-[11px] text-muted-foreground mt-2">
+        <p className="text-[11px] text-[#6b6d8f] mt-2">
           Or open a{" "}
-          <Link href="/#games" className="text-orange-400 hover:underline">
+          <Link href="/#games" className="text-[#c9a84c] hover:underline">
             game page
           </Link>{" "}
           to deposit while you browse.{" "}
-          <Link href="/dashboard/deposits" className="text-orange-400 hover:underline">
+          <Link href="/dashboard/deposits" className="text-[#c9a84c] hover:underline">
             View my deposit history
           </Link>
         </p>

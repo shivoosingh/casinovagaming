@@ -192,7 +192,7 @@ export function NotificationDropdown({
       <Link
         href="/login"
         className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-lg bg-[#1e1e1e] text-muted-foreground hover:text-white border border-white/5",
+          "flex items-center justify-center w-10 h-10 rounded-lg bg-[#0d0d1f] text-[#6b6d8f] hover:text-white border border-[rgba(0, 229, 255,0.07)]",
           buttonClassName
         )}
         aria-label="Login to view notifications"
@@ -206,12 +206,12 @@ export function NotificationDropdown({
     <div
       id="notification-dropdown-panel"
       style={{ top: panelStyle.top, left: panelStyle.left, width: PANEL_WIDTH }}
-      className="fixed z-[9999] rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/60 overflow-hidden"
+      className="fixed z-[9999] rounded-xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] shadow-2xl shadow-black/60 overflow-hidden"
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#121212]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(0, 229, 255,0.07)] bg-[#050510]">
         <h3 className="text-sm font-semibold text-white">Notifications</h3>
         {unreadCount > 0 && (
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[rgba(0, 229, 255,0.12)] text-[#00E5FF]">
             {unreadCount} new
           </span>
         )}
@@ -219,7 +219,7 @@ export function NotificationDropdown({
 
       <div className="max-h-[min(360px,60vh)] overflow-y-auto">
         {loading && notifications.length === 0 ? (
-          <div className="flex items-center justify-center py-10 text-muted-foreground">
+          <div className="flex items-center justify-center py-10 text-[#6b6d8f]">
             <Loader2 className="h-5 w-5 animate-spin" />
           </div>
         ) : notifications.length > 0 ? (
@@ -228,7 +228,7 @@ export function NotificationDropdown({
               <li
                 key={notif.id}
                 className={cn(
-                  "px-4 py-3 hover:bg-white/5 transition-colors",
+                  "px-4 py-3 hover:bg-[rgba(0, 229, 255,0.04)] transition-colors",
                   !notif.is_read && "bg-orange-500/5"
                 )}
               >
@@ -238,15 +238,15 @@ export function NotificationDropdown({
                     <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5" />
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{notif.message}</p>
-                <p className="text-[10px] text-muted-foreground/70 mt-1">
+                <p className="text-xs text-[#6b6d8f] leading-relaxed">{notif.message}</p>
+                <p className="text-[10px] text-[#6b6d8f]/70 mt-1">
                   {formatRelativeTime(notif.created_at)}
                 </p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="py-10 text-center text-sm text-muted-foreground">No notifications yet</p>
+          <p className="py-10 text-center text-sm text-[#6b6d8f]">No notifications yet</p>
         )}
       </div>
     </div>
@@ -259,8 +259,8 @@ export function NotificationDropdown({
         type="button"
         onClick={handleToggle}
         className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-lg bg-[#1e1e1e] text-muted-foreground hover:text-white border border-white/5 relative transition-colors",
-          open && "text-white border-orange-500/30",
+          "flex items-center justify-center w-10 h-10 rounded-lg bg-[#0d0d1f] text-[#6b6d8f] hover:text-white border border-[rgba(0, 229, 255,0.07)] relative transition-colors",
+          open && "text-white border-[rgba(0, 229, 255,0.2)]",
           buttonClassName
         )}
         aria-label="Notifications"

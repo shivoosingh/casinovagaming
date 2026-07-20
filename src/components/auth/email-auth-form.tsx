@@ -37,20 +37,20 @@ function EmailConfirmationNotice({
   return (
     <div className="space-y-4 text-center py-2">
       <div className="mx-auto w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center">
-        <Mail className="h-7 w-7 text-primary" />
+        <Mail className="h-7 w-7 text-[#00E5FF]" />
       </div>
       <div>
         <p className="text-lg font-semibold text-foreground">Check your email</p>
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-sm text-[#6b6d8f] mt-2">
           We sent a confirmation link to{" "}
           <strong className="text-foreground">{email}</strong>
         </p>
       </div>
-      <p className="text-sm text-muted-foreground rounded-lg bg-white/5 border border-white/10 p-3 text-left">
+      <p className="text-sm text-[#6b6d8f] rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(0, 229, 255,0.1)] p-3 text-left">
         {variant === "register" ? (
           <>
             Your account was created but is <strong className="text-foreground">not active yet</strong>.
-            Open the email and click the confirmation link. You&apos;ll be redirected to Spinora and
+            Open the email and click the confirmation link. You&apos;ll be redirected to Casinova Gaming and
             signed in automatically once verified.
           </>
         ) : (
@@ -60,12 +60,12 @@ function EmailConfirmationNotice({
           </>
         )}
       </p>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-[#6b6d8f]">
         Open the link in any browser on your phone or computer. Each link works once —
         use Sign In to request a new one if it expired.
       </p>
-      <p className="text-xs text-muted-foreground">Check spam if you don&apos;t see it in 1–2 minutes.</p>
-      <Link href="/login" className="inline-block text-sm text-primary hover:underline">
+      <p className="text-xs text-[#6b6d8f]">Check spam if you don&apos;t see it in 1–2 minutes.</p>
+      <Link href="/login" className="inline-block text-sm text-[#00E5FF] hover:underline">
         Go to sign in
       </Link>
     </div>
@@ -250,7 +250,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
     await linkSignupSecurity(deviceId);
 
     setLoading(false);
-    toast.success("Account created! Welcome to Spinora.");
+    toast.success("Account created! Welcome to Casinova Gaming.");
     router.push(redirect);
     router.refresh();
   }
@@ -295,7 +295,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
             onLocalNumberChange={setPhoneLocal}
             required
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6b6d8f]">
             Select your country, then enter your number without the country code.
           </p>
         </div>
@@ -306,7 +306,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
           {mode === "login" && (
             <Link
               href="/reset-password"
-              className="text-sm text-primary hover:underline font-medium"
+              className="text-sm text-[#00E5FF] hover:underline font-medium"
             >
               Forgot password?
             </Link>
@@ -358,12 +358,12 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
             : "Create Account"}
       </Button>
       {mode === "register" && (
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-xs text-[#6b6d8f] text-center">
           After Create Account, check your inbox and click the confirmation link to sign in.
         </p>
       )}
       {mode === "login" && (
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-xs text-[#6b6d8f] text-center">
           Sign in with the email and password you registered with.
         </p>
       )}

@@ -13,7 +13,7 @@ const GAMES = [
 ];
 
 const BADGE_STYLES = {
-  HOT: "bg-gradient-to-r from-red-600 to-orange-500 text-white badge-hot",
+  HOT: "bg-gradient-to-r from-red-600 to-[#0099cc] text-white badge-hot",
   POPULAR: "bg-gradient-to-r from-blue-600 to-cyan-500 text-white",
   NEW: "bg-gradient-to-r from-green-600 to-emerald-400 text-white",
 };

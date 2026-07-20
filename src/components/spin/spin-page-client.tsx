@@ -89,10 +89,10 @@ export function SpinPageClient({
                 <Coins className="h-5 w-5 text-amber-400" />
                 <h3 className="font-semibold text-amber-400">Spin More, Win More!</h3>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[#6b6d8f]">
                 Upgrade your VIP tier for extra daily spins and bigger winning chances.
               </p>
-              <Link href="/vip" className="inline-flex items-center gap-1 mt-3 text-sm text-orange-400 hover:text-orange-300 font-medium">
+              <Link href="/vip" className="inline-flex items-center gap-1 mt-3 text-sm text-[#00E5FF] hover:text-[#7af5ff] font-medium">
                 View VIP Plans →
               </Link>
             </div>
@@ -102,7 +102,7 @@ export function SpinPageClient({
                 <Sparkles className="h-5 w-5 text-purple-300" />
                 <h3 className="font-semibold text-purple-200">Daily Free Spin</h3>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[#6b6d8f]">
                 Free spins unlock again 24 hours after your last spin. Come back daily to keep your streak going!
               </p>
             </div>
@@ -137,17 +137,17 @@ export function SpinPageClient({
                 </h3>
               </div>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                  <span className="text-muted-foreground">Daily Spins:</span>
+                <div className="flex justify-between items-center py-2 border-b border-[rgba(0, 229, 255,0.07)]">
+                  <span className="text-[#6b6d8f]">Daily Spins:</span>
                   <span className="text-purple-400 font-bold text-lg">{dailyLimit}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-muted-foreground">Remaining Spins:</span>
+                  <span className="text-[#6b6d8f]">Remaining Spins:</span>
                   <span className="text-amber-400 font-bold text-lg">{remaining}</span>
                 </div>
                 {remaining <= 0 && cooldownMs && cooldownMs > 0 && (
-                  <div className="flex justify-between items-center py-2 border-t border-white/5">
-                    <span className="text-muted-foreground">Next spin in:</span>
+                  <div className="flex justify-between items-center py-2 border-t border-[rgba(0, 229, 255,0.07)]">
+                    <span className="text-[#6b6d8f]">Next spin in:</span>
                     <span className="text-purple-300 font-bold">{formatCountdown(cooldownMs)}</span>
                   </div>
                 )}
@@ -161,14 +161,14 @@ export function SpinPageClient({
                   To Get a Spin
                 </h3>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-[#6b6d8f] leading-relaxed">
                 Each spin unlocks 24 hours after your previous one. Higher VIP tiers get more spins
                 per 24-hour window!
               </p>
               {!isLoggedIn && (
                 <Link
                   href="/register"
-                  className="mt-4 block text-center py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 text-sm font-bold hover:opacity-90"
+                  className="mt-4 block text-center py-2.5 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#0099cc] text-gray-900 text-sm font-bold hover:opacity-90"
                 >
                   Sign Up Free
                 </Link>
@@ -178,7 +178,7 @@ export function SpinPageClient({
         </div>
 
         {showHistory && (
-          <div className="mt-10 pt-8 border-t border-white/10">
+          <div className="mt-10 pt-8 border-t border-[rgba(0, 229, 255,0.1)]">
             <SpinHistory history={history} />
           </div>
         )}

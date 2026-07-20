@@ -539,15 +539,52 @@ export function GameWalletLoadSection({
   }
 
   return (
-    <section className="rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/40 to-[#161616] p-5 space-y-5">
-      <div className="flex items-center gap-2">
-        <Zap className="h-5 w-5 text-emerald-400" />
-        <h2 className="font-bold text-white">{game.name} Account</h2>
+    <section
+      className="relative overflow-hidden rounded-2xl p-5 space-y-5"
+      style={{
+        background: "linear-gradient(160deg, rgba(0,229,255,0.08) 0%, rgba(8,8,24,0.98) 35%, rgba(255,45,120,0.06) 100%)",
+        border: "1px solid rgba(0,229,255,0.28)",
+        boxShadow: "0 0 40px rgba(0,229,255,0.08), inset 0 1px 0 rgba(0,229,255,0.1)",
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,229,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,1) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+        }}
+      />
+
+      <div className="relative z-10 flex items-center gap-2">
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-lg"
+          style={{
+            background: "rgba(0,229,255,0.12)",
+            border: "1px solid rgba(0,229,255,0.35)",
+            boxShadow: "0 0 16px rgba(0,229,255,0.25)",
+          }}
+        >
+          <Zap className="h-4 w-4 text-[#00E5FF]" />
+        </div>
+        <h2 className="font-black tracking-wide text-white">
+          {game.name}{" "}
+          <span className="bg-gradient-to-r from-[#7af5ff] to-[#ff2d78] bg-clip-text text-transparent">
+            Account
+          </span>
+        </h2>
       </div>
 
       {/* Your Account — like Game Vault */}
-      <div className="rounded-xl border border-white/10 bg-black/30 p-4 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <div
+        className="relative z-10 rounded-xl p-4 space-y-3"
+        style={{
+          background: "rgba(5,5,16,0.65)",
+          border: "1px solid rgba(0,229,255,0.18)",
+          boxShadow: "inset 0 0 24px rgba(0,229,255,0.04)",
+        }}
+      >
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00E5FF]">
           Your Account
         </p>
 
@@ -560,13 +597,13 @@ export function GameWalletLoadSection({
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-muted-foreground">Username</span>
+                <span className="text-[#6b6d8f]">Username</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-white">{savedAccount.game_username}</span>
                   <button
                     type="button"
                     onClick={() => copyText(savedAccount.game_username, "Username")}
-                    className="text-muted-foreground hover:text-white"
+                    className="text-[#6b6d8f] hover:text-white"
                   >
                     <Copy className="h-3.5 w-3.5" />
                   </button>
@@ -574,7 +611,7 @@ export function GameWalletLoadSection({
               </div>
               {savedAccount.game_password && (
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted-foreground">Password</span>
+                  <span className="text-[#6b6d8f]">Password</span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-white">
                       {showPassword ? savedAccount.game_password : "••••••••"}
@@ -582,22 +619,22 @@ export function GameWalletLoadSection({
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="text-muted-foreground hover:text-white"
+                      className="text-[#6b6d8f] hover:text-white"
                     >
                       {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </button>
                     <button
                       type="button"
                       onClick={() => copyText(savedAccount.game_password!, "Password")}
-                      className="text-muted-foreground hover:text-white"
+                      className="text-[#6b6d8f] hover:text-white"
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
               )}
-              <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5 mt-1">
-                <span className="text-muted-foreground">Last known balance</span>
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-[rgba(0, 229, 255,0.07)] mt-1">
+                <span className="text-[#6b6d8f]">Last known balance</span>
                 <span className="font-semibold text-white">
                   {lastKnownBalance !== null ? `$${lastKnownBalance.toFixed(2)}` : "—"}
                 </span>
@@ -608,7 +645,11 @@ export function GameWalletLoadSection({
               type="button"
               onClick={handleCheckBalance}
               disabled={checkingBalance || pendingCheck}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-[#7af5ff] transition-all hover:shadow-[0_0_20px_rgba(0,229,255,0.25)] disabled:opacity-50"
+              style={{
+                border: "1px solid rgba(0,229,255,0.35)",
+                background: "rgba(0,229,255,0.08)",
+              }}
             >
               {checkingBalance || pendingCheck ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -620,7 +661,7 @@ export function GameWalletLoadSection({
           </>
         ) : (
           <>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#6b6d8f]">
               No account yet. Use <strong className="text-white">Create Account</strong> below or
               the button in this panel — free, no wallet charge.
             </p>
@@ -644,7 +685,7 @@ export function GameWalletLoadSection({
               minLength={7}
               maxLength={maxUsernameLenForGame(game.slug)}
               autoComplete="off"
-              className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-muted-foreground"
+              className="w-full rounded-lg border border-[rgba(0, 229, 255,0.1)] bg-black/30 px-3 py-2 text-sm text-white placeholder:text-[#6b6d8f]"
             />
             <input
               type="text"
@@ -656,9 +697,9 @@ export function GameWalletLoadSection({
               minLength={7}
               maxLength={13}
               autoComplete="off"
-              className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-muted-foreground"
+              className="w-full rounded-lg border border-[rgba(0, 229, 255,0.1)] bg-black/30 px-3 py-2 text-sm text-white placeholder:text-[#6b6d8f]"
             />
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[11px] text-[#6b6d8f]">
               7–13 characters each, letters and numbers only (no symbols). If the name is taken, we&apos;ll
               adjust it to stay unique.
             </p>
@@ -667,7 +708,7 @@ export function GameWalletLoadSection({
                 type="button"
                 onClick={handleCreateCustom}
                 disabled={creating || pendingCreate}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+                className="cyber-btn-primary flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black uppercase tracking-wide disabled:opacity-50"
               >
                 {creating || pendingCreate ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -680,7 +721,7 @@ export function GameWalletLoadSection({
                 type="button"
                 onClick={() => setCustomMode(false)}
                 disabled={creating || pendingCreate}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
+                className="cyber-btn-ghost flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -693,7 +734,7 @@ export function GameWalletLoadSection({
               type="button"
               onClick={() => handleCreateAccount()}
               disabled={creating || pendingCreate}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+              className="cyber-btn-primary flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide disabled:opacity-50"
             >
               {creating || pendingCreate ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -707,7 +748,7 @@ export function GameWalletLoadSection({
               onClick={() => setCustomMode(true)}
               disabled={creating || pendingCreate}
               title="Choose your own username & password"
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
+              className="cyber-btn-ghost flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-bold disabled:opacity-50"
             >
               <Pencil className="h-4 w-4" />
               <span className="hidden sm:inline">Own login</span>
@@ -719,7 +760,7 @@ export function GameWalletLoadSection({
               type="button"
               onClick={() => handleCreateAccount()}
               disabled={creating || pendingCreate}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+              className="cyber-btn-primary flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide disabled:opacity-50"
             >
               {creating || pendingCreate ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -733,7 +774,7 @@ export function GameWalletLoadSection({
               onClick={() => setCustomMode(true)}
               disabled={creating || pendingCreate}
               title="Choose your own username & password"
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
+              className="cyber-btn-ghost flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-bold disabled:opacity-50"
             >
               <Pencil className="h-4 w-4" />
               <span className="hidden sm:inline">Own login</span>
@@ -742,7 +783,7 @@ export function GameWalletLoadSection({
         )}
 
         {hasSavedAccount && !customMode && (
-          <p className="text-[11px] text-muted-foreground text-center">
+          <p className="text-[11px] text-[#6b6d8f] text-center">
             One account per game — Replace creates a new login on the game panel.
           </p>
         )}
@@ -784,32 +825,39 @@ export function GameWalletLoadSection({
         )}
 
         {!hasSavedAccount && !customMode && previewAccount && (
-          <p className="text-xs text-muted-foreground text-center">
-            Will be created as <span className="font-mono text-emerald-300">{previewAccount}</span>{" "}
+          <p className="text-xs text-[#6b6d8f] text-center">
+            Will be created as <span className="font-mono text-[#7af5ff]">{previewAccount}</span>{" "}
             (same password)
           </p>
         )}
 
         {hasSavedAccount && !customMode && previewAccount && usesNumberedAccounts && (
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-[#6b6d8f] text-center">
             Replace will create{" "}
-            <span className="font-mono text-emerald-300">{previewAccount}</span> (or the next free
+            <span className="font-mono text-[#7af5ff]">{previewAccount}</span> (or the next free
             number if that is taken)
           </p>
         )}
       </div>
 
       {/* Load / Redeem */}
-      <div className="rounded-xl border border-orange-500/20 bg-black/20 p-4 sm:p-5 space-y-4">
+      <div
+        className="relative z-10 rounded-xl p-4 sm:p-5 space-y-4"
+        style={{
+          background: "rgba(5,5,16,0.7)",
+          border: "1px solid rgba(0,229,255,0.2)",
+          boxShadow: "inset 0 0 30px rgba(0,229,255,0.03)",
+        }}
+      >
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => setFundsTab("load")}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-xl py-3.5 sm:py-4 px-4 text-sm sm:text-base font-semibold border transition-colors",
+              "flex items-center justify-center gap-2 rounded-xl py-3.5 sm:py-4 px-4 text-sm sm:text-base font-black uppercase tracking-wide border transition-all",
               fundsTab === "load"
-                ? "border-orange-500/60 bg-gradient-to-r from-orange-500/25 to-red-500/15 text-orange-100 shadow-sm shadow-orange-500/10"
-                : "border-white/10 bg-[#2a2a2a] text-muted-foreground hover:border-white/20 hover:text-white"
+                ? "cyber-tab-load-active"
+                : "cyber-tab-inactive"
             )}
           >
             <ArrowDownCircle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
@@ -819,10 +867,10 @@ export function GameWalletLoadSection({
             type="button"
             onClick={() => setFundsTab("redeem")}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-xl py-3.5 sm:py-4 px-4 text-sm sm:text-base font-semibold border transition-colors",
+              "flex items-center justify-center gap-2 rounded-xl py-3.5 sm:py-4 px-4 text-sm sm:text-base font-black uppercase tracking-wide border transition-all",
               fundsTab === "redeem"
-                ? "border-amber-500/60 bg-gradient-to-r from-amber-500/25 to-orange-500/15 text-amber-100 shadow-sm shadow-amber-500/10"
-                : "border-white/10 bg-[#2a2a2a] text-muted-foreground hover:border-white/20 hover:text-white"
+                ? "cyber-tab-redeem-active"
+                : "cyber-tab-inactive"
             )}
           >
             <ArrowUpCircle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
@@ -830,25 +878,37 @@ export function GameWalletLoadSection({
           </button>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-[#242424]/80 px-4 py-3.5 sm:px-5 sm:py-4">
-          <span className="text-xs sm:text-sm text-muted-foreground">Total Deposit</span>
-          <p className="mt-1 text-xl sm:text-2xl font-bold text-white tabular-nums">
+        <div
+          className="rounded-xl px-4 py-3.5 sm:px-5 sm:py-4"
+          style={{
+            background: "linear-gradient(135deg, rgba(0,229,255,0.1), rgba(123,47,247,0.08))",
+            border: "1px solid rgba(0,229,255,0.28)",
+            boxShadow: "0 0 24px rgba(0,229,255,0.08)",
+          }}
+        >
+          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#00E5FF]">
+            Total Deposit
+          </span>
+          <p
+            className="mt-1 text-xl sm:text-2xl font-black text-white tabular-nums"
+            style={{ textShadow: "0 0 20px rgba(0,229,255,0.35)" }}
+          >
             ${walletBalance.toFixed(2)}
           </p>
         </div>
 
         {fundsTab === "load" ? (
           <>
-            <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#00E5FF]">
               Load Credits
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#6b6d8f]">
               Load from your Total Deposit balance into {game.name}.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-muted-foreground">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-[#00E5FF]">$</span>
                 <input
                   type="number"
                   min={WALLET_LOAD_LIMITS.min}
@@ -857,14 +917,14 @@ export function GameWalletLoadSection({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   disabled={!savedAccount}
-                  className="w-full rounded-xl border border-white/10 bg-black/30 pl-8 pr-4 py-3.5 sm:py-4 text-base text-white disabled:opacity-50"
+                  className="cyber-input w-full rounded-xl pl-8 pr-4 py-3.5 sm:py-4 text-base text-white disabled:opacity-50"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleLoad}
                 disabled={loading || pendingLoad || !savedAccount || available < WALLET_LOAD_LIMITS.min}
-                className="flex w-full sm:w-auto sm:min-w-[132px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3.5 sm:py-4 text-base font-bold text-black disabled:opacity-50 shrink-0"
+                className="cyber-btn-load flex w-full sm:w-auto sm:min-w-[132px] items-center justify-center gap-2 rounded-xl px-6 py-3.5 sm:py-4 text-sm font-black uppercase tracking-wide disabled:opacity-50 shrink-0"
               >
                 {loading || pendingLoad ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -876,15 +936,15 @@ export function GameWalletLoadSection({
             </div>
 
             {!savedAccount && (
-              <p className="text-sm text-amber-400/90">Create your account first, then load credits.</p>
+              <p className="text-sm text-[#ff2d78]">Create your account first, then load credits.</p>
             )}
           </>
         ) : (
           <>
-            <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#ff2d78]">
               Redeem Credits
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#6b6d8f]">
               Pull credits from your {game.name} account to your Deposit Redeem wallet.
             </p>
 
@@ -933,7 +993,7 @@ export function GameWalletLoadSection({
                 checked={redeemAll}
                 onChange={(e) => setRedeemAll(e.target.checked)}
                 disabled={!savedAccount}
-                className="h-4 w-4 rounded border-white/20"
+                className="h-4 w-4 rounded border-white/20 accent-[#ff2d78]"
               />
               Redeem all (zero out game account)
             </label>
@@ -941,7 +1001,7 @@ export function GameWalletLoadSection({
             {!redeemAll && (
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-muted-foreground">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base text-[#ff2d78]">$</span>
                   <input
                     type="number"
                     min={WALLET_LOAD_LIMITS.min}
@@ -950,7 +1010,7 @@ export function GameWalletLoadSection({
                     value={redeemAmount}
                     onChange={(e) => setRedeemAmount(e.target.value)}
                     disabled={!savedAccount}
-                    className="w-full rounded-xl border border-white/10 bg-black/30 pl-8 pr-4 py-3.5 sm:py-4 text-base text-white disabled:opacity-50"
+                    className="cyber-input w-full rounded-xl pl-8 pr-4 py-3.5 sm:py-4 text-base text-white disabled:opacity-50"
                   />
                 </div>
                 <button
@@ -964,7 +1024,7 @@ export function GameWalletLoadSection({
                     redeemBlocked ||
                     (redeemRulesActive && activeRedeemRollover!.maxRedeemRemaining <= 0)
                   }
-                  className="flex w-full sm:w-auto sm:min-w-[132px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 sm:py-4 text-base font-bold text-black disabled:opacity-50 shrink-0"
+                  className="cyber-btn-redeem flex w-full sm:w-auto sm:min-w-[132px] items-center justify-center gap-2 rounded-xl px-6 py-3.5 sm:py-4 text-sm font-black uppercase tracking-wide disabled:opacity-50 shrink-0"
                 >
                   {redeeming || pendingRedeem ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -988,7 +1048,7 @@ export function GameWalletLoadSection({
                   redeemBlocked ||
                   (redeemRulesActive && activeRedeemRollover!.maxRedeemRemaining <= 0)
                 }
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 sm:py-4 text-base font-bold text-black disabled:opacity-50"
+                className="cyber-btn-redeem w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 sm:py-4 text-sm font-black uppercase tracking-wide disabled:opacity-50"
               >
                 {redeeming || pendingRedeem ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -1000,15 +1060,15 @@ export function GameWalletLoadSection({
             )}
 
             {!savedAccount && (
-              <p className="text-sm text-amber-400/90">Create your account first, then redeem credits.</p>
+              <p className="text-sm text-[#ff2d78]">Create your account first, then redeem credits.</p>
             )}
           </>
         )}
       </div>
 
       {recentLoads.length > 0 && (
-        <div className="space-y-2 pt-2 border-t border-white/10">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="space-y-2 pt-2 border-t border-[rgba(0, 229, 255,0.1)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#6b6d8f]">
             Recent activity
           </p>
           {recentLoads.slice(0, 5).map((load) => (
@@ -1027,7 +1087,7 @@ export function GameWalletLoadSection({
                   {" · "}
                   {load.status}
                 </span>
-                <span className="text-muted-foreground shrink-0">
+                <span className="text-[#6b6d8f] shrink-0">
                   {formatRelativeTime(load.created_at)}
                 </span>
               </div>

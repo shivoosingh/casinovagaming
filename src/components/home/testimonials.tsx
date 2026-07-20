@@ -27,7 +27,7 @@ export function Testimonials({ reviews }: TestimonialsProps) {
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">
           What Our <span className="gradient-text">Players Say</span>
         </h2>
-        <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+        <p className="text-sm text-[#6b6d8f] max-w-xl mx-auto">
           Real reviews from our community — updated live when players share their experience.
         </p>
       </motion.div>
@@ -42,7 +42,7 @@ export function Testimonials({ reviews }: TestimonialsProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="rounded-xl p-5 bg-[#1e1e1e] border border-white/5 flex flex-col"
+                className="review-card-surface rounded-2xl p-5 flex flex-col"
               >
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex gap-1">
@@ -51,27 +51,27 @@ export function Testimonials({ reviews }: TestimonialsProps) {
                     ))}
                   </div>
                   {review.admin_liked && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#00E5FF] bg-[rgba(0, 229, 255,0.08)] px-2 py-0.5 rounded-full shrink-0">
                       <Heart className="h-3 w-3 fill-current" />
                       Team pick
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed flex-1">
+                <p className="text-sm text-[#6b6d8f] mb-4 leading-relaxed flex-1">
                   &ldquo;{review.comment}&rdquo;
                 </p>
 
                 {review.admin_comment && (
-                  <p className="text-xs text-orange-200/70 mb-4 leading-relaxed border-l-2 border-orange-500/40 pl-3">
-                    <span className="font-semibold text-orange-300">Spinora Team: </span>
+                  <p className="text-xs text-orange-200/70 mb-4 leading-relaxed border-l-2 border-[rgba(0, 229, 255,0.25)] pl-3">
+                    <span className="font-semibold text-[#7af5ff]">Spinora Team: </span>
                     {review.admin_comment}
                   </p>
                 )}
 
                 <div>
                   <p className="font-semibold text-sm">{formatReviewDisplayName(review)}</p>
-                  <p className="text-xs text-orange-400">{formatReviewVipTier(review)}</p>
+                  <p className="text-xs text-[#00E5FF]">{formatReviewVipTier(review)}</p>
                 </div>
               </motion.article>
             ))}
@@ -84,8 +84,8 @@ export function Testimonials({ reviews }: TestimonialsProps) {
           </div>
         </>
       ) : (
-        <div className="text-center rounded-xl border border-white/5 bg-[#1e1e1e] py-12 px-6">
-          <p className="text-muted-foreground mb-4">
+        <div className="text-center review-card-surface rounded-2xl py-12 px-6">
+          <p className="text-[#6b6d8f] mb-4">
             No player reviews yet. Be the first to share your Spinora experience!
           </p>
           <Button asChild>

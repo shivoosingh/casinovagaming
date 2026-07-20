@@ -36,14 +36,14 @@ export function VipPageClient() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-muted-foreground">Current Tier</p>
+              <p className="text-sm text-[#6b6d8f]">Current Tier</p>
               <p className="text-3xl font-bold capitalize">{profile.vip_tier}</p>
             </div>
             <Badge className="text-lg px-4 py-2">{profile.vip_points} pts</Badge>
           </div>
           <Progress value={Math.min(progress, 100)} className="mb-2" />
           {nextTier && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#6b6d8f]">
               {nextTier.minPoints - profile.vip_points} points until {nextTier.name}
             </p>
           )}
@@ -67,7 +67,7 @@ export function VipPageClient() {
                 <ul className="space-y-2">
                   {tier.benefits.map((b) => (
                     <li key={b} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-primary" /> {b}
+                      <Check className="h-4 w-4 text-[#00E5FF]" /> {b}
                     </li>
                   ))}
                 </ul>

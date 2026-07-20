@@ -1,7 +1,7 @@
 export default function RootLoading() {
   return (
-    <div className="min-h-screen bg-[#121212] flex flex-col">
-      <div className="h-14 border-b border-white/5 bg-[#121212]/95" />
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+      <div className="h-14 border-b border-[rgba(201,168,76,0.08)] bg-[#0a0a0f]/95" />
       <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6 flex gap-6">
         <div className="hidden lg:block w-64 shrink-0 space-y-3">
           <div className="h-10 rounded-lg bg-white/[0.04] animate-pulse" />

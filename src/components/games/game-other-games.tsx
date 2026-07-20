@@ -17,7 +17,7 @@ export function GameOtherGames({ games }: GameOtherGamesProps) {
           <Link
             key={game.id}
             href={`/games/${game.slug}`}
-            className="group flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-[#1a1a1a] p-2.5 hover:border-orange-500/40 transition-colors"
+            className="group flex flex-col items-center gap-2 rounded-xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] p-2.5 hover:border-[rgba(0, 229, 255,0.25)] transition-colors"
           >
             <div className="relative w-full aspect-square rounded-lg overflow-hidden">
               <Image

@@ -57,8 +57,8 @@ export function SocialLinks({ className = "" }: { className?: string }) {
           href={item.href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Follow Spinora on ${item.name}`}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground border border-border hover:text-white hover:border-primary hover:bg-primary/20 transition-all duration-200"
+          aria-label={`Follow Casinova Gaming on ${item.name}`}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(255,255,255,0.04)] text-[#6b6d8f] border border-[rgba(255,255,255,0.08)] hover:text-[#c9a84c] hover:border-[rgba(201,168,76,0.4)] hover:bg-[rgba(201,168,76,0.08)] transition-all duration-200"
         >
           {item.icon}
         </a>

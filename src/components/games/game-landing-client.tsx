@@ -230,13 +230,13 @@ export function GameLandingClient({
       )}
 
       {/* Hero banner + game identity */}
-      <section className="relative overflow-hidden rounded-2xl border border-white/10">
+      <section className="relative overflow-hidden rounded-2xl border border-[rgba(0, 229, 255,0.1)]">
         <div className={cn("absolute inset-0 bg-gradient-to-br opacity-90", game.gradient)} />
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay"
           style={{ backgroundImage: `url(${game.image})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/60 to-transparent" />
 
         <div className="relative p-5 sm:p-6 flex items-end gap-4 min-h-[140px]">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl">
@@ -260,11 +260,11 @@ export function GameLandingClient({
       {walletSection}
 
       {/* Recent winners */}
-      <section className="rounded-2xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-5">
+      <section className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#0d0d1f] p-4 sm:p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-400" />
-            <h2 className="font-bold text-white">Recent winners</h2>
+            <Trophy className="h-5 w-5 text-[#c9a84c]" />
+            <h2 className="font-bold text-[#f0f0f5]">Recent winners</h2>
           </div>
           <LiveBadge />
         </div>
@@ -274,12 +274,12 @@ export function GameLandingClient({
             <>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-white">{winner.username}</span>
+                  <span className="font-bold text-[#f0f0f5]">{winner.username}</span>
                   {winner.verified && (
                     <BadgeCheck className="h-4 w-4 text-sky-400 shrink-0" aria-label="Verified" />
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <p className="text-xs text-[#6b6d8f] flex items-center gap-1 mt-1">
                   <MapPin className="h-3 w-3 shrink-0" />
                   from {winner.state}
                 </p>
@@ -289,7 +289,7 @@ export function GameLandingClient({
               </span>
             </>
           ) : (
-            <div className="w-full h-10 rounded-lg bg-white/5 animate-pulse" aria-hidden />
+            <div className="w-full h-10 rounded-lg bg-[rgba(255,255,255,0.03)] animate-pulse" aria-hidden />
           )}
         </div>
 
@@ -297,7 +297,7 @@ export function GameLandingClient({
         <button
           type="button"
           onClick={toggleWinnersList}
-          className="w-full text-center text-xs text-orange-400 hover:text-orange-300 mt-3 flex items-center justify-center gap-1 transition-colors"
+          className="w-full text-center text-xs text-[#c9a84c] hover:text-[#f0d080] mt-3 flex items-center justify-center gap-1 transition-colors"
         >
           {showAllWinners ? (
             <>
@@ -316,16 +316,16 @@ export function GameLandingClient({
             {extraWinners.map((w, i) => (
               <li
                 key={`${w.username}-${i}`}
-                className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-[#242424]/80 px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.03)] px-3 py-2.5"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-white truncate">{w.username}</span>
+                    <span className="text-sm font-semibold text-[#f0f0f5] truncate">{w.username}</span>
                     {w.verified && (
                       <BadgeCheck className="h-3.5 w-3.5 text-sky-400 shrink-0" aria-label="Verified" />
                     )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                  <p className="text-[10px] text-[#6b6d8f] flex items-center gap-1 mt-0.5">
                     <MapPin className="h-2.5 w-2.5 shrink-0" />
                     {w.state}
                   </p>
@@ -338,37 +338,37 @@ export function GameLandingClient({
       </section>
 
       {/* Bonuses & Rules */}
-      <section className="rounded-2xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-5">
+      <section className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#0d0d1f] p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="h-5 w-5 text-violet-400" />
-          <h2 className="font-bold text-white">Bonuses &amp; Rules</h2>
+          <h2 className="font-bold text-[#f0f0f5]">Bonuses &amp; Rules</h2>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="rounded-xl bg-[#242424] border border-white/5 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">First Time Bonus</p>
+          <div className="rounded-xl bg-[rgba(16,185,129,0.06)] border border-emerald-500/20 p-4 text-center">
+            <p className="text-xs text-[#6b6d8f] mb-1">First Time Bonus</p>
             <p className="text-3xl font-bold text-emerald-400">{rules.firstTimeBonus}%</p>
           </div>
-          <div className="rounded-xl bg-[#242424] border border-white/5 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Regular Bonus</p>
+          <div className="rounded-xl bg-[rgba(13,148,136,0.06)] border border-teal-500/20 p-4 text-center">
+            <p className="text-xs text-[#6b6d8f] mb-1">Regular Bonus</p>
             <p className="text-3xl font-bold text-teal-400">{rules.regularBonus}%</p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white">
+          <span className="inline-flex items-center rounded-full border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.08)] px-3 py-1.5 text-xs font-medium text-[#c9a84c]">
             Load: ${rules.minDeposit} – ${rules.maxDeposit}
           </span>
-          <span className="inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-medium text-violet-200">
+          <span className="inline-flex items-center rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-medium text-violet-300">
             Redeem: {rules.redeemMin}x – {rules.redeemMax}x
           </span>
         </div>
       </section>
 
       {/* SEO bio */}
-      <section className="rounded-2xl border border-white/5 bg-[#161616] p-4 sm:p-5">
+      <section className="rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#0d0d12] p-4 sm:p-5">
         <h2 className="sr-only">About {game.name}</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">{game.bio}</p>
+        <p className="text-sm text-[#6b6d8f] leading-relaxed">{game.bio}</p>
       </section>
 
       {/* Create Account — only when user has no game login yet */}
@@ -380,8 +380,8 @@ export function GameLandingClient({
             className={cn(
               "w-full flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold transition-opacity shadow-lg",
               game.upcoming
-                ? "text-white/80 bg-[#2a2a2a] border border-white/10 cursor-not-allowed opacity-80"
-                : "text-black bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 hover:opacity-95 shadow-orange-500/20"
+                ? "text-[#6b6d8f] bg-[#13131a] border border-[rgba(255,255,255,0.07)] cursor-not-allowed opacity-80"
+                : "text-[#0a0a0f] bg-gradient-to-b from-[#d4ae52] to-[#a07830] hover:opacity-95 shadow-[rgba(201,168,76,0.2)]"
             )}
           >
             <UserPlus className="h-5 w-5" />
@@ -394,7 +394,7 @@ export function GameLandingClient({
             href={game.downloadUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold text-white bg-[#2a2a2a] border border-white/10 hover:border-white/20 hover:bg-[#333] transition-colors"
+            className="flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold text-[#f0f0f5] bg-[#13131a] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] hover:bg-[#16161e] transition-colors"
           >
             <Download className="h-4 w-4" />
             Download App
@@ -402,7 +402,7 @@ export function GameLandingClient({
           <button
             type="button"
             onClick={handleHowItWorks}
-            className="flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold text-white bg-[#2a2a2a] border border-white/10 hover:border-white/20 hover:bg-[#333] transition-colors"
+            className="flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold text-[#f0f0f5] bg-[#13131a] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] hover:bg-[#16161e] transition-colors"
           >
             <Info className="h-4 w-4" />
             How it works
@@ -416,58 +416,58 @@ export function GameLandingClient({
       {showHowItWorks && (
         <div
           ref={howItWorksRef}
-          className="rounded-2xl border border-orange-500/20 bg-[#1a1a1a] p-5 space-y-4 scroll-mt-24"
+          className="rounded-2xl border border-[rgba(201,168,76,0.2)] bg-[#0d0d1f] p-5 space-y-4 scroll-mt-24"
         >
-          <h3 className="font-bold text-white">How to get started</h3>
+          <h3 className="font-bold text-[#f0f0f5]">How to get started</h3>
           {walletLoadEnabled ? (
-            <ol className="space-y-3 text-sm text-muted-foreground">
+            <ol className="space-y-3 text-sm text-[#6b6d8f]">
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">1</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">1</span>
                 <span>
-                  Tap <strong className="text-white">Create Account</strong> to open your {game.name} panel.
+                  Tap <strong className="text-[#f0f0f5]">Create Account</strong> to open your {game.name} panel.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">2</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">2</span>
                 <span>
                   In the panel, create your game login — username and password appear instantly when ready.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">3</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">3</span>
                 <span>
-                  Download the app, sign in with your credentials, then use <strong className="text-white">Load</strong> to move Spinora wallet credits into {game.name}.
+                  Download the app, sign in with your credentials, then use <strong className="text-[#f0f0f5]">Load</strong> to move Casinova Gaming wallet credits into {game.name}.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">4</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">4</span>
                 <span>
-                  Need more Spinora balance? Use the <strong className="text-white">Deposit</strong> section below for PayPal, Chime, Cash App, Bitcoin, or Venmo.
+                  Need more Casinova Gaming balance? Use the <strong className="text-[#f0f0f5]">Deposit</strong> section below for PayPal, Chime, Cash App, Bitcoin, or Venmo.
                 </span>
               </li>
             </ol>
           ) : (
-            <ol className="space-y-3 text-sm text-muted-foreground">
+            <ol className="space-y-3 text-sm text-[#6b6d8f]">
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">1</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">1</span>
                 <span>
-                  Tap <strong className="text-white">Create Account</strong> to open your {game.name} panel.
+                  Tap <strong className="text-[#f0f0f5]">Create Account</strong> to open your {game.name} panel.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">2</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">2</span>
                 <span>
                   Download the app with the button above, then use your login from the panel.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">3</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">3</span>
                 <span>
-                  Use the <strong className="text-white">Deposit</strong> section to load funds — pick PayPal, Chime, Cash App, Bitcoin, or Venmo and upload your payment screenshot.
+                  Use the <strong className="text-[#f0f0f5]">Deposit</strong> section to load funds — pick PayPal, Chime, Cash App, Bitcoin, or Venmo and upload your payment screenshot.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold">4</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">4</span>
                 <span>
                   Redeem at {rules.redeemMin}x–{rules.redeemMax}x after loading from Total Deposit.
                 </span>

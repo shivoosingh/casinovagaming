@@ -127,8 +127,8 @@ function QuickChatPanel({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden bg-[#121212]">
-      <div className="flex items-center gap-2 px-3 py-3 border-b border-white/10 bg-[#141414] shrink-0 safe-area-top">
+    <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden bg-[#0a0a0f]">
+      <div className="flex items-center gap-2 px-3 py-3 border-b border-[rgba(201,168,76,0.1)] bg-[#0d0d14] shrink-0 safe-area-top">
         {isMobile && (
           <Button
             variant="ghost"
@@ -140,23 +140,23 @@ function QuickChatPanel({
             <ArrowLeft className="h-4 w-4" />
           </Button>
         )}
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center shrink-0">
-          <Headphones className="h-4 w-4 text-white" />
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a1020] to-[#0f1a10] border border-[rgba(201,168,76,0.25)] flex items-center justify-center shrink-0">
+          <Headphones className="h-4 w-4 text-[#c9a84c]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">Spinora Support</p>
+          <p className="text-sm font-semibold text-white truncate">Casinova Support</p>
           <p className="text-[10px] text-emerald-300">Live chat</p>
         </div>
         <Link
           href={`/dashboard/messages?conversation=${conversationId}`}
-          className="text-[10px] font-medium text-orange-400 hover:text-orange-300 px-2 shrink-0"
+          className="text-[10px] font-medium text-[#c9a84c] hover:text-[#f0d080] px-2 shrink-0"
         >
           Full view
         </Link>
         <button
           type="button"
           onClick={handleClose}
-          className="p-2 rounded-lg hover:bg-white/10 text-muted-foreground shrink-0"
+          className="p-2 rounded-lg hover:bg-[rgba(0, 229, 255,0.08)] text-[#6b6d8f] shrink-0"
           aria-label={isMobile ? "Close chat" : "Minimize chat"}
         >
           {isMobile ? <X className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
@@ -166,12 +166,12 @@ function QuickChatPanel({
       <div
         ref={scrollRef}
         onScroll={onScrollMessages}
-        className={cn(CHAT_SCROLL_CLASS, "flex-1 min-h-0 p-3 space-y-2 bg-[#0f0f0f]")}
+        className={cn(CHAT_SCROLL_CLASS, "flex-1 min-h-0 p-3 space-y-2 bg-[#0a0a1e]")}
       >
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <MessageCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-xs text-muted-foreground">Say hello — we reply fast.</p>
+            <MessageCircle className="h-8 w-8 text-[#6b6d8f] mx-auto mb-2" />
+            <p className="text-xs text-[#6b6d8f]">Say hello — we reply fast.</p>
           </div>
         ) : (
           messages.map((msg) => {
@@ -182,8 +182,8 @@ function QuickChatPanel({
                   className={cn(
                     "max-w-[85%] rounded-2xl px-3 py-2 text-xs break-words",
                     isOwn
-                      ? "gradient-bg text-white rounded-br-md"
-                      : "bg-[#1e1e1e] border border-white/5 rounded-bl-md"
+                      ? "bg-gradient-to-b from-[#d4ae52] to-[#a07830] text-[#0a0a0f] rounded-br-md"
+                      : "bg-[#13131a] border border-[rgba(255,255,255,0.06)] text-[#f0f0f5] rounded-bl-md"
                   )}
                 >
                   <ChatMessageContent message={msg} />
@@ -201,7 +201,7 @@ function QuickChatPanel({
         onSend={handleSend}
         loading={loading}
         placeholder="Reply..."
-        className="bg-[#121212] border-white/10 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        className="bg-[#050510] border-[rgba(0, 229, 255,0.1)] shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       />
     </div>
   );
@@ -230,7 +230,7 @@ export function UserQuickChat({ open, conversationId, userId, onClose }: UserQui
   }
 
   return (
-    <div className="fixed bottom-[5.5rem] right-6 z-[140] w-[min(100vw-2rem,22rem)] h-[min(70vh,28rem)] rounded-2xl border border-white/10 bg-[#121212] shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed bottom-[5.5rem] right-6 z-[140] w-[min(100vw-2rem,22rem)] h-[min(70vh,28rem)] rounded-2xl border border-[rgba(201,168,76,0.15)] bg-[#0a0a0f] shadow-2xl shadow-black/60 flex flex-col overflow-hidden">
       {panel}
     </div>
   );

@@ -7,4 +7,4 @@ export const CHAT_PAGE_SHELL_CLASS =
   "flex flex-col min-h-0 h-[calc(100dvh-11rem)] sm:h-[calc(100dvh-10rem)] lg:h-[calc(100vh-7rem)]";
 
 export const CHAT_INBOX_CARD_CLASS =
-  "h-full min-h-0 flex flex-col overflow-hidden border-white/10 bg-[#161616]";
+  "h-full min-h-0 flex flex-col overflow-hidden border-[rgba(0, 229, 255,0.1)] bg-[#0a0a1e]";

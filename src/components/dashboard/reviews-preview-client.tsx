@@ -83,7 +83,7 @@ export function ReviewsPreviewClient() {
           Community Reviews
         </CardTitle>
         {stats.count > 0 && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-[#6b6d8f]">
             <StarRating value={Math.round(stats.average)} readonly size="sm" />
             <span>
               {stats.average} ({stats.count})
@@ -98,7 +98,7 @@ export function ReviewsPreviewClient() {
               {featured.map((review) => (
                 <div
                   key={review.id}
-                  className="p-3 rounded-lg bg-muted/50 border border-white/5"
+                  className="p-3 rounded-lg bg-muted/50 border border-[rgba(0, 229, 255,0.07)]"
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
@@ -106,13 +106,13 @@ export function ReviewsPreviewClient() {
                         {previewName(review.author?.full_name, review.author?.email)}
                       </p>
                       {review.admin_liked && (
-                        <Heart className="h-3 w-3 text-orange-400 fill-orange-400 shrink-0" />
+                        <Heart className="h-3 w-3 text-[#00E5FF] fill-orange-400 shrink-0" />
                       )}
                     </div>
                     <StarRating value={review.rating} readonly size="sm" />
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{review.comment}</p>
-                  <p className="text-[10px] text-muted-foreground/70 mt-1">
+                  <p className="text-sm text-[#6b6d8f] line-clamp-2">{review.comment}</p>
+                  <p className="text-[10px] text-[#6b6d8f]/70 mt-1">
                     {formatRelativeTime(review.created_at)}
                   </p>
                 </div>
@@ -126,7 +126,7 @@ export function ReviewsPreviewClient() {
           </>
         ) : (
           <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-[#6b6d8f] mb-3">
               No reviews yet — be the first to share your experience!
             </p>
             <Button asChild>

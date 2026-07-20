@@ -76,7 +76,7 @@ export function DepositsPageClient() {
                   <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
                     <div>
                       <h3 className="font-semibold">{dep.game_name}</h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[#6b6d8f]">
                         {method?.label ?? dep.payment_method}
                       </p>
                     </div>
@@ -88,16 +88,16 @@ export function DepositsPageClient() {
                     </p>
                   )}
                   {dep.proof_url && <DepositProofImage path={dep.proof_url} />}
-                  <p className="text-xs text-muted-foreground mt-2">{formatDate(dep.created_at)}</p>
+                  <p className="text-xs text-[#6b6d8f] mt-2">{formatDate(dep.created_at)}</p>
                 </CardContent>
               </Card>
             );
           })
         ) : (
           <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
+            <CardContent className="p-8 text-center text-[#6b6d8f]">
               No deposits yet.{" "}
-              <Link href="/dashboard/deposit" className="text-orange-400 hover:underline">
+              <Link href="/dashboard/deposit" className="text-[#00E5FF] hover:underline">
                 Make a deposit
               </Link>
             </CardContent>

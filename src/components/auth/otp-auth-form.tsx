@@ -191,7 +191,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
 
     setLoading(false);
 
-    toast.success(mode === "register" ? "Account created! Welcome to Spinora." : "Welcome back!");
+    toast.success(mode === "register" ? "Account created! Welcome to Casinova Gaming." : "Welcome back!");
     router.push(redirect);
     router.refresh();
   }
@@ -199,9 +199,9 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
   if (step === "otp") {
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border border-orange-500/40 bg-orange-500/10 p-4 text-center">
-          <p className="text-base font-semibold text-orange-400">Enter your 6-digit code</p>
-          <p className="text-sm text-muted-foreground mt-1">
+        <div className="rounded-xl border border-[rgba(0, 229, 255,0.25)] bg-[rgba(0, 229, 255,0.08)] p-4 text-center">
+          <p className="text-base font-semibold text-[#00E5FF]">Enter your 6-digit code</p>
+          <p className="text-sm text-[#6b6d8f] mt-1">
             Sent to <strong className="text-foreground">{maskEmail(targetEmail)}</strong>
           </p>
         </div>
@@ -220,7 +220,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
               maxLength={6}
               className="text-center text-2xl tracking-[0.4em] h-14 font-mono"
             />
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-[#6b6d8f] text-center">
               Paste the code from your email — do not click the link
             </p>
           </div>
@@ -233,7 +233,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
               setStep("details");
               setOtp("");
             }}
-            className="w-full text-sm text-muted-foreground hover:text-primary"
+            className="w-full text-sm text-[#6b6d8f] hover:text-[#00E5FF]"
           >
             Back — send a new code
           </button>
@@ -258,7 +258,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
             placeholder="you@gmail.com or +91 98765 43210"
             className="font-mono text-base"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6b6d8f]">
             We&apos;ll send a 6-digit code to the Gmail/email linked to your account
           </p>
         </div>
@@ -295,7 +295,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
           placeholder={PHONE_EXAMPLES[2]}
           className="font-mono text-base"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-[#6b6d8f]">
           Include country code — any country works (e.g. {PHONE_EXAMPLES[1]})
         </p>
       </div>
@@ -311,7 +311,7 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
           required
           placeholder="you@gmail.com"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-[#6b6d8f]">
           Your login code will be sent to this email — not by SMS
         </p>
       </div>

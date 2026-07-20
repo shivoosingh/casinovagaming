@@ -11,7 +11,7 @@ interface SpinRecord {
 export function SpinHistory({ history }: { history: SpinRecord[] }) {
   if (history.length === 0) {
     return (
-      <p className="text-center text-muted-foreground py-8">
+      <p className="text-center text-[#6b6d8f] py-8">
         No spin history yet. Spin the wheel to get started!
       </p>
     );
@@ -21,7 +21,7 @@ export function SpinHistory({ history }: { history: SpinRecord[] }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-muted-foreground text-left">
+          <tr className="border-b border-border text-[#6b6d8f] text-left">
             <th className="pb-3 pr-4">Date & Time</th>
             <th className="pb-3 pr-4">Prize</th>
             <th className="pb-3 pr-4">Type</th>
@@ -33,8 +33,8 @@ export function SpinHistory({ history }: { history: SpinRecord[] }) {
             <tr key={spin.id} className="border-b border-border/50">
               <td className="py-3 pr-4">{formatDate(spin.created_at)}</td>
               <td className="py-3 pr-4 font-semibold text-amber-400">{spin.prize_label}</td>
-              <td className="py-3 pr-4 capitalize text-muted-foreground">{spin.prize_type}</td>
-              <td className="py-3 text-muted-foreground">{formatRelativeTime(spin.created_at)}</td>
+              <td className="py-3 pr-4 capitalize text-[#6b6d8f]">{spin.prize_type}</td>
+              <td className="py-3 text-[#6b6d8f]">{formatRelativeTime(spin.created_at)}</td>
             </tr>
           ))}
         </tbody>

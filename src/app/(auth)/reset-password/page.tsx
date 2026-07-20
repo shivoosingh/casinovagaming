@@ -51,7 +51,7 @@ export default function ResetPasswordPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-4 rounded-lg bg-white/5 border border-white/10 p-3">
+        <p className="text-sm text-[#6b6d8f] mb-4 rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(0, 229, 255,0.1)] p-3">
           Enter the email you used to register.
         </p>
         {!sent ? (
@@ -65,12 +65,12 @@ export default function ResetPasswordPage() {
             </Button>
           </form>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">
+          <p className="text-sm text-[#6b6d8f] text-center py-4">
             We&apos;ve sent a password reset link to <strong>{email}</strong>
           </p>
         )}
-        <p className="text-sm text-muted-foreground text-center mt-4">
-          <Link href="/login" className="text-primary hover:underline">Back to Login</Link>
+        <p className="text-sm text-[#6b6d8f] text-center mt-4">
+          <Link href="/login" className="text-[#00E5FF] hover:underline">Back to Login</Link>
         </p>
       </CardContent>
     </Card>

@@ -60,7 +60,7 @@ export function PhoneNumberInput({
               <span className="flex items-center gap-2">
                 <span>{country.flag}</span>
                 <span className="font-mono">{country.dial}</span>
-                <span className="text-muted-foreground truncate">{country.name}</span>
+                <span className="text-[#6b6d8f] truncate">{country.name}</span>
               </span>
             </SelectItem>
           ))}

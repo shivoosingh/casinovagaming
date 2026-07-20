@@ -22,7 +22,7 @@ function displayName(review: ReviewWithAuthor) {
   if (email && !email.endsWith("@phone.spinora.local")) {
     return email.split("@")[0];
   }
-  return "Spinora Player";
+  return "Casinova Player";
 }
 
 interface ReviewCardProps {
@@ -86,8 +86,8 @@ export function ReviewCard({ review, isAdmin, isOwn }: ReviewCardProps) {
       className={cn(
         "rounded-xl border p-4 sm:p-5 transition-colors",
         review.admin_liked
-          ? "border-orange-500/40 bg-orange-500/5"
-          : "border-white/10 bg-[#161616]"
+          ? "border-[rgba(0, 229, 255,0.25)] bg-orange-500/5"
+          : "border-[rgba(0, 229, 255,0.1)] bg-[#0a0a1e]"
       )}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -95,18 +95,18 @@ export function ReviewCard({ review, isAdmin, isOwn }: ReviewCardProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-white truncate">{displayName(review)}</p>
             {isOwn && (
-              <span className="text-[10px] uppercase tracking-wide text-orange-400 font-medium">
+              <span className="text-[10px] uppercase tracking-wide text-[#00E5FF] font-medium">
                 You
               </span>
             )}
             {review.admin_liked && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#00E5FF] bg-[rgba(0, 229, 255,0.08)] px-2 py-0.5 rounded-full">
                 <Heart className="h-3 w-3 fill-current" />
                 Team pick
               </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-[#6b6d8f] mt-0.5">
             {formatRelativeTime(review.created_at)}
           </p>
         </div>
@@ -118,12 +118,12 @@ export function ReviewCard({ review, isAdmin, isOwn }: ReviewCardProps) {
       </p>
 
       {review.admin_comment && (
-        <div className="mt-4 rounded-lg border border-orange-500/20 bg-orange-500/5 p-3 sm:p-4">
+        <div className="mt-4 rounded-lg border border-[rgba(0, 229, 255,0.15)] bg-orange-500/5 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Shield className="h-4 w-4 text-orange-400 shrink-0" />
-            <p className="text-xs font-semibold text-orange-300">Spinora Team</p>
+            <Shield className="h-4 w-4 text-[#00E5FF] shrink-0" />
+            <p className="text-xs font-semibold text-[#c9a84c]">Casinova Team</p>
             {review.admin_commented_at && (
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[10px] text-[#6b6d8f]">
                 · {formatRelativeTime(review.admin_commented_at)}
               </span>
             )}
@@ -135,9 +135,9 @@ export function ReviewCard({ review, isAdmin, isOwn }: ReviewCardProps) {
       )}
 
       {isAdmin && (
-        <div className="mt-4 pt-3 border-t border-white/10 space-y-3">
+        <div className="mt-4 pt-3 border-t border-[rgba(0, 229, 255,0.1)] space-y-3">
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+            <p className="text-xs font-semibold text-[#6b6d8f] flex items-center gap-1.5">
               <MessageSquare className="h-3.5 w-3.5" />
               Team reply on review
             </p>
@@ -147,7 +147,7 @@ export function ReviewCard({ review, isAdmin, isOwn }: ReviewCardProps) {
               placeholder="Thank the player or add a follow-up note — visible to everyone on this review..."
               rows={3}
               maxLength={1000}
-              className="bg-[#1e1e1e] border-white/10 resize-none text-sm"
+              className="bg-[#0d0d1f] border-[rgba(0, 229, 255,0.1)] resize-none text-sm"
             />
             <Button
               type="button"

@@ -26,7 +26,7 @@ export default async function AdminChatPage({
     <div className={CHAT_PAGE_SHELL_CLASS}>
       <div className="mb-4 sm:mb-6 shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold">Customer Chat</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
+        <p className="text-[#6b6d8f] text-sm sm:text-base">
           Search any user to message them, or reply to existing chats in real time.
         </p>
       </div>

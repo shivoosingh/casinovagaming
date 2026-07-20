@@ -72,7 +72,7 @@ export function AdminWalletGrant({ userId }: AdminWalletGrantProps) {
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-end gap-2">
         <div>
-          <label className="text-[10px] text-muted-foreground uppercase tracking-wide">Amount</label>
+          <label className="text-[10px] text-[#6b6d8f] uppercase tracking-wide">Amount</label>
           <Input
             type="number"
             min="0.01"
@@ -83,7 +83,7 @@ export function AdminWalletGrant({ userId }: AdminWalletGrantProps) {
           />
         </div>
         <div>
-          <label className="text-[10px] text-muted-foreground uppercase tracking-wide">Wallet</label>
+          <label className="text-[10px] text-[#6b6d8f] uppercase tracking-wide">Wallet</label>
           <select
             value={walletType}
             onChange={(e) => setWalletType(e.target.value as WalletType)}
@@ -109,7 +109,7 @@ export function AdminWalletGrant({ userId }: AdminWalletGrantProps) {
           {loading === "clear" ? "..." : "Clear all ($0)"}
         </Button>
       </div>
-      <p className="text-[10px] text-muted-foreground">
+      <p className="text-[10px] text-[#6b6d8f]">
         Reset $ removes the entered amount from the wallet. Clear all ($0) wipes the full balance.
       </p>
     </div>

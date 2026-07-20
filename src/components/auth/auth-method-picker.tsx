@@ -40,7 +40,7 @@ const METHODS: { id: AuthMethod; label: string; icon: React.ReactNode }[] = [
 
 export function AuthMethodPicker({ value, onChange }: AuthMethodPickerProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-white/5 border border-white/10">
+    <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(0, 229, 255,0.1)]">
       {METHODS.map((method) => (
         <button
           key={method.id}
@@ -51,8 +51,8 @@ export function AuthMethodPicker({ value, onChange }: AuthMethodPickerProps) {
             value === method.id
               ? method.id === "google"
                 ? "bg-red-600/90 text-white shadow-md"
-                : "bg-primary text-primary-foreground shadow-md"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                : "bg-primary text-[#00E5FF]-foreground shadow-md"
+              : "text-[#6b6d8f] hover:text-foreground hover:bg-[rgba(0, 229, 255,0.04)]"
           )}
         >
           {method.icon}

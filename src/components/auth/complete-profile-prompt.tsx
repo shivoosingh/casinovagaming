@@ -47,14 +47,14 @@ export function CompleteProfilePrompt({ email, fullName }: CompleteProfilePrompt
   }
 
   return (
-    <div className="mb-6 rounded-xl border border-orange-500/30 bg-orange-500/10 p-4">
+    <div className="mb-6 rounded-xl border border-[rgba(0, 229, 255,0.2)] bg-[rgba(0, 229, 255,0.08)] p-4">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0">
-          <Phone className="h-5 w-5 text-orange-400" />
+        <div className="w-10 h-10 rounded-full bg-[rgba(0, 229, 255,0.12)] flex items-center justify-center shrink-0">
+          <Phone className="h-5 w-5 text-[#00E5FF]" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-foreground">Add your phone number</p>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-[#6b6d8f] mt-0.5">
             Required for support and account recovery. Email on file: <strong>{email}</strong>
           </p>
           <form onSubmit={handleSubmit} className="mt-3 flex flex-col sm:flex-row gap-2">

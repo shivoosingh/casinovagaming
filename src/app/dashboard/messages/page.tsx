@@ -8,7 +8,7 @@ export default function MessagesPage() {
     <div className={CHAT_PAGE_SHELL_CLASS}>
       <div className="mb-6 shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold">Messages</h1>
-        <p className="text-muted-foreground">Chat with our support team — like Messenger</p>
+        <p className="text-[#6b6d8f]">Chat with our support team — like Messenger</p>
       </div>
 
       <div className="flex-1 min-h-0">

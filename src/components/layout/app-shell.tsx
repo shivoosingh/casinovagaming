@@ -4,12 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { HomeHeader } from "@/components/home/home-header";
+import { PromoBanner } from "@/components/home/promo-banner";
 import { Footer } from "@/components/layout/footer";
 import { cn } from "@/lib/utils";
 
 const MarqueeTicker = dynamic(
   () => import("@/components/ui/MarqueeTicker").then((m) => ({ default: m.MarqueeTicker })),
-  { ssr: false, loading: () => <div className="h-9 bg-[#0d0318] border-y border-purple-900/40" aria-hidden /> }
+  { ssr: false, loading: () => <div className="h-9 bg-[#0a0a1e] border-y border-[rgba(0, 229, 255,0.08)]" aria-hidden /> }
 );
 
 const DeferredCookieConsent = dynamic(
@@ -23,6 +24,7 @@ const DeferredCookieConsent = dynamic(
 interface AppShellProps {
   children: React.ReactNode;
   sidebar: React.ReactNode;
+  rightRail?: React.ReactNode;
   onSearchClick?: () => void;
   showFooter?: boolean;
   showTicker?: boolean;
@@ -33,6 +35,7 @@ interface AppShellProps {
 export function AppShell({
   children,
   sidebar,
+  rightRail,
   onSearchClick,
   showFooter = true,
   showTicker = true,
@@ -66,35 +69,36 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-foreground">
+    <div className="min-h-screen bg-[#09090F] text-[#F5F3FF]">
       <HomeHeader
         onSearchClick={onSearchClick ?? (() => {})}
         onMenuClick={() => setMobileOpen(true)}
         assumeLoggedIn={assumeLoggedIn}
       />
+      <PromoBanner />
       {showTicker && <MarqueeTicker />}
 
       {mobileOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 z-50 bg-black/70 mobile-drawer-backdrop"
+            className="lg:hidden fixed inset-0 z-50 bg-black/75 mobile-drawer-backdrop"
             onClick={closeMobile}
             aria-hidden
           />
           <aside
             className={cn(
               "lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[min(18rem,88vw)] overflow-y-auto",
-              "bg-[#121212] border-r border-white/10 shadow-2xl mobile-drawer-panel"
+              "bg-[#09090F] border-r border-violet-500/20 shadow-2xl mobile-drawer-panel"
             )}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            <div className="sticky top-0 z-10 flex items-center justify-end p-3 bg-[#121212]/95 backdrop-blur-sm border-b border-white/5">
+            <div className="sticky top-0 z-10 flex items-center justify-end border-b border-violet-500/15 bg-[#09090F]/95 p-3 backdrop-blur-sm">
               <button
                 type="button"
                 onClick={closeMobile}
-                className="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:text-white hover:bg-white/10 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-violet-500/10 hover:text-fuchsia-300"
                 aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
@@ -110,12 +114,17 @@ export function AppShell({
         </>
       )}
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-4 lg:gap-6 items-start">
-          <div className="hidden lg:block w-64 xl:w-72 shrink-0 sticky top-[4.5rem] self-start max-h-[calc(100vh-4.5rem)] overflow-y-auto scrollbar-hide">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+        <div className="flex items-start gap-4 lg:gap-5">
+          <div className="scrollbar-hide sticky top-[4.5rem] hidden max-h-[calc(100vh-4.5rem)] w-60 shrink-0 overflow-y-auto self-start lg:block xl:w-64">
             {sidebar}
           </div>
-          <main className="flex-1 min-w-0 pb-8">{children}</main>
+          <main className="min-w-0 flex-1 pb-8">{children}</main>
+          {rightRail && (
+            <div className="scrollbar-hide sticky top-[4.5rem] hidden max-h-[calc(100vh-4.5rem)] w-64 shrink-0 overflow-y-auto self-start xl:block">
+              {rightRail}
+            </div>
+          )}
         </div>
       </div>
 

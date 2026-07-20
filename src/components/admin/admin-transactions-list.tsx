@@ -62,7 +62,7 @@ export function AdminTransactionsList({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f] pointer-events-none" />
           <Input
             value={query}
             onChange={(e) => {
@@ -91,7 +91,7 @@ export function AdminTransactionsList({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#6b6d8f]">
           Showing {filtered.length} transaction{filtered.length === 1 ? "" : "s"}
           {totalStored != null ? ` · ${totalStored} stored in database` : ""}
           {query.trim() ? " (filtered)" : ""}
@@ -125,9 +125,9 @@ export function AdminTransactionsList({
                         {isDebit ? "Debit" : row.transaction_type === "credit" ? "Credit" : "Adjustment"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground break-all">{user?.email ?? "—"}</p>
+                    <p className="text-sm text-[#6b6d8f] break-all">{user?.email ?? "—"}</p>
                     <p className="text-sm mt-2">{transactionSummary(tx)}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-[#6b6d8f] mt-2">
                       {formatDate(row.created_at)} · {formatRelativeTime(row.created_at)}
                     </p>
                   </div>
@@ -140,8 +140,8 @@ export function AdminTransactionsList({
                     >
                       {formatTransactionAmount(Number(row.amount), tx.transaction_type)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">Transaction ID</p>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[140px]">
+                    <p className="text-xs text-[#6b6d8f] mt-1">Transaction ID</p>
+                    <p className="text-[10px] text-[#6b6d8f] font-mono truncate max-w-[140px]">
                       {row.id.slice(0, 8)}…
                     </p>
                   </div>
@@ -153,7 +153,7 @@ export function AdminTransactionsList({
 
         {filtered.length === 0 && (
           <Card className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#6b6d8f]">
               No transactions match your search
               {walletFilter !== "all" ? ` in ${walletTypeLabel(walletFilter as WalletType)}` : ""}.
             </p>

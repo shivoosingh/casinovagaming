@@ -11,7 +11,7 @@ export function HomeSection({ children, className, tinted = false }: HomeSection
   return (
     <section
       className={cn(
-        "rounded-2xl border border-white/5 p-6 sm:p-8 lg:p-10 w-full",
+        "rounded-2xl border border-[rgba(0, 229, 255,0.07)] p-6 sm:p-8 lg:p-10 w-full",
         tinted && "bg-[#181818]/80",
         className
       )}

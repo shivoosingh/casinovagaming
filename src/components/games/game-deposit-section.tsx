@@ -128,14 +128,14 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
   return (
     <section
       id={hideSectionAnchor ? undefined : "deposit"}
-      className="rounded-2xl border border-white/10 bg-[#1a1a1a] p-4 sm:p-5 scroll-mt-24"
+      className="rounded-2xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] p-4 sm:p-5 scroll-mt-24"
     >
       <div className="flex items-center gap-2 mb-4">
         <Banknote className="h-5 w-5 text-emerald-400" />
         <h2 className="font-bold text-white">Deposit</h2>
       </div>
 
-      <p className="text-xs text-muted-foreground mb-4">
+      <p className="text-xs text-[#6b6d8f] mb-4">
         Choose a payment method, send your deposit, then upload a screenshot. Our team will credit your{" "}
         {game.name} account after verification.
       </p>
@@ -152,8 +152,8 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
             className={cn(
               "rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors",
               selectedMethod === m.id
-                ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
-                : "bg-white/5 border-white/10 text-muted-foreground hover:text-white hover:border-white/20"
+                ? "bg-[rgba(0, 229, 255,0.12)] border-orange-500/50 text-[#7af5ff]"
+                : "bg-[rgba(255,255,255,0.03)] border-[rgba(0, 229, 255,0.1)] text-[#6b6d8f] hover:text-white hover:border-white/20"
             )}
           >
             {m.label}
@@ -168,7 +168,7 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
         )}
       >
         <div className="flex flex-col items-center w-full max-w-sm mx-auto">
-          <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl overflow-hidden border border-white/10 bg-white shadow-lg">
+          <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl overflow-hidden border border-[rgba(0, 229, 255,0.1)] bg-white shadow-lg">
             {!qrError ? (
               <Image
                 src={method.qrImage}
@@ -192,21 +192,21 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           <button
             type="button"
             onClick={handleDownloadQr}
-            className="mt-3 flex items-center gap-1.5 text-xs text-orange-400 hover:underline"
+            className="mt-3 flex items-center gap-1.5 text-xs text-[#00E5FF] hover:underline"
           >
             <Download className="h-3.5 w-3.5" />
             Download QR
           </button>
         </div>
 
-        <div className="flex flex-col items-center w-full max-w-sm mx-auto mt-5 pt-5 border-t border-white/10">
-          <p className="text-xs text-muted-foreground mb-1">{method.copyLabel}</p>
+        <div className="flex flex-col items-center w-full max-w-sm mx-auto mt-5 pt-5 border-t border-[rgba(0, 229, 255,0.1)]">
+          <p className="text-xs text-[#6b6d8f] mb-1">{method.copyLabel}</p>
           <p className="font-mono text-base sm:text-lg text-white break-all mb-4">{method.username}</p>
           <div className="flex flex-col gap-2 w-full">
             <button
               type="button"
               onClick={handleCopyUsername}
-              className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-[#2a2a2a] border border-white/10 hover:border-white/20 text-white transition-colors w-full"
+              className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-[#10102a] border border-[rgba(0, 229, 255,0.1)] hover:border-white/20 text-white transition-colors w-full"
             >
               <Copy className="h-4 w-4" />
               Copy {method.label} details
@@ -216,7 +216,7 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
                 href={method.payLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-orange-500/15 border border-orange-500/40 hover:border-orange-500/60 text-orange-200 transition-colors w-full"
+                className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-orange-500/15 border border-[rgba(0, 229, 255,0.25)] hover:border-orange-500/60 text-orange-200 transition-colors w-full"
               >
                 <ExternalLink className="h-4 w-4" />
                 Pay using link
@@ -228,7 +228,7 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
 
       <div className="space-y-3">
         <div>
-          <label htmlFor="deposit-amount" className="text-xs text-muted-foreground block mb-1.5">
+          <label htmlFor="deposit-amount" className="text-xs text-[#6b6d8f] block mb-1.5">
             Amount sent (optional)
           </label>
           <input
@@ -239,12 +239,12 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
             placeholder="e.g. 50"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#242424] px-4 py-3 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-orange-500/40"
+            className="w-full rounded-xl border border-[rgba(0, 229, 255,0.1)] bg-[#0f0f22] px-4 py-3 text-sm text-white placeholder:text-[#6b6d8f] focus:outline-none focus:border-[rgba(0, 229, 255,0.25)]"
           />
         </div>
 
         <div>
-          <label className="text-xs text-muted-foreground block mb-1.5">
+          <label className="text-xs text-[#6b6d8f] block mb-1.5">
             Payment screenshot (required)
           </label>
           <input
@@ -257,13 +257,13 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold bg-[#2a2a2a] border border-dashed border-white/15 hover:border-orange-500/40 text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold bg-[#10102a] border border-dashed border-white/15 hover:border-[rgba(0, 229, 255,0.25)] text-white transition-colors"
           >
             <Upload className="h-4 w-4" />
             {proofFile ? proofFile.name : "Upload payment screenshot"}
           </button>
           {proofPreview && (
-            <div className="mt-3 relative h-32 w-full max-w-xs rounded-lg overflow-hidden border border-white/10">
+            <div className="mt-3 relative h-32 w-full max-w-xs rounded-lg overflow-hidden border border-[rgba(0, 229, 255,0.1)]">
               <Image src={proofPreview} alt="Payment proof preview" fill className="object-cover" unoptimized />
             </div>
           )}

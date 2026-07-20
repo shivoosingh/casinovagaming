@@ -25,9 +25,9 @@ export function GlowButton({
       className={cn(
         "glow-btn relative inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-200",
         variant === "primary" &&
-          "bg-gradient-to-r from-[#7c3aed] to-[#5b21b6] text-white hover:-translate-y-0.5 active:scale-[0.97]",
+          "bg-gradient-to-b from-[#d4ae52] to-[#a07830] text-[#0a0a0f] hover:-translate-y-0.5 active:scale-[0.97]",
         variant === "gold" &&
-          "bg-gradient-to-r from-[#fbbf24] to-[#d97706] text-gray-900 shadow-[0_4px_0_#92400e] hover:-translate-y-0.5 active:scale-[0.97] active:shadow-[0_2px_0_#92400e]",
+          "bg-gradient-to-b from-[#f0d080] to-[#c9a84c] text-[#0a0a0f] shadow-[0_4px_0_#6b4f1a] hover:-translate-y-0.5 active:scale-[0.97] active:shadow-[0_2px_0_#6b4f1a]",
         className
       )}
     >

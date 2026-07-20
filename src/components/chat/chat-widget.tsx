@@ -199,10 +199,10 @@ export function ChatWidget() {
                 <p className="text-xs text-white/70">We typically reply in minutes</p>
               </div>
               <div className="flex gap-1">
-                <button type="button" onClick={() => setOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg">
+                <button type="button" onClick={() => setOpen(false)} className="p-1.5 hover:bg-[rgba(0, 229, 255,0.08)] rounded-lg">
                   <Minimize2 className="h-4 w-4 text-white" />
                 </button>
-                <button type="button" onClick={() => setOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg">
+                <button type="button" onClick={() => setOpen(false)} className="p-1.5 hover:bg-[rgba(0, 229, 255,0.08)] rounded-lg">
                   <X className="h-4 w-4 text-white" />
                 </button>
               </div>
@@ -214,16 +214,16 @@ export function ChatWidget() {
               className={`${CHAT_SCROLL_CLASS} p-4 space-y-3`}
             >
               {!supabase ? (
-                <p className="text-sm text-muted-foreground text-center py-8">Chat unavailable</p>
+                <p className="text-sm text-[#6b6d8f] text-center py-8">Chat unavailable</p>
               ) : !userId ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground mb-3">Please log in to start chatting</p>
+                  <p className="text-sm text-[#6b6d8f] mb-3">Please log in to start chatting</p>
                   <Button size="sm" asChild>
                     <a href="/login">Login</a>
                   </Button>
                 </div>
               ) : messages.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
+                <p className="text-sm text-[#6b6d8f] text-center py-8">
                   Start a conversation with our support team!
                 </p>
               ) : (

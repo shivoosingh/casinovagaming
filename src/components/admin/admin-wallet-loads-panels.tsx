@@ -57,7 +57,7 @@ function LoadEntry({ load }: { load: AdminGameLoadRow }) {
               </Badge>
             </div>
             {user && (
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="text-xs text-[#6b6d8f] truncate">
                 {user.full_name || "Unnamed"} ({user.email})
               </p>
             )}
@@ -72,7 +72,7 @@ function LoadEntry({ load }: { load: AdminGameLoadRow }) {
             {load.game_username && (
               <p className="text-xs mt-1">Game login: {load.game_username}</p>
             )}
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-[11px] text-[#6b6d8f] mt-1">
               {formatDate(load.created_at)} · {formatRelativeTime(load.created_at)}
             </p>
           </div>
@@ -102,17 +102,17 @@ function LoadsPanel({
     <Card className={cn("flex flex-col min-h-[360px] border-2", accentClass)}>
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <Icon className="h-4 w-4 text-primary" />
+          <Icon className="h-4 w-4 text-[#00E5FF]" />
           {title}
         </CardTitle>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-[#6b6d8f]">
           {loads.length} load/redeem{loads.length === 1 ? "" : "s"}
           {pending > 0 ? ` · ${pending} waiting for bot` : ""}
         </p>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto max-h-[640px] space-y-2 pt-0">
         {loads.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">{emptyHint}</p>
+          <p className="text-sm text-[#6b6d8f] text-center py-8">{emptyHint}</p>
         ) : (
           loads.map((load) => <LoadEntry key={load.id} load={load} />)
         )}
@@ -190,7 +190,7 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="relative max-w-lg">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f] pointer-events-none" />
           <Input
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
@@ -239,7 +239,7 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
                 }}
               >
                 <span className="text-xs font-medium">{u.full_name || "Unnamed"}</span>
-                <span className="text-[10px] text-muted-foreground font-normal">{u.email}</span>
+                <span className="text-[10px] text-[#6b6d8f] font-normal">{u.email}</span>
               </Button>
             ))}
           </div>

@@ -2,53 +2,29 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
+  Search,
   LayoutGrid,
   Clock,
   Star,
-  TrendingUp,
-  Award,
-  Search,
+  Zap,
+  Trophy,
   Crown,
   Sparkles,
-  LayoutDashboard,
-  MessageSquare,
-  Users,
   Headphones,
-  ShieldCheck,
-  StarHalf,
-  Target,
-  Gamepad2,
-  Banknote,
+  Circle,
 } from "lucide-react";
 import type { GameTab } from "@/lib/games";
 import { cn } from "@/lib/utils";
-import { useUnreadMessages } from "@/hooks/use-unread-messages";
-import { UnreadBadge } from "@/components/ui/unread-badge";
 
-const SIDEBAR_LINKS: { id: GameTab; label: string; icon: React.ElementType }[] = [
+export const SIDEBAR_LINKS: { id: GameTab; label: string; icon: React.ElementType }[] = [
   { id: "all", label: "All Games", icon: LayoutGrid },
   { id: "upcoming", label: "Upcoming Games", icon: Clock },
   { id: "popular", label: "Popular Games", icon: Star },
-  { id: "trending", label: "Trending Games", icon: TrendingUp },
-  { id: "topRated", label: "Top Rated Games", icon: Award },
+  { id: "trending", label: "Trending Games", icon: Zap },
+  { id: "topRated", label: "Top Rated Games", icon: Trophy },
 ];
-
-const ACCOUNT_LINKS = [
-  { href: "/", label: "Home", icon: LayoutDashboard },
-  { href: "/#games", label: "Games", icon: Gamepad2, gamesLink: true },
-  { href: "/dashboard/deposit", label: "Deposit", icon: Banknote },
-  { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
-  { href: "/dashboard/vip", label: "VIP Status", icon: Crown },
-  { href: "/dashboard/referrals", label: "Referrals", icon: Users },
-  { href: "/dashboard/reviews", label: "Reviews", icon: StarHalf },
-  { href: "/spin", label: "Daily Spin", icon: Sparkles },
-];
-
-const PREFETCH_ROUTES = ACCOUNT_LINKS.map((link) => link.href).filter(
-  (href) => !href.startsWith("/#") && href !== "/"
-);
 
 interface HomeSidebarProps {
   activeTab: GameTab;
@@ -58,42 +34,6 @@ interface HomeSidebarProps {
   className?: string;
 }
 
-function SidebarFooter({
-  isLoggedIn,
-  onWarmMessages,
-}: {
-  isLoggedIn: boolean;
-  onWarmMessages?: () => void;
-}) {
-  return (
-    <div className="mt-auto space-y-3 pt-2">
-      <div className="rounded-xl p-4 bg-gradient-to-br from-[#1f1f1f] to-[#141414] border border-white/5">
-        <div className="flex items-center gap-2 mb-2">
-          <Headphones className="h-4 w-4 text-orange-400" />
-          <p className="text-xs font-semibold text-white">24/7 Live Support</p>
-        </div>
-        <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
-          Need help? Chat with our team anytime.
-        </p>
-        <Link
-          href={isLoggedIn ? "/dashboard/messages" : "/support"}
-          onTouchStart={() => isLoggedIn && onWarmMessages?.()}
-          className="block text-center py-2 rounded-lg bg-white/5 text-white text-xs font-medium hover:bg-white/10 transition-colors border border-white/10"
-        >
-          {isLoggedIn ? "Open Messages" : "Contact Support"}
-        </Link>
-      </div>
-
-      <div className="rounded-xl px-3 py-2.5 flex items-center gap-2 border border-emerald-500/20 bg-emerald-500/5">
-        <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-        <p className="text-[10px] text-emerald-200/80 leading-snug">
-          Secure accounts · Fast setup · Trusted platform
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export function HomeSidebar({
   activeTab,
   onTabChange,
@@ -101,14 +41,12 @@ export function HomeSidebar({
   walletSlot,
   className,
 }: HomeSidebarProps) {
-  const pathname = usePathname();
   const router = useRouter();
   const prefetched = useRef(new Set<string>());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { count: unreadMessages } = useUnreadMessages();
 
-  function warmRoute(href: string) {
-    if (prefetched.current.has(href) || href.startsWith("/#") || href === "/") return;
+  function warm(href: string) {
+    if (prefetched.current.has(href)) return;
     prefetched.current.add(href);
     router.prefetch(href);
   }
@@ -116,165 +54,134 @@ export function HomeSidebar({
   useEffect(() => {
     const run = () => {
       import("@/lib/supabase/client").then(({ createClient }) => {
-        const supabase = createClient();
-        if (!supabase) return;
-        void supabase.auth.getSession().then(({ data: { session } }) => {
-          const loggedIn = !!session?.user;
-          setIsLoggedIn(loggedIn);
-          if (loggedIn) {
-            for (const href of PREFETCH_ROUTES) {
-              warmRoute(href);
-            }
-          }
+        const sb = createClient();
+        if (!sb) return;
+        void sb.auth.getSession().then(({ data: { session } }) => {
+          setIsLoggedIn(!!session?.user);
         });
       });
     };
-
     if ("requestIdleCallback" in window) {
       const id = window.requestIdleCallback(run, { timeout: 1200 });
       return () => window.cancelIdleCallback(id);
     }
-    const timer = setTimeout(run, 300);
-    return () => clearTimeout(timer);
-  }, [router]);
+    const t = setTimeout(run, 300);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <aside
       className={cn(
-        "flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#161616] p-4 shadow-xl shadow-black/20",
-        "min-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]",
+        "cx-glass flex h-full min-h-[calc(100vh-6rem)] flex-col gap-3 rounded-3xl p-3.5",
         className
       )}
     >
-      {isLoggedIn && walletSlot}
-
       <button
         type="button"
         onClick={onSearchClick}
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 font-bold text-sm hover:from-orange-400 hover:to-amber-400 transition-all shadow-lg shadow-orange-500/20"
+        className="cx-search-pill group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
       >
-        <Search className="h-4 w-4" />
-        Search Games
+        <span className="absolute inset-0 bg-gradient-to-r from-orange-500 via-fuchsia-500 to-violet-600" />
+        <span className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-orange-500" />
+        <Search className="relative z-10 h-4 w-4" />
+        <span className="relative z-10">Search Games</span>
       </button>
 
-      {isLoggedIn && (
-        <div className="rounded-xl p-4 border border-white/5 bg-[#1a1a1a]">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-            My Account
-          </p>
-          <nav className="space-y-1">
-            {ACCOUNT_LINKS.map(({ href, label, icon: Icon, gamesLink }) => {
-              const active = gamesLink
-                ? pathname === "/" || pathname.startsWith("/games")
-                : pathname === href || (href !== "/" && pathname.startsWith(href));
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  prefetch={!href.startsWith("/#") && href !== "/"}
-                  onMouseEnter={() => warmRoute(href)}
-                  onFocus={() => warmRoute(href)}
-                  onTouchStart={() => warmRoute(href)}
-                  className={cn(
-                    "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm transition-colors",
-                    active
-                      ? "bg-white/10 text-white font-medium"
-                      : "text-muted-foreground hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1">{label}</span>
-                  {href === "/dashboard/messages" && (
-                    <UnreadBadge count={unreadMessages} />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      )}
+      {isLoggedIn && walletSlot && <div>{walletSlot}</div>}
 
-      <div className="rounded-xl p-4 border border-white/5 bg-[#1a1a1a]">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+      <div className="cx-glass-soft rounded-2xl p-3">
+        <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-violet-300/70">
           Explore Games
         </p>
         <nav className="space-y-1">
-          {SIDEBAR_LINKS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onTabChange(id)}
-              className={cn(
-                "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm transition-colors text-left",
-                activeTab === id
-                  ? "bg-white/10 text-white font-medium"
-                  : "text-muted-foreground hover:text-white hover:bg-white/5"
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {label}
-            </button>
-          ))}
+          {SIDEBAR_LINKS.map(({ id, label, icon: Icon }) => {
+            const active = activeTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onTabChange(id)}
+                className={cn(
+                  "relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-300",
+                  active
+                    ? "text-white shadow-[0_0_24px_rgba(168,85,247,0.45)]"
+                    : "text-slate-400 hover:bg-white/[0.04] hover:text-violet-100"
+                )}
+              >
+                {active && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-500" />
+                )}
+                <Icon className={cn("relative z-10 h-4 w-4 shrink-0", active ? "text-white" : "text-violet-300/70")} />
+                <span className="relative z-10">{label}</span>
+              </button>
+            );
+          })}
         </nav>
       </div>
 
+      <div className="cx-glass-soft relative overflow-hidden rounded-2xl p-4">
+        <div
+          className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-40 blur-2xl"
+          style={{ background: "radial-gradient(circle, #A855F7, transparent)" }}
+        />
+        <div className="relative z-10 mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-violet-400/30 bg-violet-500/20">
+          <Crown className="h-4 w-4 text-fuchsia-300" />
+        </div>
+        <p className="relative z-10 mb-1 text-sm font-bold text-white">Unlock Premium Access</p>
+        <p className="relative z-10 mb-3 text-[11px] leading-relaxed text-slate-400">
+          Experience VIP perks, bigger wins, and exclusive features.
+        </p>
+        <Link
+          href={isLoggedIn ? "/dashboard/vip" : "/login"}
+          onMouseEnter={() => warm(isLoggedIn ? "/dashboard/vip" : "/login")}
+          className="relative z-10 block w-full rounded-xl border border-violet-400/35 bg-violet-500/20 py-2.5 text-center text-xs font-bold text-violet-100 transition-all hover:bg-violet-500/35 hover:shadow-[0_0_20px_rgba(168,85,247,0.35)]"
+        >
+          Login & Access All
+        </Link>
+      </div>
+
       {!isLoggedIn && (
-        <>
-          <div className="rounded-xl p-4 bg-gradient-to-br from-purple-700/80 to-purple-950 border border-purple-500/30">
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="h-5 w-5 text-amber-400" />
-              <h3 className="font-semibold text-sm text-white">Unlock Premium Access</h3>
-            </div>
-            <p className="text-xs text-purple-200/70 mb-3">
-              Experience VIP perks, bigger wins, and exclusive features.
-            </p>
-            <Link
-              href="/login"
-              className="block text-center py-2 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors border border-white/10"
-            >
-              Login & Access All
-            </Link>
+        <div className="cx-glass-soft rounded-2xl p-4">
+          <div className="mb-1 flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-orange-400" />
+            <p className="text-sm font-bold text-white">New Here?</p>
           </div>
-
-          <div className="rounded-xl p-4 bg-gradient-to-br from-purple-600/60 to-indigo-950 border border-purple-400/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-amber-300" />
-              <h3 className="font-semibold text-sm text-white">New Here?</h3>
-            </div>
-            <p className="text-xs text-purple-200/70 mb-3">Claim your free account & start playing!</p>
-            <Link
-              href="/register"
-              className="block text-center py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 text-xs font-bold hover:opacity-90 transition-opacity"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </>
-      )}
-
-      {isLoggedIn && (
-        <div className="rounded-xl p-4 bg-gradient-to-br from-purple-700/80 to-purple-950 border border-purple-500/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Crown className="h-5 w-5 text-amber-400" />
-            <h3 className="font-semibold text-sm text-white">Level Up Now</h3>
-          </div>
-          <p className="text-xs text-purple-200/70 mb-3">Unlock VIP rewards and exclusive perks.</p>
+          <p className="mb-3 text-[11px] leading-relaxed text-slate-400">
+            Claim your free account & start playing!
+          </p>
           <Link
-            href="/dashboard/vip"
-            onTouchStart={() => warmRoute("/dashboard/vip")}
-            className="block text-center py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-gray-900 text-xs font-bold hover:opacity-90 transition-opacity"
+            href="/register"
+            onMouseEnter={() => warm("/register")}
+            className="block w-full rounded-full bg-gradient-to-r from-orange-500 via-fuchsia-500 to-violet-600 py-2.5 text-center text-xs font-black text-white shadow-[0_8px_24px_rgba(232,121,249,0.35)] transition-transform hover:scale-[1.02]"
           >
-            View VIP Status
+            Sign Up
           </Link>
         </div>
       )}
 
-      <SidebarFooter
-        isLoggedIn={isLoggedIn}
-        onWarmMessages={() => warmRoute("/dashboard/messages")}
-      />
+      <div className="cx-glass-soft rounded-2xl p-4">
+        <div className="mb-1 flex items-center gap-2">
+          <Headphones className="h-4 w-4 text-sky-400" />
+          <p className="text-sm font-bold text-white">24/7 Live Support</p>
+        </div>
+        <p className="mb-3 text-[11px] leading-relaxed text-slate-400">
+          Need help? Chat with our team anytime.
+        </p>
+        <Link
+          href="/support"
+          onMouseEnter={() => warm("/support")}
+          className="block w-full rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-center text-xs font-bold text-slate-200 transition-colors hover:border-violet-400/40 hover:bg-violet-500/10"
+        >
+          Contact Support
+        </Link>
+      </div>
+
+      <div className="mt-auto flex items-center gap-2 px-1 pb-1">
+        <Circle className="h-2.5 w-2.5 fill-emerald-400 text-emerald-400 animate-pulse" />
+        <p className="text-[11px] font-medium text-slate-500">
+          System Status: <span className="text-emerald-400">Online</span>
+        </p>
+      </div>
     </aside>
   );
 }
-
-export { SIDEBAR_LINKS };

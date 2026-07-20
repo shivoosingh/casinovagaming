@@ -1,59 +1,21 @@
-# Spinora US database setup (drpitkvjcwrbzzufwwjt)
+# Casinova database setup
 
-Run each file in **Supabase SQL Editor** in this order:
+## One-file setup (recommended)
 
-https://supabase.com/dashboard/project/drpitkvjcwrbzzufwwjt/sql/new
+Run this **once** in Supabase → SQL Editor on a **new empty** project:
 
-| # | File |
-|---|------|
-| 1 | `schema.sql` |
-| 2 | `signup-email-phone.sql` |
-| 3 | `auth-phone.sql` |
-| 4 | `auth-email-otp.sql` |
-| 5 | `welcome-message.sql` |
-| 6 | `chat-attachments.sql` |
-| 7 | `deposit-requests.sql` |
-| 8 | `deposit-usdt-payment.sql` |
-| 9 | `wheel-spins.sql` |
-| 10 | `wallets.sql` |
-| 11 | `wallet-cashout.sql` |
-| 12 | `daily-tasks.sql` |
-| 13 | `daily-tasks-realtime.sql` |
-| 14 | `task-proof-attachments.sql` |
-| 15 | `reviews.sql` |
-| 16 | `reviews-admin-comment.sql` |
-| 17 | `reviews-public-read.sql` |
-| 18 | `message-notifications.sql` |
-| 19 | `notifications-rpc.sql` |
-| 20 | `admin-presence.sql` |
-| 21 | `game-requests-realtime.sql` |
+**[`CASINOVA-FULL-SCHEMA.sql`](./CASINOVA-FULL-SCHEMA.sql)**
 
-## After SQL — Dashboard settings
+That file is the full schema (auth profiles, wallets, deposits, game loads, chat, reviews, spin, blog, etc.).
 
-**Authentication → URL Configuration**
-
-- Site URL: `http://localhost:3000` (dev) / `https://spinoracasinos.com` (before deploy)
-- Redirect URLs:
-  - `http://localhost:3000/auth/callback`
-  - `https://spinoracasinos.com/auth/callback`
-
-**Authentication → Providers → Email** — enable + confirm email if used
-
-**SMTP** — copy Resend settings from old project (see `.env.example`)
-
-**Google OAuth** — enable + add callback:
-`https://drpitkvjcwrbzzufwwjt.supabase.co/auth/v1/callback`
-
-## Make yourself admin (after first signup)
+Then:
 
 ```sql
 UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL@example.com';
 ```
 
-## Before production deploy
+Point `.env.local` at the new project URL + anon + service role keys.
 
-Update Vercel env vars (do not deploy until SQL + auth are tested locally):
+## Split files (optional)
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+Numbered pieces still live in [`fresh-migrations/`](./fresh-migrations/) if you prefer running step-by-step.

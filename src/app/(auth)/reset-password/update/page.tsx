@@ -163,7 +163,7 @@ export default function UpdatePasswordPage() {
   if (checkingSession) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-muted-foreground text-sm">
+        <CardContent className="py-12 text-center text-[#6b6d8f] text-sm">
           Verifying reset link…
         </CardContent>
       </Card>
@@ -178,14 +178,14 @@ export default function UpdatePasswordPage() {
           <CardDescription>This password reset link is no longer valid</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[#6b6d8f]">
             Request a new reset link and open it in the same browser within a few minutes.
           </p>
           <Button asChild className="w-full">
             <Link href="/reset-password">Request new reset link</Link>
           </Button>
-          <p className="text-sm text-muted-foreground text-center">
-            <Link href="/login" className="text-primary hover:underline">
+          <p className="text-sm text-[#6b6d8f] text-center">
+            <Link href="/login" className="text-[#00E5FF] hover:underline">
               Back to sign in
             </Link>
           </p>

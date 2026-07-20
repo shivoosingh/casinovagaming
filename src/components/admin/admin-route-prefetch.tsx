@@ -2,24 +2,13 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const ADMIN_ROUTES = [
-  "/admin",
-  "/admin/chat",
-  "/admin/users",
-  "/admin/fraud",
-  "/admin/transactions",
-  "/admin/game-loads",
-  "/admin/deposits",
-  "/admin/reviews",
-  "/admin/analytics",
-];
+import { ADMIN_MODULES } from "@/lib/data/admin-modules";
 
 export function AdminRoutePrefetch() {
   const router = useRouter();
 
   useEffect(() => {
-    for (const href of ADMIN_ROUTES) {
+    for (const href of ADMIN_MODULES.map((m) => m.href)) {
       router.prefetch(href);
     }
   }, [router]);

@@ -9,7 +9,6 @@ import {
   Crown,
   Users,
   StarHalf,
-  Target,
   Sparkles,
   Headphones,
   ShieldCheck,
@@ -55,23 +54,21 @@ export function AccountSidebar({ walletSlot, className }: AccountSidebarProps) {
   }
 
   useEffect(() => {
-    for (const href of PREFETCH_ROUTES) {
-      warmRoute(href);
-    }
+    for (const href of PREFETCH_ROUTES) warmRoute(href);
   }, [router]);
 
   return (
     <aside
       className={cn(
-        "flex flex-col gap-4 rounded-2xl border border-white/5 bg-[#161616] p-4 shadow-xl shadow-black/20",
-        "min-h-[calc(100vh-6rem)] lg:min-h-[calc(100vh-6rem)]",
+        "cx-glass flex flex-col gap-3 rounded-3xl p-3.5",
+        "min-h-[calc(100vh-6rem)]",
         className
       )}
     >
       {walletSlot}
 
-      <div className="rounded-xl p-4 border border-white/5 bg-[#1a1a1a]">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+      <div className="cx-glass-soft rounded-2xl p-3.5">
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-violet-300/70">
           My Account
         </p>
         <nav className="space-y-1">
@@ -79,8 +76,8 @@ export function AccountSidebar({ walletSlot, className }: AccountSidebarProps) {
             const active = gamesLink
               ? pathname === "/" || pathname.startsWith("/games")
               : exact
-                ? pathname === href
-                : pathname === href || pathname.startsWith(`${href}/`);
+              ? pathname === href
+              : pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={href}
@@ -90,16 +87,21 @@ export function AccountSidebar({ walletSlot, className }: AccountSidebarProps) {
                 onFocus={() => warmRoute(href)}
                 onTouchStart={() => warmRoute(href)}
                 className={cn(
-                  "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm transition-colors",
+                  "relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 text-sm transition-all duration-300",
                   active
-                    ? "bg-white/10 text-white font-medium"
-                    : "text-muted-foreground hover:text-white hover:bg-white/5"
+                    ? "font-semibold text-white shadow-[0_0_24px_rgba(168,85,247,0.4)]"
+                    : "text-slate-400 hover:bg-white/[0.04] hover:text-violet-100"
                 )}
               >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span className="flex-1">{label}</span>
+                {active && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-500" />
+                )}
+                <Icon className={cn("relative z-10 h-4 w-4 shrink-0", active ? "text-white" : "text-violet-300/70")} />
+                <span className="relative z-10 flex-1">{label}</span>
                 {href === "/dashboard/messages" && (
-                  <UnreadBadge count={unreadMessages} />
+                  <span className="relative z-10">
+                    <UnreadBadge count={unreadMessages} />
+                  </span>
                 )}
               </Link>
             );
@@ -108,23 +110,23 @@ export function AccountSidebar({ walletSlot, className }: AccountSidebarProps) {
       </div>
 
       <div className="mt-auto space-y-3 pt-2">
-        <div className="rounded-xl p-4 bg-gradient-to-br from-[#1f1f1f] to-[#141414] border border-white/5">
-          <div className="flex items-center gap-2 mb-2">
-            <Headphones className="h-4 w-4 text-orange-400" />
+        <div className="cx-glass-soft rounded-2xl p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <Headphones className="h-4 w-4 text-sky-400" />
             <p className="text-xs font-semibold text-white">24/7 Live Support</p>
           </div>
           <Link
             href="/dashboard/messages"
             prefetch
             onTouchStart={() => warmRoute("/dashboard/messages")}
-            className="block text-center py-2 rounded-lg bg-white/5 text-white text-xs font-medium hover:bg-white/10 transition-colors border border-white/10"
+            className="block rounded-xl border border-violet-400/30 bg-violet-500/15 py-2 text-center text-xs font-semibold text-violet-100 transition-all hover:bg-violet-500/30 hover:shadow-[0_0_18px_rgba(168,85,247,0.3)]"
           >
             Open Messages
           </Link>
         </div>
-        <div className="rounded-xl px-3 py-2.5 flex items-center gap-2 border border-emerald-500/20 bg-emerald-500/5">
-          <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-          <p className="text-[10px] text-emerald-200/80 leading-snug">
+        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-3 py-2.5">
+          <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-400" />
+          <p className="text-[10px] leading-snug text-emerald-300/80">
             Secure accounts · Fast setup · Trusted platform
           </p>
         </div>

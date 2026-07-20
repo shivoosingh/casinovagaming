@@ -15,7 +15,7 @@ export default async function AdminReviewsPage() {
     <div>
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">User Reviews</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
+        <p className="text-[#6b6d8f] text-sm sm:text-base">
           Like standout reviews or remove inappropriate ones
         </p>
       </div>
@@ -24,19 +24,19 @@ export default async function AdminReviewsPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold">{stats.count}</p>
-            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-xs text-[#6b6d8f]">Total</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold">{stats.average || "—"}</p>
-            <p className="text-xs text-muted-foreground">Average</p>
+            <p className="text-xs text-[#6b6d8f]">Average</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold">{reviews.filter((r) => r.admin_liked).length}</p>
-            <p className="text-xs text-muted-foreground">Liked</p>
+            <p className="text-xs text-[#6b6d8f]">Liked</p>
           </CardContent>
         </Card>
         <Card>
@@ -46,7 +46,7 @@ export default async function AdminReviewsPage() {
             ) : (
               <p className="text-2xl font-bold">—</p>
             )}
-            <p className="text-xs text-muted-foreground">Stars</p>
+            <p className="text-xs text-[#6b6d8f]">Stars</p>
           </CardContent>
         </Card>
       </div>
@@ -58,7 +58,7 @@ export default async function AdminReviewsPage() {
           ))
         ) : (
           <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
+            <CardContent className="py-12 text-center text-[#6b6d8f]">
               No reviews yet.
             </CardContent>
           </Card>

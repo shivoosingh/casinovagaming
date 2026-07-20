@@ -169,7 +169,7 @@ export function MessageRealtimeProvider({ children }: { children: ReactNode }) {
     async (msg: Message, href: string) => {
       const adminView = isAdminRef.current;
 
-      let title = adminView ? "New customer message" : "Spinora Support";
+      let title = adminView ? "New customer message" : "Casinova Support";
 
       if (adminView) {
         const supabase = createClient();
@@ -746,7 +746,7 @@ export function MessageRealtimeProvider({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={openActivityPopup}
-          className="fixed z-[9998] left-3 right-3 sm:left-auto sm:right-auto sm:w-[320px] bottom-[5.5rem] sm:bottom-6 sm:left-6 flex items-start gap-3 p-3 rounded-2xl border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/50 text-left hover:bg-[#222] transition-opacity duration-200 opacity-100"
+          className="fixed z-[9998] left-3 right-3 sm:left-auto sm:right-auto sm:w-[320px] bottom-[5.5rem] sm:bottom-6 sm:left-6 flex items-start gap-3 p-3 rounded-2xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] shadow-2xl shadow-black/50 text-left hover:bg-[#222] transition-opacity duration-200 opacity-100"
           aria-label={
             popup.kind === "message"
               ? "Open chat"
@@ -755,13 +755,13 @@ export function MessageRealtimeProvider({ children }: { children: ReactNode }) {
                 : "Open game request"
           }
         >
-          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-[#0099cc] flex items-center justify-center shrink-0">
             {popupIcon(popup)}
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
             <p className="text-sm font-semibold text-white truncate">{popup.title}</p>
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{popup.preview}</p>
-            <p className="text-[10px] text-orange-400 mt-1.5 font-medium">{popupActionLabel(popup)}</p>
+            <p className="text-xs text-[#6b6d8f] line-clamp-2 mt-0.5">{popup.preview}</p>
+            <p className="text-[10px] text-[#00E5FF] mt-1.5 font-medium">{popupActionLabel(popup)}</p>
           </div>
           <span
             role="button"
@@ -776,7 +776,7 @@ export function MessageRealtimeProvider({ children }: { children: ReactNode }) {
                 setPopup(null);
               }
             }}
-            className="p-1 rounded-lg hover:bg-white/10 text-muted-foreground shrink-0"
+            className="p-1 rounded-lg hover:bg-[rgba(0, 229, 255,0.08)] text-[#6b6d8f] shrink-0"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />

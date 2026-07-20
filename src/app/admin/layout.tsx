@@ -1,24 +1,23 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+
+import { AdminLayoutGate } from "@/components/admin/admin-layout-gate";
+import { AdminLayoutSkeleton } from "@/components/admin/admin-layout-skeleton";
 import { AdminRoutePrefetch } from "@/components/admin/admin-route-prefetch";
-import { DashboardNav } from "@/components/layout/dashboard-nav";
-import { getAuthUser, getProfile } from "@/lib/supabase/session";
 import AdminLoading from "./loading";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const user = await getAuthUser();
-  if (!user) redirect("/login");
+export const metadata: Metadata = {
+  title: { default: "Admin", template: "%s · Casinova Admin" },
+  robots: { index: false, follow: false },
+};
 
-  const profile = await getProfile();
-  if (profile?.role !== "admin") redirect("/dashboard");
-
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
+    <Suspense fallback={<AdminLayoutSkeleton />}>
       <AdminRoutePrefetch />
-      <DashboardNav isAdmin />
-      <main className="flex-1 pt-14 lg:pt-0 p-4 sm:p-6 lg:p-8 overflow-auto">
+      <AdminLayoutGate>
         <Suspense fallback={<AdminLoading />}>{children}</Suspense>
-      </main>
-    </div>
+      </AdminLayoutGate>
+    </Suspense>
   );
 }

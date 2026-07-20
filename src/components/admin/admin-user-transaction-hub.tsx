@@ -46,7 +46,7 @@ function TransactionEntry({ row, compact }: { row: AdminTransactionRow; compact?
             </Badge>
           </div>
           <p className={cn("text-sm", compact ? "line-clamp-2" : "")}>{transactionSummary(tx)}</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-[#6b6d8f] mt-1">
             {formatDate(row.created_at)} · {formatRelativeTime(row.created_at)}
           </p>
         </div>
@@ -81,17 +81,17 @@ function WalletColumn({
     <Card className="flex flex-col min-h-[320px]">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <Icon className="h-4 w-4 text-primary" />
+          <Icon className="h-4 w-4 text-[#00E5FF]" />
           {title}
         </CardTitle>
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground pt-1">
+        <div className="flex flex-wrap gap-3 text-xs text-[#6b6d8f] pt-1">
           <span>{transactions.length} transaction{transactions.length === 1 ? "" : "s"}</span>
           {loadsOut > 0 && <span className="text-amber-400">Loads out: −${loadsOut.toFixed(2)}</span>}
           {creditsIn > 0 && (
             <span className="text-emerald-400">Credits in: +${creditsIn.toFixed(2)}</span>
           )}
           {loadRefunds > 0 && (
-            <span className="text-muted-foreground">Load refunds: +${loadRefunds.toFixed(2)}</span>
+            <span className="text-[#6b6d8f]">Load refunds: +${loadRefunds.toFixed(2)}</span>
           )}
           {redeemedBack > 0 && (
             <span className="text-sky-400">Redeemed back: +${redeemedBack.toFixed(2)}</span>
@@ -100,7 +100,7 @@ function WalletColumn({
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto max-h-[520px] pt-0">
         {transactions.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-6 text-center">{emptyHint}</p>
+          <p className="text-sm text-[#6b6d8f] py-6 text-center">{emptyHint}</p>
         ) : (
           transactions.map((row) => <TransactionEntry key={row.id} row={row} compact />)
         )}
@@ -143,7 +143,7 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="relative max-w-lg">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f] pointer-events-none" />
           <Input
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
@@ -167,11 +167,11 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
                 }}
               >
                 <span className="font-medium">{u.full_name || "Unnamed"}</span>
-                <span className="text-xs text-muted-foreground font-normal">{u.email}</span>
+                <span className="text-xs text-[#6b6d8f] font-normal">{u.email}</span>
               </Button>
             ))}
             {matchingUsers.length === 0 && userQuery.trim() && (
-              <p className="text-sm text-muted-foreground">No users match that search.</p>
+              <p className="text-sm text-[#6b6d8f]">No users match that search.</p>
             )}
           </div>
         )}
@@ -182,14 +182,14 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
           <Card>
             <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                  <User className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-full bg-[rgba(0, 229, 255,0.12)] flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 text-[#00E5FF]" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="font-semibold text-lg truncate">
                     {selectedUser.full_name || "Unnamed user"}
                   </h2>
-                  <p className="text-sm text-muted-foreground truncate">{selectedUser.email}</p>
+                  <p className="text-sm text-[#6b6d8f] truncate">{selectedUser.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -215,7 +215,7 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
             </CardContent>
           </Card>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[#6b6d8f]">
             <strong className="text-foreground font-medium">Total Deposit</strong> — game loads and
             redeems from the deposit wallet.
           </p>
@@ -229,9 +229,9 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
         </>
       ) : (
         <Card className="p-10 text-center">
-          <User className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
+          <User className="h-10 w-10 text-[#6b6d8f] mx-auto mb-3 opacity-50" />
           <p className="font-medium">Select a user above</p>
-          <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+          <p className="text-sm text-[#6b6d8f] mt-1 max-w-md mx-auto">
             One user at a time — see their Total Deposit transaction history.
           </p>
         </Card>

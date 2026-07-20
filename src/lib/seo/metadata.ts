@@ -7,7 +7,6 @@ interface PageSEO {
   keywords: string[];
   path: string;
   ogImage?: string;
-  /** Overrides the default "{title} | Spinora" document title when set */
   documentTitle?: string;
 }
 
@@ -21,7 +20,7 @@ export function createMetadata({
 }: PageSEO): Metadata {
   const fullTitle =
     documentTitle ??
-    (title === SITE_NAME ? `${SITE_NAME} | Premium Gaming Support Platform` : `${title} | ${SITE_NAME}`);
+    (title === SITE_NAME ? `${SITE_NAME} | Premium Gaming Platform` : `${title} | ${SITE_NAME}`);
   const url = `${SITE_URL}${path}`;
 
   return {
@@ -58,11 +57,11 @@ export function createMetadata({
 
 export const homeMetadata = createMetadata({
   title: SITE_NAME,
-  documentTitle: "Spinora | Juwa Casino, Slot Games & Fish Games",
+  documentTitle: "Casinova Gaming | Juwa Casino, Slot Games & Fish Games",
   description:
-    "Play Juwa casino, Game Vault, Fire Kirin, Panda Master, and top slot games on Spinora. Create your game account in minutes, claim deposit bonuses, earn VIP rewards, and get 24/7 live chat support.",
+    "Play Juwa casino, Game Vault, Fire Kirin, Panda Master, and top slot games on Casinova Gaming. Create your game account in minutes, claim deposit bonuses, earn VIP rewards, and get 24/7 live chat support.",
   keywords: [
-    "Spinora",
+    "Casinova Gaming",
     "juwa casino",
     "juwa 777",
     "juwa slots",
@@ -85,31 +84,31 @@ export const homeMetadata = createMetadata({
 export const promotionsMetadata = createMetadata({
   title: "Promotions & Bonuses",
   description:
-    "Discover exclusive Spinora promotions, bonuses, and limited-time offers for premium gaming accounts and VIP rewards.",
-  keywords: ["gaming promotions", "casino bonuses", "Spinora deals", "VIP bonuses", "gaming rewards"],
+    "Discover exclusive Casinova Gaming promotions, bonuses, and limited-time offers for premium gaming accounts and VIP rewards.",
+  keywords: ["gaming promotions", "casino bonuses", "Casinova Gaming deals", "VIP bonuses", "gaming rewards"],
   path: "/promotions",
 });
 
 export const vipMetadata = createMetadata({
   title: "VIP Rewards Program",
   description:
-    "Join the Spinora VIP program. Earn points, unlock Bronze to Platinum tiers, and enjoy exclusive gaming benefits and rewards.",
-  keywords: ["VIP gaming", "loyalty program", "gaming rewards", "Spinora VIP", "premium gaming"],
+    "Join the Casinova Gaming VIP program. Earn points, unlock Bronze to Platinum tiers, and enjoy exclusive gaming benefits and rewards.",
+  keywords: ["VIP gaming", "loyalty program", "gaming rewards", "Casinova Gaming VIP", "premium gaming"],
   path: "/vip",
 });
 
 export const aboutMetadata = createMetadata({
-  title: "About Spinora",
+  title: "About Casinova Gaming",
   description:
-    "Learn about Spinora — the premium gaming support platform trusted by thousands for game accounts, live support, and VIP rewards.",
-  keywords: ["about Spinora", "gaming support platform", "trusted gaming", "game account service"],
+    "Learn about Casinova Gaming — the premium gaming support platform trusted by thousands for game accounts, live support, and VIP rewards.",
+  keywords: ["about Casinova Gaming", "gaming support platform", "trusted gaming", "game account service"],
   path: "/about",
 });
 
 export const supportMetadata = createMetadata({
   title: "Support & Help Center",
   description:
-    "Get help with Spinora. Contact our 24/7 live chat support team for game accounts, VIP questions, and technical assistance.",
-  keywords: ["gaming support", "live chat help", "Spinora support", "game account help", "customer service"],
+    "Get help with Casinova Gaming. Contact our 24/7 live chat support team for game accounts, VIP questions, and technical assistance.",
+  keywords: ["gaming support", "live chat help", "Casinova Gaming support", "game account help", "customer service"],
   path: "/support",
 });

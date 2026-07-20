@@ -38,7 +38,7 @@ export default async function AdminRequestsPage({
       <GameRequestsLiveRefresh />
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Game Requests</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
+        <p className="text-[#6b6d8f] text-sm sm:text-base">
           {status === "pending" ? "Showing pending requests only" : "Manage and process game account requests"}
         </p>
       </div>
@@ -55,12 +55,12 @@ export default async function AdminRequestsPage({
                       <h3 className="font-semibold">{req.game_name}</h3>
                       <Badge variant={statusVariant[req.status as RequestStatus]}>{req.status}</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[#6b6d8f]">
                       {user?.full_name} ({user?.email}) &middot; {req.game_provider}
                     </p>
                     {req.notes && <p className="text-sm mt-2">Notes: {req.notes}</p>}
-                    {req.admin_notes && <p className="text-sm mt-1 text-primary">Admin: {req.admin_notes}</p>}
-                    <p className="text-xs text-muted-foreground mt-2">{formatDate(req.created_at)}</p>
+                    {req.admin_notes && <p className="text-sm mt-1 text-[#00E5FF]">Admin: {req.admin_notes}</p>}
+                    <p className="text-xs text-[#6b6d8f] mt-2">{formatDate(req.created_at)}</p>
                   </div>
                   <RequestActions requestId={req.id} currentStatus={req.status as RequestStatus} />
                 </div>

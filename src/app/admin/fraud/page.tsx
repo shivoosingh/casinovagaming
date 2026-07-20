@@ -8,7 +8,7 @@ export default async function AdminFraudPage() {
     <div>
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Fraud &amp; Multi-Account</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
+        <p className="text-[#6b6d8f] text-sm sm:text-base">
           Review flagged users and restore access for real customers
         </p>
       </div>

@@ -13,7 +13,6 @@ import {
   Crown,
   Users,
   Star,
-  Target,
   Shield,
   BarChart3,
   LogOut,
@@ -104,8 +103,8 @@ function NavLinks({
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
               active
-                ? "bg-primary/20 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "bg-[rgba(0, 229, 255,0.1)] text-[#00E5FF] font-semibold"
+                : "text-[#6b6d8f] hover:text-[#e8eaf6] hover:bg-[rgba(255,255,255,0.04)]"
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -120,7 +119,8 @@ function NavLinks({
       {isAdmin && (
         <>
           <div className="pt-4 pb-2 px-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/80">
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-[rgba(0, 229, 255,0.3)] to-transparent mb-3" />
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#00E5FF] opacity-70">
               Admin Only
             </p>
           </div>
@@ -141,15 +141,13 @@ function NavLinks({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                   active
-                    ? "bg-primary/20 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "bg-[rgba(0, 229, 255,0.1)] text-[#00E5FF] font-semibold"
+                    : "text-[#6b6d8f] hover:text-[#e8eaf6] hover:bg-[rgba(255,255,255,0.04)]"
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 <span className="flex-1">{link.label}</span>
-                {link.href === "/admin/chat" && (
-                  <UnreadBadge count={unreadMessages} />
-                )}
+                {link.href === "/admin/chat" && <UnreadBadge count={unreadMessages} />}
               </Link>
             );
           })}
@@ -173,10 +171,10 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
   }
 
   useEffect(() => {
-    const routes = isAdmin ? ALL_NAV_ROUTES : userLinks.map((l) => l.href).filter((h) => !h.startsWith("/#"));
-    for (const href of routes) {
-      warmRoute(href);
-    }
+    const routes = isAdmin
+      ? ALL_NAV_ROUTES
+      : userLinks.map((l) => l.href).filter((h) => !h.startsWith("/#"));
+    for (const href of routes) warmRoute(href);
   }, [router, isAdmin]);
 
   async function handleLogout() {
@@ -186,14 +184,15 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
   return (
     <>
       {/* Mobile top bar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 glass border-b border-border h-14 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 glass border-b border-[rgba(0, 229, 255,0.08)] h-14 flex items-center justify-between px-4">
+        <div className="h-[1px] absolute top-0 left-0 right-0 bg-gradient-to-r from-transparent via-[rgba(0, 229, 255,0.3)] to-transparent" />
         <AnimatedLogo imageSize={28} textClassName="text-sm" href="/dashboard" />
         <div className="flex items-center gap-1">
-          <NotificationDropdown buttonClassName="bg-transparent border-transparent hover:bg-muted" />
+          <NotificationDropdown buttonClassName="bg-transparent border-transparent hover:bg-[rgba(0, 229, 255,0.06)]" />
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg hover:bg-muted"
+            className="p-2 rounded-lg hover:bg-[rgba(0, 229, 255,0.06)] text-[#00E5FF]"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
@@ -209,7 +208,7 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-[110] bg-black/60"
+              className="lg:hidden fixed inset-0 z-[110] bg-black/70"
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
@@ -217,15 +216,21 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-[120] w-72 glass border-r border-border flex flex-col"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-[120] w-72 bg-[#050510] border-r border-[rgba(0, 229, 255,0.08)] flex flex-col"
             >
-              <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="h-[1px] bg-gradient-to-r from-transparent via-[rgba(0, 229, 255,0.4)] to-transparent" />
+              <div className="p-4 border-b border-[rgba(0, 229, 255,0.06)] flex items-center justify-between">
                 <AnimatedLogoText textClassName="text-base" />
-                <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-[#6b6d8f] hover:text-[#00E5FF]"
+                  aria-label="Close menu"
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+              <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
                 <NavLinks
                   pathname={pathname}
                   isAdmin={isAdmin}
@@ -234,8 +239,8 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
                   warmRoute={warmRoute}
                 />
               </nav>
-              <div className="p-3 border-t border-border">
-                <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
+              <div className="p-3 border-t border-[rgba(0, 229, 255,0.06)]">
+                <Button variant="ghost" className="w-full justify-start gap-3 text-[#6b6d8f] hover:text-[#00E5FF]" onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
                   Logout
                 </Button>
@@ -246,19 +251,32 @@ export function DashboardNav({ isAdmin = false }: DashboardNavProps) {
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col glass border-r border-border min-h-screen relative z-30">
-        <div className="p-4 border-b border-border flex flex-col gap-3 overflow-visible">
+      <aside className="hidden lg:flex w-64 flex-col bg-[#050510] border-r border-[rgba(0, 229, 255,0.08)] min-h-screen relative z-30">
+        <div className="h-[1px] bg-gradient-to-r from-transparent via-[rgba(0, 229, 255,0.4)] to-transparent" />
+        <div className="p-4 border-b border-[rgba(0, 229, 255,0.06)] flex flex-col gap-3 overflow-visible">
           <div className="flex items-center justify-between gap-2">
             <AnimatedLogo imageSize={32} textClassName="text-sm" className="min-w-0" href="/" />
-            <NotificationDropdown align="right" buttonClassName="bg-muted/50 border-border shrink-0" />
+            <NotificationDropdown
+              align="right"
+              buttonClassName="bg-[rgba(201,168,76,0.06)] border-[rgba(0, 229, 255,0.15)] hover:bg-[rgba(0, 229, 255,0.1)] shrink-0"
+            />
           </div>
           <WalletCardLoader />
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          <NavLinks pathname={pathname} isAdmin={isAdmin} unreadMessages={unreadMessages} warmRoute={warmRoute} />
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+          <NavLinks
+            pathname={pathname}
+            isAdmin={isAdmin}
+            unreadMessages={unreadMessages}
+            warmRoute={warmRoute}
+          />
         </nav>
-        <div className="p-3 border-t border-border">
-          <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
+        <div className="p-3 border-t border-[rgba(0, 229, 255,0.06)]">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-[#6b6d8f] hover:text-[#00E5FF]"
+            onClick={handleLogout}
+          >
             <LogOut className="h-4 w-4" />
             Logout
           </Button>

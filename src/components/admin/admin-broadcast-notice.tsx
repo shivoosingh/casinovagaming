@@ -11,7 +11,7 @@ import { Megaphone } from "lucide-react";
 const MAINTENANCE_TEMPLATE = {
   title: "Site under maintenance",
   message:
-    "Spinora is currently under maintenance. No requests (loads, redeems, new accounts, or deposits) will be approved until further notice. Thank you for your patience — we will update you when service resumes.",
+    "Casinova Gaming is currently under maintenance. No requests (loads, redeems, new accounts, or deposits) will be approved until further notice. Thank you for your patience — we will update you when service resumes.",
 } as const;
 
 export function AdminBroadcastNotice() {
@@ -64,7 +64,7 @@ export function AdminBroadcastNotice() {
         </div>
         <div className="min-w-0">
           <h2 className="font-semibold text-white">Broadcast notice to all users</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-[#6b6d8f] mt-1">
             Type your own title and message below, then send. Every non-admin user gets an in-app
             notification. Optionally also posts in their Support chat.
           </p>
@@ -73,7 +73,7 @@ export function AdminBroadcastNotice() {
 
       <div className="space-y-3">
         <div>
-          <label className="text-[10px] text-muted-foreground uppercase tracking-wide">Title</label>
+          <label className="text-[10px] text-[#6b6d8f] uppercase tracking-wide">Title</label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -82,7 +82,7 @@ export function AdminBroadcastNotice() {
           />
         </div>
         <div>
-          <label className="text-[10px] text-muted-foreground uppercase tracking-wide">Message</label>
+          <label className="text-[10px] text-[#6b6d8f] uppercase tracking-wide">Message</label>
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -91,7 +91,7 @@ export function AdminBroadcastNotice() {
             className="mt-1 resize-y min-h-[96px]"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+        <label className="flex items-center gap-2 text-sm text-[#6b6d8f] cursor-pointer">
           <input
             type="checkbox"
             checked={sendChat}

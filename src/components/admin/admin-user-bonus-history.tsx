@@ -92,7 +92,7 @@ export function AdminUserBonusHistory({ userId, userName }: AdminUserBonusHistor
         type="button"
         variant="ghost"
         size="sm"
-        className="gap-1.5 h-8 px-2 text-muted-foreground hover:text-foreground"
+        className="gap-1.5 h-8 px-2 text-[#6b6d8f] hover:text-foreground"
         onClick={() => void toggle()}
       >
         <History className="h-4 w-4" />
@@ -102,12 +102,12 @@ export function AdminUserBonusHistory({ userId, userName }: AdminUserBonusHistor
 
       {open && (
         <div className="mt-2 rounded-lg border border-border bg-muted/20 p-3 space-y-2">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6b6d8f]">
             Bonus wallet loads, redeems, refunds, and credits for {userName}
           </p>
 
           {loading && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground py-4 justify-center">
+            <div className="flex items-center gap-2 text-sm text-[#6b6d8f] py-4 justify-center">
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading…
             </div>
@@ -116,7 +116,7 @@ export function AdminUserBonusHistory({ userId, userName }: AdminUserBonusHistor
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           {!loading && !error && timeline?.length === 0 && (
-            <p className="text-sm text-muted-foreground py-2">No bonus wallet activity yet.</p>
+            <p className="text-sm text-[#6b6d8f] py-2">No bonus wallet activity yet.</p>
           )}
 
           {!loading && !error && timeline && timeline.length > 0 && (
@@ -132,7 +132,7 @@ export function AdminUserBonusHistory({ userId, userName }: AdminUserBonusHistor
                     >
                       <div className="min-w-0">
                         <p className="font-medium truncate">{transactionSummary(tx)}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-[#6b6d8f]">
                           {formatDate(tx.created_at)} · {formatRelativeTime(tx.created_at)}
                         </p>
                       </div>
@@ -161,12 +161,12 @@ export function AdminUserBonusHistory({ userId, userName }: AdminUserBonusHistor
                         </Badge>
                       </div>
                       {load.game_username && (
-                        <p className="text-xs text-muted-foreground truncate">Game user: {load.game_username}</p>
+                        <p className="text-xs text-[#6b6d8f] truncate">Game user: {load.game_username}</p>
                       )}
                       {load.error_message && load.status === "failed" && (
                         <p className="text-xs text-destructive truncate">{load.error_message}</p>
                       )}
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[#6b6d8f]">
                         {formatDate(load.created_at)} · {formatRelativeTime(load.created_at)}
                       </p>
                     </div>

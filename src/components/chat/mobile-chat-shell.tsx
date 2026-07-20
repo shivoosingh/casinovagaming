@@ -64,7 +64,7 @@ export function MobileChatShell({ open, onClose, children, className }: MobileCh
     <MobileChatCloseContext.Provider value={closeFromUi}>
       <div
         className={cn(
-          "fixed inset-0 z-[250] flex flex-col min-h-0 overflow-hidden bg-[#0f0f0f]",
+          "fixed inset-0 z-[250] flex flex-col min-h-0 overflow-hidden bg-[#050510]",
           "pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]",
           "overscroll-none",
           className
@@ -72,7 +72,7 @@ export function MobileChatShell({ open, onClose, children, className }: MobileCh
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden bg-[#0f0f0f] isolate">
+        <div className="flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden bg-[#050510] isolate">
           {children}
         </div>
       </div>

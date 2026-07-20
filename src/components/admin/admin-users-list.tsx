@@ -57,7 +57,7 @@ export function AdminUsersList({ users }: AdminUsersListProps) {
   return (
     <div className="space-y-4">
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f] pointer-events-none" />
         <Input
           value={query}
           onChange={(e) => {
@@ -69,7 +69,7 @@ export function AdminUsersList({ users }: AdminUsersListProps) {
         />
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-[#6b6d8f]">
         {filtered.length} user{filtered.length === 1 ? "" : "s"}
         {query.trim() ? " found" : " total"}
         {filtered.length > PAGE_SIZE && !query.trim() ? " · showing newest first" : ""}
@@ -86,8 +86,8 @@ export function AdminUsersList({ users }: AdminUsersListProps) {
                     <Badge variant={user.role === "admin" ? "default" : "secondary"}>{user.role}</Badge>
                     {user.is_suspended && <Badge variant="destructive">Suspended</Badge>}
                   </div>
-                  <p className="text-sm text-muted-foreground break-all">{user.email}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-sm text-[#6b6d8f] break-all">{user.email}</p>
+                  <p className="text-xs text-[#6b6d8f] mt-1">
                     {user.vip_tier} &middot; {user.vip_points} pts &middot; Joined {formatDate(user.created_at)}
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export function AdminUsersList({ users }: AdminUsersListProps) {
 
         {filtered.length === 0 && (
           <Card className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">No users match your search.</p>
+            <p className="text-sm text-[#6b6d8f]">No users match your search.</p>
           </Card>
         )}
 

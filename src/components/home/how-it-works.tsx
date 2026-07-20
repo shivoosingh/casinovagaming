@@ -37,9 +37,9 @@ export function HowItWorks() {
         className="text-center mb-10"
       >
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-          How <span className="gradient-text">Spinora</span> Works
+          How <span className="gradient-text">Casinova Gaming</span> Works
         </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+        <p className="text-[#6b6d8f] max-w-2xl mx-auto text-sm sm:text-base">
           Get started in minutes with our simple 4-step process.
         </p>
       </motion.div>
@@ -54,14 +54,14 @@ export function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="rounded-xl p-5 text-center bg-[#1e1e1e] border border-white/5 hover:border-orange-500/20 transition-colors"
+              className="cyber-surface-card rounded-2xl p-5 text-center"
             >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl gradient-bg mb-3">
-                <Icon className="h-6 w-6 text-white" />
+              <div className="relative z-10 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#00E5FF] to-[#7B2FF7] mb-3 shadow-[0_0_20px_rgba(0, 229, 255,0.3)]">
+                <Icon className="h-6 w-6 text-[#050510]" />
               </div>
-              <div className="text-xs text-orange-400 font-semibold mb-1.5">Step {i + 1}</div>
-              <h3 className="font-semibold mb-1.5 text-sm">{step.title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
+              <div className="relative z-10 text-xs text-[#00E5FF] font-semibold mb-1.5">Step {i + 1}</div>
+              <h3 className="relative z-10 font-bold mb-1.5 text-sm text-[#f0f0f5]">{step.title}</h3>
+              <p className="relative z-10 text-xs text-[#6b6d8f] leading-relaxed">{step.description}</p>
             </motion.div>
           );
         })}

@@ -29,10 +29,10 @@ export function GameBrowser() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-2">
               Explore <span className="gradient-text">Games</span>
             </h2>
-            <p className="text-muted-foreground">Browse and request accounts for top gaming platforms</p>
+            <p className="text-[#6b6d8f]">Browse and request accounts for top gaming platforms</p>
           </div>
           <div className="relative w-full lg:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b6d8f]" />
             <Input
               placeholder="Search games..."
               value={search}
@@ -52,7 +52,7 @@ export function GameBrowser() {
                 "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
                 tab === t.id
                   ? "gradient-bg text-white shadow-lg shadow-purple-500/25"
-                  : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "bg-muted/50 text-[#6b6d8f] hover:text-foreground hover:bg-muted"
               )}
             >
               {t.label}
@@ -81,14 +81,14 @@ export function GameBrowser() {
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-full text-center py-16 text-muted-foreground">
+              <div className="col-span-full text-center py-16 text-[#6b6d8f]">
                 No games found. Try a different search or tab.
               </div>
             )}
           </motion.div>
         </AnimatePresence>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">
+        <p className="text-center text-xs text-[#6b6d8f] mt-8">
           Showing {games.length} of {GAMES.length} games
         </p>
       </div>
