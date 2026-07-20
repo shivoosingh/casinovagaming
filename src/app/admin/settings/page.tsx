@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminSqlNeeded } from "@/components/admin/admin-sql-needed";
+import { AdminSqlRequiredNotice } from "@/components/admin/admin-sql-required-notice";
 import { SettingsEditor } from "@/components/admin/settings-editor";
 import { adminDb, isMissingRelation } from "@/lib/actions/admin/core";
 import { requirePermission } from "@/lib/data/admin";
@@ -17,7 +17,7 @@ export default async function AdminSettingsPage() {
     return (
       <div className="mx-auto max-w-3xl">
         <AdminPageHeader title="Settings" description="Site settings and feature toggles" />
-        <AdminSqlNeeded moduleName="Settings" />
+        <AdminSqlRequiredNotice title="Settings need the admin SQL" />
       </div>
     );
   }

@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminSqlNeeded } from "@/components/admin/admin-sql-needed";
+import { AdminSqlRequiredNotice } from "@/components/admin/admin-sql-required-notice";
 import {
   EntityEditDialog,
   type FieldValue,
@@ -109,7 +109,7 @@ export default async function AdminPaymentsPage() {
     return (
       <div className="mx-auto max-w-3xl">
         <AdminPageHeader title="Payment Methods" description="Deposit options for players" />
-        <AdminSqlNeeded moduleName="Payment Methods" />
+        <AdminSqlRequiredNotice title="Payment Methods need the admin SQL" />
         <p className="mt-3 text-sm text-slate-400">
           Also run <code className="text-violet-300">admin-payments-settings-upgrade.sql</code> after
           essentials for full columns (QR, pay link, kind).
