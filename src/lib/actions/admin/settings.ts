@@ -91,3 +91,83 @@ export async function deleteSiteSettingAction(key: string): Promise<AdminActionR
   revalidateSettings();
   return { ok: true, message: "Setting removed." };
 }
+
+const telegramPromoMessageSchema = z.object({
+  text: z.string().trim().min(3).max(500),
+  link: z.string().trim().max(500).optional().default(""),
+  image_url: z.string().trim().max(500).optional().default(""),
+  is_active: z.boolean(),
+});
+
+export async function upsertTelegramPromoMessageAction(
+  input: z.infer<typeof telegramPromoMessageSchema> & { id?: string }
+): Promise<AdminActionResult> {
+  const auth = await authorize(PERMISSION);
+  if ("error" in auth) return { ok: false, error: auth.error };
+
+  const parsed = telegramPromoMessageSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
+
+  const payload = {
+    text: parsed.data.text,
+    link: parsed.data.link || null,
+    image_url: parsed.data.image_url || null,
+    is_active: parsed.data.is_active,
+  };
+
+  const db = adminDb();
+  const result = input.id
+    ? await db.from("telegram_promo_messages").update(payload).eq("id", input.id)
+    : await db.from("telegram_promo_messages").insert(payload);
+
+  if (result.error) {
+    if (isMissingRelation(result.error)) return { ok: false, error: RUN_ADMIN_SQL_HINT };
+    return { ok: false, error: result.error.message };
+  }
+
+  await writeAudit({
+    actorId: auth.staff.userId,
+    action: input.id ? "telegram_promo_message.update" : "telegram_promo_message.create",
+    entityType: "telegram_promo_message",
+    entityId: input.id ?? null,
+    after: payload,
+  });
+
+  revalidatePath("/admin/telegram");
+  revalidateSettings();
+  return { ok: true, message: "Promo message saved." };
+}
+
+export async function deleteTelegramPromoMessageAction(id: string): Promise<AdminActionResult> {
+  const auth = await authorize(PERMISSION);
+  if ("error" in auth) return { ok: false, error: auth.error };
+
+  const { error } = await adminDb().from("telegram_promo_messages").delete().eq("id", id);
+  if (error) {
+    if (isMissingRelation(error)) return { ok: false, error: RUN_ADMIN_SQL_HINT };
+    return { ok: false, error: error.message };
+  }
+
+  await writeAudit({
+    actorId: auth.staff.userId,
+    action: "telegram_promo_message.delete",
+    entityType: "telegram_promo_message",
+    entityId: id,
+  });
+
+  revalidatePath("/admin/telegram");
+  revalidateSettings();
+  return { ok: true, message: "Deleted." };
+}
+
+export async function sendTelegramPromoNowAction(): Promise<AdminActionResult> {
+  const auth = await authorize(PERMISSION);
+  if ("error" in auth) return { ok: false, error: auth.error };
+
+  const { runTelegramPromoBroadcast } = await import("@/lib/telegram/promo-broadcast");
+  const result = await runTelegramPromoBroadcast({ force: true });
+
+  if (!result.ok) return { ok: false, error: result.error };
+  if (result.status === "skipped") return { ok: false, error: result.reason };
+  return { ok: true, message: `Sent to Telegram: "${result.preview}"` };
+}

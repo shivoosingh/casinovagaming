@@ -26,6 +26,9 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
+  --color-ws-green: #00e5ff;
+  --color-ws-emerald: #34d399;
+  --color-ws-text-faint: #64748b;
 }
 
 * { border-color: var(--color-border); }
@@ -57,6 +60,38 @@ body::before {
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid rgba(168, 85, 247, 0.22);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glass-strong {
+  background: rgba(18, 16, 32, 0.78);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glass-edge {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(168, 85, 247, 0.25);
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root {
+  --ws-green: #00e5ff;
+  --ws-green-glow: rgba(0, 229, 255, 0.35);
+  --ws-gold-glow: rgba(255, 215, 0, 0.3);
+  --ws-cyan-glow: rgba(0, 229, 255, 0.3);
+  --ws-purple-glow: rgba(168, 85, 247, 0.35);
+  --ws-emerald: #34d399;
+  --ws-text-faint: #64748b;
 }
 
 .cx-glass {

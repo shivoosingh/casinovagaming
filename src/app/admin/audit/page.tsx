@@ -1,34 +1,32 @@
 ﻿import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminSqlNeeded } from "@/components/admin/admin-sql-needed";
-import { adminDb } from "@/lib/actions/admin/core";
-import { adminTableReady } from "@/lib/admin/table-ready";
+import { AdminSqlRequiredNotice } from "@/components/admin/admin-sql-required-notice";
+import { adminDb, isMissingRelation } from "@/lib/actions/admin/core";
 import { requirePermission } from "@/lib/data/admin";
 
 export const metadata: Metadata = { title: "Audit Logs" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminAuditPage() {
   await requirePermission("audit.read");
-  const ready = await adminTableReady("audit_logs");
-  if (!ready) {
-    return (
-      <div className="mx-auto max-w-4xl">
-        <AdminPageHeader title="Audit Logs" description="Staff action history" />
-        <AdminSqlNeeded moduleName="Audit Logs" />
-      </div>
-    );
-  }
+  const db = adminDb();
 
-  const { data: rows } = await adminDb()
+  const { data: rows, error } = await db
     .from("audit_logs")
     .select("id, actor_id, action, entity_type, entity_id, created_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
+  if (error && !isMissingRelation(error)) {
+    throw new Error(error.message);
+  }
+
   return (
     <div className="mx-auto max-w-5xl">
       <AdminPageHeader title="Audit Logs" description={`${rows?.length ?? 0} recent events`} />
-      {(rows?.length ?? 0) === 0 ? (
+      {error && isMissingRelation(error) ? (
+        <AdminSqlRequiredNotice title="Audit logs need the Phase 2 admin SQL" />
+      ) : (rows?.length ?? 0) === 0 ? (
         <div className="rounded-2xl border border-violet-400/20 py-16 text-center text-slate-400">
           No audit events yet. Actions you take in admin will appear here.
         </div>

@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/actions/notifications";
 import { notifyAdminOfCustomerMessage } from "@/lib/telegram/notify-admin-message";
+import { processAIChatQuery, getBotSenderProfileId } from "@/lib/ai/chatbot";
+import { getChatbotSettings } from "@/lib/ai/settings";
+import { isTelegramConfigured, sendTelegramMessage, escapeTelegramHtml } from "@/lib/telegram/client";
+import { SITE_URL } from "@/lib/constants";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -95,6 +99,56 @@ export async function POST(request: Request) {
       content,
       attachmentType,
     });
+
+    // AI auto-reply (behind settings; no-ops if tables/keys missing)
+    void (async () => {
+      try {
+        if (!content.trim()) return;
+        const chatSettings = await getChatbotSettings();
+        if (!chatSettings.is_enabled || !chatSettings.auto_reply_enabled) return;
+
+        const aiResult = await processAIChatQuery(content, conversationId, user.id);
+        const botSenderId = await getBotSenderProfileId();
+        const db = adminClient ?? supabase;
+
+        if (
+          aiResult.shouldEscalateToHuman &&
+          chatSettings.telegram_escalation_enabled &&
+          isTelegramConfigured()
+        ) {
+          const { data: p } = await db
+            .from("profiles")
+            .select("full_name, email")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          const displayName = p?.full_name || "Player";
+          const email = p?.email || "No Email";
+
+          await sendTelegramMessage(
+            [
+              "🚨 <b>CHAT ESCALATION</b>",
+              `<b>Player:</b> ${escapeTelegramHtml(displayName)}`,
+              `<b>Email:</b> ${escapeTelegramHtml(email)}`,
+              `<b>Message:</b> ${escapeTelegramHtml(content.slice(0, 500))}`,
+              `<i>${SITE_URL}/admin/chat</i>`,
+            ].join("\n")
+          );
+          return;
+        }
+
+        if (aiResult.response && botSenderId) {
+          await db.from("messages").insert({
+            conversation_id: conversationId,
+            sender_id: botSenderId,
+            content: `🤖 ${aiResult.response}`,
+            is_read: false,
+          });
+        }
+      } catch (err) {
+        console.error("[AfterSend AI Auto-Reply Error]:", err);
+      }
+    })();
   }
 
   return NextResponse.json({ ok: true });

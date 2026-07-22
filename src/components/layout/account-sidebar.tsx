@@ -15,6 +15,7 @@ import {
   Gamepad2,
   Banknote,
   History,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUnreadMessages } from "@/hooks/use-unread-messages";
@@ -22,7 +23,9 @@ import { UnreadBadge } from "@/components/ui/unread-badge";
 
 const ACCOUNT_LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/#games", label: "Games", icon: Gamepad2, gamesLink: true },
+  { href: "/dashboard/games", label: "My Games", icon: Gamepad2 },
+  { href: "/blog", label: "Blog & Guides", icon: Target },
+  { href: "/games", label: "All Games", icon: Gamepad2 },
   { href: "/dashboard/deposit", label: "Deposit", icon: Banknote },
   { href: "/dashboard/deposits", label: "My Deposits", icon: History },
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
@@ -72,15 +75,13 @@ export function AccountSidebar({ walletSlot, className }: AccountSidebarProps) {
           My Account
         </p>
         <nav className="space-y-1">
-          {ACCOUNT_LINKS.map(({ href, label, icon: Icon, exact, gamesLink }) => {
-            const active = gamesLink
-              ? pathname === "/" || pathname.startsWith("/games")
-              : exact
+          {ACCOUNT_LINKS.map(({ href, label, icon: Icon, exact }) => {
+            const active = exact
               ? pathname === href
               : pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
-                key={href}
+                key={`${href}-${label}`}
                 href={href}
                 prefetch={!href.startsWith("/#")}
                 onMouseEnter={() => warmRoute(href)}

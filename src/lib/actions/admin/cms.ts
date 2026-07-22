@@ -9,6 +9,11 @@ import {
   authorize,
   writeAudit,
 } from "@/lib/actions/admin/core";
+import {
+  buildCoverImageUrl,
+  generateBlogDraftWithGemini,
+  uniqueSlug,
+} from "@/lib/blog/generate-post";
 
 const PERMISSION = "cms.manage";
 
@@ -145,4 +150,103 @@ export async function deleteBlogPostAction(id: string): Promise<AdminActionResul
   });
   revalidateCms();
   return { ok: true, message: "Blog post deleted." };
+}
+
+const generateTopicSchema = z.object({
+  topic: z.string().trim().min(3).max(200),
+});
+
+export type GeneratedBlogPostResult =
+  | {
+      ok: true;
+      message?: string;
+      post: {
+        id: string;
+        slug: string;
+        title: string;
+        excerpt: string;
+        content: string;
+        is_published: boolean;
+        published_at: string | null;
+        seo_title: string | null;
+        seo_description: string | null;
+        cover_image_url: string | null;
+      };
+    }
+  | { ok: false; error: string };
+
+/** AI draft: Gemini content + free cover image. Always saved unpublished. */
+export async function generateBlogPostAction(
+  input: z.infer<typeof generateTopicSchema>
+): Promise<GeneratedBlogPostResult> {
+  const auth = await authorize(PERMISSION);
+  if ("error" in auth) return { ok: false, error: auth.error };
+
+  const parsed = generateTopicSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Enter a topic." };
+  }
+
+  try {
+    const draft = await generateBlogDraftWithGemini(parsed.data.topic);
+    const db = adminDb();
+
+    const { data: existingRows } = await db.from("blog_posts").select("slug");
+    const existing = new Set((existingRows ?? []).map((r) => String(r.slug)));
+    const slug = uniqueSlug(draft.slug, existing);
+
+    const cover_image_url = await buildCoverImageUrl({
+      imagePrompt: draft.image_prompt,
+      slug,
+      upload: async (path, bytes, contentType) => {
+        const { error } = await db.storage.from("cms-media").upload(path, Buffer.from(bytes), {
+          contentType,
+          upsert: true,
+        });
+        if (error) return null;
+        const { data } = db.storage.from("cms-media").getPublicUrl(path);
+        return data.publicUrl;
+      },
+    });
+
+    const payload = {
+      slug,
+      title: draft.title,
+      excerpt: draft.excerpt,
+      content: draft.content,
+      cover_image_url,
+      is_published: false,
+      published_at: null as string | null,
+      seo_title: draft.seo_title,
+      seo_description: draft.seo_description,
+      author_id: auth.staff.userId,
+    };
+
+    const { data: inserted, error } = await db
+      .from("blog_posts")
+      .insert(payload)
+      .select(
+        "id, slug, title, excerpt, content, is_published, published_at, seo_title, seo_description, cover_image_url"
+      )
+      .single();
+
+    if (error) return { ok: false, error: error.message };
+
+    await writeAudit({
+      actorId: auth.staff.userId,
+      action: "blog_post.generate",
+      entityType: "blog_post",
+      entityId: inserted.id,
+      after: { ...payload, topic: parsed.data.topic },
+    });
+    revalidateCms();
+    return {
+      ok: true,
+      post: inserted,
+      message: "Draft generated. Review it, then click Publish.",
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: message };
+  }
 }

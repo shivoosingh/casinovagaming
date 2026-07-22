@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   deleteBlogPostAction,
+  generateBlogPostAction,
   upsertBlogPostAction,
 } from "@/lib/actions/admin/cms";
 import { Button } from "@/components/ui/button";
@@ -130,6 +131,14 @@ function BlogForm({
             value={form.cover_image_url ?? ""}
             onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
           />
+          {form.cover_image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={form.cover_image_url}
+              alt=""
+              className="mt-2 h-28 w-full rounded-lg border border-white/10 object-cover"
+            />
+          ) : null}
         </div>
         <div className="space-y-2">
           <Label htmlFor="blog-seo-title">SEO title</Label>
@@ -170,11 +179,87 @@ function BlogForm({
   );
 }
 
+function GenerateDraftCard({
+  onGenerated,
+}: {
+  onGenerated: (post: AdminBlogPostRow) => void;
+}) {
+  const [topic, setTopic] = useState("");
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function generate() {
+    const trimmed = topic.trim();
+    if (trimmed.length < 3) {
+      toast.error("Enter a topic (at least 3 characters).");
+      return;
+    }
+    startTransition(async () => {
+      const result = await generateBlogPostAction({ topic: trimmed });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(result.message ?? "Draft ready");
+      setTopic("");
+      onGenerated(result.post);
+      router.refresh();
+    });
+  }
+
+  return (
+    <div className={cn(CARD, "space-y-3 p-5")}>
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 rounded-lg bg-violet-500/15 p-2 text-violet-300">
+          <Sparkles className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-white">Generate post</p>
+          <p className="mt-0.5 text-xs text-slate-400">
+            Gemini writes the article + a free cover image. Saved as a draft — you click Publish.
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="e.g. How to deposit at Casinova and load Game Vault"
+          disabled={pending}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              generate();
+            }
+          }}
+        />
+        <Button type="button" onClick={generate} disabled={pending} className="shrink-0 sm:min-w-40">
+          {pending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Generating…
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4" />
+              Generate post
+            </>
+          )}
+        </Button>
+      </div>
+      {pending ? (
+        <p className="text-xs text-slate-500">Usually 15–45 seconds (content + image)…</p>
+      ) : null}
+    </div>
+  );
+}
+
 export function CmsBlogPanel({ posts }: { posts: AdminBlogPostRow[] }) {
   const router = useRouter();
   type EditState = Omit<AdminBlogPostRow, "id"> & { id?: string };
   const [editing, setEditing] = useState<EditState | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingPublishId, setPendingPublishId] = useState<string | null>(null);
 
   function refresh() {
     setEditing(null);
@@ -193,14 +278,42 @@ export function CmsBlogPanel({ posts }: { posts: AdminBlogPostRow[] }) {
     }
   }
 
+  async function publish(post: AdminBlogPostRow) {
+    setPendingPublishId(post.id);
+    const result = await upsertBlogPostAction({
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      cover_image_url: post.cover_image_url ?? "",
+      is_published: true,
+      published_at: new Date().toISOString(),
+      seo_title: post.seo_title ?? "",
+      seo_description: post.seo_description ?? "",
+    });
+    setPendingPublishId(null);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success("Published — live on /blog");
+    router.refresh();
+  }
+
   return (
     <div className="space-y-4">
       {!editing ? (
-        <div className="flex justify-end">
-          <Button onClick={() => setEditing(emptyForm())}>New post</Button>
-        </div>
+        <>
+          <GenerateDraftCard onGenerated={(post) => setEditing(post)} />
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setEditing(emptyForm())}>
+              New post manually
+            </Button>
+          </div>
+        </>
       ) : (
-        <BlogForm initial={editing} onDone={refresh} />
+        <BlogForm key={editing.id ?? "new"} initial={editing} onDone={refresh} />
       )}
 
       <div className={cn(CARD, "divide-y divide-white/[0.04]")}>
@@ -212,24 +325,47 @@ export function CmsBlogPanel({ posts }: { posts: AdminBlogPostRow[] }) {
               key={p.id}
               className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between"
             >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium text-white">{p.title}</p>
-                  <span
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
-                      p.is_published
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "bg-slate-500/15 text-slate-400"
-                    )}
-                  >
-                    {p.is_published ? "Published" : "Draft"}
-                  </span>
+              <div className="flex min-w-0 gap-3">
+                {p.cover_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.cover_image_url}
+                    alt=""
+                    className="hidden h-14 w-20 shrink-0 rounded-lg object-cover sm:block"
+                  />
+                ) : null}
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-white">{p.title}</p>
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                        p.is_published
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "bg-slate-500/15 text-slate-400"
+                      )}
+                    >
+                      {p.is_published ? "Published" : "Draft"}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{p.excerpt}</p>
+                  <p className="mt-1 text-xs text-slate-500">/blog/{p.slug}</p>
                 </div>
-                <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{p.excerpt}</p>
-                <p className="mt-1 text-xs text-slate-500">/blog/{p.slug}</p>
               </div>
-              <div className="flex shrink-0 gap-2">
+              <div className="flex shrink-0 flex-wrap gap-2">
+                {!p.is_published ? (
+                  <Button
+                    size="sm"
+                    onClick={() => publish(p)}
+                    disabled={pendingPublishId === p.id || Boolean(editing)}
+                  >
+                    {pendingPublishId === p.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Publish"
+                    )}
+                  </Button>
+                ) : null}
                 <Button
                   variant="outline"
                   size="sm"

@@ -8,6 +8,8 @@ import { adminDb } from "@/lib/actions/admin/core";
 import { requirePermission } from "@/lib/data/admin";
 
 export const metadata: Metadata = { title: "CMS" };
+/** Gemini + image generation can take ~30–60s on free APIs */
+export const maxDuration = 60;
 
 export default async function AdminCmsPage({
   searchParams,

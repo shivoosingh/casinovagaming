@@ -54,6 +54,8 @@ export const PUBLIC_ROUTES = [
   { path: "/about", priority: 0.8 },
   { path: "/support", priority: 0.8 },
   { path: "/spin", priority: 0.85 },
+  { path: "/privacy", priority: 0.4 },
+  { path: "/terms", priority: 0.4 },
   { path: "/login", priority: 0.5 },
   { path: "/register", priority: 0.5 },
 ] as const;

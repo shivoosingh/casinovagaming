@@ -1,4 +1,5 @@
 import {
+  Activity,
   BadgePercent,
   Banknote,
   Bot,
@@ -17,9 +18,11 @@ import {
   Megaphone,
   MessageSquare,
   ScrollText,
+  Send,
   Settings,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   Star,
   Swords,
   Trophy,
@@ -57,6 +60,9 @@ const ADMIN_ICONS: Record<string, LucideIcon> = {
   Wallet,
   History,
   Star,
+  Sparkles,
+  Send,
+  Activity,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

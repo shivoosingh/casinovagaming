@@ -55,7 +55,13 @@ const CAT_CHIPS: { id: GameTab; label: string; icon: typeof Star; tone: string }
   { id: "upcoming", label: "Upcoming", icon: Clock, tone: "from-violet-400 to-indigo-600" },
 ];
 
-export function HomeLandingShell({ hero }: { hero?: ReactNode }) {
+export function HomeLandingShell({
+  hero,
+  belowFold,
+}: {
+  hero?: ReactNode;
+  belowFold?: ReactNode;
+}) {
   const router = useRouter();
   usePrefetchDashboardRoutes();
   const [sidebarTab, setSidebarTab] = useState<GameTab>("all");
@@ -239,6 +245,8 @@ export function HomeLandingShell({ hero }: { hero?: ReactNode }) {
         <LazyWhenVisible placeholder={<Placeholder />}>
           <FaqSection />
         </LazyWhenVisible>
+
+        {belowFold ? <div className="space-y-10 py-4">{belowFold}</div> : null}
       </div>
       <DeferredActivityToast />
     </AppShell>

@@ -147,8 +147,18 @@ export function OverviewPageClient() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/#games" prefetch={false}>
+              <Link href="/dashboard/games" prefetch={false}>
+                My Games
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/games" prefetch={false}>
                 Browse Games
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/blog" prefetch={false}>
+                Blog & Guides
               </Link>
             </Button>
             <Button variant="outline" asChild>
@@ -159,11 +169,6 @@ export function OverviewPageClient() {
             <Button variant="outline" asChild>
               <Link href="/dashboard/messages" prefetch={false}>
                 Open Messages
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/reviews" prefetch={false}>
-                Write a Review
               </Link>
             </Button>
           </CardContent>

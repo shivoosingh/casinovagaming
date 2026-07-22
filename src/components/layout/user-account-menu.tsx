@@ -25,7 +25,8 @@ import { toast } from "sonner";
 
 const MENU_LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/#games", label: "Games", icon: Gamepad2 },
+  { href: "/dashboard/games", label: "My Games", icon: Gamepad2 },
+  { href: "/blog", label: "Blog & Guides", icon: Target },
   { href: "/dashboard/deposit", label: "Deposit", icon: Banknote },
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
   { href: "/dashboard/vip", label: "VIP Status", icon: Crown },

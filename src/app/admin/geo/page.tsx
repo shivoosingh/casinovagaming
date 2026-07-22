@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 
+import { AdminBulkLandingGenerator } from "@/components/admin/admin-bulk-landing-generator";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSqlRequiredNotice } from "@/components/admin/admin-sql-required-notice";
 import { GeoPanel } from "@/components/admin/geo-panel";
@@ -39,7 +40,10 @@ export default async function AdminGeoPage() {
       {missing ? (
         <AdminSqlRequiredNotice title="Geo pages need the Phase 2 admin SQL" />
       ) : (
-        <GeoPanel states={states ?? []} cities={cities ?? []} />
+        <div className="space-y-8">
+          <AdminBulkLandingGenerator />
+          <GeoPanel states={states ?? []} cities={cities ?? []} />
+        </div>
       )}
     </div>
   );
