@@ -13,6 +13,7 @@ import {
   DEPOSIT_LOAD_TYPES,
   type DepositRolloverBounds,
 } from "@/lib/wallet/deposit-redeem-rollover";
+import { autoFulfillCashMachineRequest, isCashMachineApiConfigured } from "@/lib/game-automation/cashmachine-service";
 
 export async function requestGameAccountCreate(input: {
   gameSlug: string;
@@ -105,6 +106,14 @@ export async function requestGameAccountCreate(input: {
     return { error: error.message };
   }
 
+  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
+    await autoFulfillCashMachineRequest(requestId as string, "create_account", {
+      userId: user.id,
+      requestedUsername: username,
+      requestedPassword: finalPassword,
+    });
+  }
+
   revalidatePath(`/games/${input.gameSlug}`);
   revalidatePath("/admin/game-loads");
 
@@ -161,6 +170,13 @@ export async function requestGameCheckBalance(input: {
       return { error: "Run supabase/redeem-wallets-and-balance-check.sql in Supabase SQL Editor first." };
     }
     return { error: error.message };
+  }
+
+  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
+    await autoFulfillCashMachineRequest(requestId as string, "check_balance", {
+      userId: user.id,
+      gameUsername: input.gameUsername.trim(),
+    });
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -226,6 +242,14 @@ export async function requestGameLoad(input: {
       return { error: "Run supabase/game-load-requests.sql in Supabase SQL Editor first." };
     }
     return { error: error.message };
+  }
+
+  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
+    await autoFulfillCashMachineRequest(requestId as string, "load", {
+      userId: user.id,
+      gameUsername: input.gameUsername.trim(),
+      amount,
+    });
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -346,6 +370,14 @@ export async function requestGameRedeem(input: {
       };
     }
     return { error: error.message };
+  }
+
+  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
+    await autoFulfillCashMachineRequest(requestId as string, "redeem", {
+      userId: user.id,
+      gameUsername: input.gameUsername.trim(),
+      amount: redeemAll ? null : input.amount,
+    });
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
