@@ -368,28 +368,33 @@ export function GameWalletLoadSection({
       if (!ok) return;
     }
 
-    setCreating(true);
-    const result = await requestGameAccountCreate({
-      gameSlug: game.slug,
-      gameName: game.name,
-      username: custom?.username,
-      password: custom?.password,
-      replaceAccount: hasSavedAccount,
-    });
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success(
-        hasSavedAccount
-          ? `Replacing your ${game.name} account…`
-          : `Creating your ${game.name} account…`
-      );
-      setCustomMode(false);
-      setCustomUsername("");
-      setCustomPassword("");
+    try {
+      setCreating(true);
+      const result = await requestGameAccountCreate({
+        gameSlug: game.slug,
+        gameName: game.name,
+        username: custom?.username,
+        password: custom?.password,
+        replaceAccount: hasSavedAccount,
+      });
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          hasSavedAccount
+            ? `Replacing your ${game.name} account…`
+            : `Account request submitted successfully!`
+        );
+        setCustomMode(false);
+        setCustomUsername("");
+        setCustomPassword("");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Account creation failed");
+    } finally {
+      void refreshLoads();
+      setCreating(false);
     }
-    void refreshLoads();
-    setCreating(false);
   }
 
   async function handleCreateCustom() {

@@ -34,6 +34,7 @@ export async function autoFulfillMilkyWayRequest(
 
   try {
     if (loadType === "create_account") {
+      console.log(`[DB] Starting create_account for requestId: ${requestId || "none"}`);
       const passToUse = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
       const created = await client.createAccount(cleanAccount, passToUse);
 
@@ -48,6 +49,7 @@ export async function autoFulfillMilkyWayRequest(
             updated_at: new Date().toISOString(),
           })
           .eq("id", requestId);
+        console.log(`[DB] Local user / request updated to completed for requestId: ${requestId}`);
       }
 
       return {
@@ -155,23 +157,19 @@ export async function autoFulfillMilkyWayRequest(
 
     throw new Error(`Unsupported loadType for Milky Way: ${loadType}`);
   } catch (err: any) {
-    console.error("[Milky Way Auto-Fulfill Error]", err);
+    console.error("[Milky Way Auto-Fulfill Error]", err.message);
 
-    // If direct terminal API returns Session timeout, queue request in pending for admin/worker fulfillment
-    if (requestId && admin && err.message?.includes("Session timeout")) {
+    // Update database status to failed so the UI does not hang in pending status
+    if (admin && requestId) {
       await admin
         .from("game_load_requests")
         .update({
-          admin_notes: `Direct API session timeout. Queued for fulfillment.`,
+          status: "failed",
+          error_message: err.message || "Milky Way operation failed",
           updated_at: new Date().toISOString(),
         })
         .eq("id", requestId);
-
-      return {
-        success: true,
-        message: `Request created and queued for fulfillment`,
-        accountName: cleanAccount,
-      };
+      console.log(`[DB] Request status updated to failed for requestId: ${requestId}`);
     }
 
     return {
