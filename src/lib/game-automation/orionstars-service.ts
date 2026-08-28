@@ -1,3 +1,4 @@
+import { createAdminClient } from "@/lib/supabase/admin";
 import { OrionStarsApiClient } from "./orionstars-api";
 
 export interface AutoFulfillOrionStarsOptions {
@@ -27,13 +28,27 @@ export async function autoFulfillOrionStarsRequest(
 ): Promise<AutoFulfillOrionStarsResult> {
   const client = new OrionStarsApiClient();
 
-  const { loadType, accountName, password, amount = 0 } = options;
+  const { requestId, loadType, accountName, password, amount = 0 } = options;
   const cleanAccount = accountName.trim();
+  const admin = createAdminClient();
 
   try {
     if (loadType === "create_account") {
       const passToUse = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
       const created = await client.createAccount(cleanAccount, passToUse);
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            game_username: created.account,
+            game_password: created.pass,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
@@ -50,6 +65,19 @@ export async function autoFulfillOrionStarsRequest(
       const info = await client.queryInfo(cleanAccount);
       const userBalance = Number(info.userbalance || 0);
 
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            amount: userBalance,
+            admin_notes: `Balance: $${userBalance.toFixed(2)}`,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
+
       return {
         success: true,
         message: `Orion Stars balance checked for ${cleanAccount}`,
@@ -64,29 +92,35 @@ export async function autoFulfillOrionStarsRequest(
         throw new Error("Invalid deposit amount for Orion Stars load");
       }
 
-      // Check if account exists first, if not create account
-      let accountExists = true;
+      let createdPass: string | undefined;
       try {
         await client.queryInfo(cleanAccount);
       } catch (err) {
-        accountExists = false;
-      }
-
-      let createdPass: string | undefined;
-      if (!accountExists) {
         createdPass = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
-        await client.createAccount(cleanAccount, createdPass);
+        await client.createAccount(cleanAccount, createdPass).catch(() => null);
       }
 
       const res = await client.rechargePlayer(cleanAccount, amount);
       const infoAfter = await client.queryInfo(cleanAccount).catch(() => ({ userbalance: amount }));
+      const newBal = Number(infoAfter.userbalance || amount);
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
         message: `Orion Stars recharged $${amount}.00 to ${cleanAccount}`,
         accountName: cleanAccount,
         credentials: createdPass ? { username: cleanAccount, password: createdPass } : undefined,
-        newBalance: Number(infoAfter.userbalance || amount),
+        newBalance: newBal,
         rawResponse: res,
       };
     }
@@ -98,6 +132,17 @@ export async function autoFulfillOrionStarsRequest(
 
       const res = await client.withdrawPlayer(cleanAccount, amount);
       const infoAfter = await client.queryInfo(cleanAccount).catch(() => ({ userbalance: 0 }));
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
@@ -111,6 +156,23 @@ export async function autoFulfillOrionStarsRequest(
     throw new Error(`Unsupported loadType for Orion Stars: ${loadType}`);
   } catch (err: any) {
     console.error("[Orion Stars Auto-Fulfill Error]", err);
+
+    if (requestId && admin && err.message?.includes("Session timeout")) {
+      await admin
+        .from("game_load_requests")
+        .update({
+          admin_notes: `Direct API session timeout. Queued for fulfillment.`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", requestId);
+
+      return {
+        success: true,
+        message: `Request created and queued for fulfillment`,
+        accountName: cleanAccount,
+      };
+    }
+
     return {
       success: false,
       message: err.message || "Orion Stars auto-fulfillment failed",

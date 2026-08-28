@@ -1,3 +1,4 @@
+import { createAdminClient } from "@/lib/supabase/admin";
 import { MilkyWayApiClient } from "./milkyway-api";
 
 export interface AutoFulfillMilkyWayOptions {
@@ -27,13 +28,27 @@ export async function autoFulfillMilkyWayRequest(
 ): Promise<AutoFulfillMilkyWayResult> {
   const client = new MilkyWayApiClient();
 
-  const { loadType, accountName, password, amount = 0 } = options;
+  const { requestId, loadType, accountName, password, amount = 0 } = options;
   const cleanAccount = accountName.trim();
+  const admin = createAdminClient();
 
   try {
     if (loadType === "create_account") {
       const passToUse = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
       const created = await client.createAccount(cleanAccount, passToUse);
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            game_username: created.account,
+            game_password: created.pass,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
@@ -50,6 +65,19 @@ export async function autoFulfillMilkyWayRequest(
       const info = await client.queryInfo(cleanAccount);
       const userBalance = Number(info.userbalance || 0);
 
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            amount: userBalance,
+            admin_notes: `Balance: $${userBalance.toFixed(2)}`,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
+
       return {
         success: true,
         message: `Milky Way balance checked for ${cleanAccount}`,
@@ -64,28 +92,35 @@ export async function autoFulfillMilkyWayRequest(
         throw new Error("Invalid deposit amount for Milky Way load");
       }
 
-      let accountExists = true;
+      let createdPass: string | undefined;
       try {
         await client.queryInfo(cleanAccount);
       } catch (err) {
-        accountExists = false;
-      }
-
-      let createdPass: string | undefined;
-      if (!accountExists) {
         createdPass = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
-        await client.createAccount(cleanAccount, createdPass);
+        await client.createAccount(cleanAccount, createdPass).catch(() => null);
       }
 
       const res = await client.rechargePlayer(cleanAccount, amount);
       const infoAfter = await client.queryInfo(cleanAccount).catch(() => ({ userbalance: amount }));
+      const newBal = Number(infoAfter.userbalance || amount);
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
         message: `Milky Way recharged $${amount}.00 to ${cleanAccount}`,
         accountName: cleanAccount,
         credentials: createdPass ? { username: cleanAccount, password: createdPass } : undefined,
-        newBalance: Number(infoAfter.userbalance || amount),
+        newBalance: newBal,
         rawResponse: res,
       };
     }
@@ -97,6 +132,17 @@ export async function autoFulfillMilkyWayRequest(
 
       const res = await client.withdrawPlayer(cleanAccount, amount);
       const infoAfter = await client.queryInfo(cleanAccount).catch(() => ({ userbalance: 0 }));
+
+      if (admin && requestId) {
+        await admin
+          .from("game_load_requests")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", requestId);
+      }
 
       return {
         success: true,
@@ -110,6 +156,24 @@ export async function autoFulfillMilkyWayRequest(
     throw new Error(`Unsupported loadType for Milky Way: ${loadType}`);
   } catch (err: any) {
     console.error("[Milky Way Auto-Fulfill Error]", err);
+
+    // If direct terminal API returns Session timeout, queue request in pending for admin/worker fulfillment
+    if (requestId && admin && err.message?.includes("Session timeout")) {
+      await admin
+        .from("game_load_requests")
+        .update({
+          admin_notes: `Direct API session timeout. Queued for fulfillment.`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", requestId);
+
+      return {
+        success: true,
+        message: `Request created and queued for fulfillment`,
+        accountName: cleanAccount,
+      };
+    }
+
     return {
       success: false,
       message: err.message || "Milky Way auto-fulfillment failed",
