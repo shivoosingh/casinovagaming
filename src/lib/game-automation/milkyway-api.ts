@@ -87,9 +87,6 @@ export class MilkyWayApiClient {
   private apiUrl: string;
   private agentName: string;
   private agentPasswdHash: string;
-  private agentKey: string | null = null;
-  private sessionTime: string | null = null;
-  private agentKeyExpiresAt: number = 0;
   public lastAgentBalance: number = 0;
 
   constructor(config: MilkyWayConfig = {}) {
@@ -126,43 +123,37 @@ export class MilkyWayApiClient {
   }
 
   /**
-   * Perform agentLogin to obtain fresh agentKey and balance.
+   * Perform fresh agentLogin on EVERY call to guarantee no stale cached agentKey or timestamp is ever used.
    */
-  public async getValidSession(): Promise<{ agentKey: string; time: string }> {
-    const now = Date.now();
-    if (this.agentKey && this.sessionTime && this.agentKeyExpiresAt > now) {
-      return { agentKey: this.agentKey, time: this.sessionTime };
-    }
-
-    const time = now.toString();
+  public async getFreshSession(): Promise<{ agentKey: string; time: string; balance: number }> {
+    const time = Date.now().toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(
       this.agentName
     )}&agentPasswd=${encodeURIComponent(this.agentPasswdHash)}&time=${time}`;
 
-    console.log(`[MW] Starting agentLogin | agentName: "${this.agentName}"`);
+    console.log(`[MW] Executing fresh agentLogin | agentName: "${this.agentName}" | time: ${time}`);
 
     const json: MilkyWayLoginResponse = await this.request(loginUrl);
 
-    console.log(`[MW] agentLogin response received | code: ${json.code} | balance: "${json.balance}" | agentKey prefix: ${json.agentkey ? json.agentkey.slice(0, 6) + "..." : "NONE"}`);
+    const keyPrefix = json.agentkey ? `${json.agentkey.slice(0, 6)}...` : "NONE";
+    console.log(`[MW] agentLogin response | code: ${json.code} | balance: "${json.balance}" | agentKey prefix: ${keyPrefix}`);
 
     if (String(json.code) !== "200" || !json.agentkey) {
       const msg = json.msg || `code ${json.code}`;
       throw new Error(`Milky Way agentLogin failed: ${msg}`);
     }
 
-    this.agentKey = json.agentkey;
-    this.sessionTime = time;
-    this.lastAgentBalance = parseFloat(String(json.balance || "0"));
-    this.agentKeyExpiresAt = now + 3 * 60 * 1000;
+    const bal = parseFloat(String(json.balance || "0"));
+    this.lastAgentBalance = bal;
 
-    return { agentKey: this.agentKey, time: this.sessionTime };
+    return { agentKey: json.agentkey, time, balance: bal };
   }
 
   /**
-   * Calculate MD5 signature per v1.2.3 spec: MD5(lowercase(agentName) + time + lowercase(agentKey))
+   * Calculate fresh MD5 signature per v1.2.3 spec: MD5(lowercase(agentName) + time + lowercase(freshAgentKey))
    */
-  private async createSign(): Promise<{ sign: string; time: string; agentKey: string }> {
-    const session = await this.getValidSession();
+  private async createFreshSign(): Promise<{ sign: string; time: string; agentKey: string }> {
+    const session = await this.getFreshSession();
     const rawSignStr = (this.agentName + session.time + session.agentKey).toLowerCase();
     const sign = md5(rawSignStr);
     return { sign, time: session.time, agentKey: session.agentKey };
@@ -175,7 +166,7 @@ export class MilkyWayApiClient {
     account: string,
     pass: string
   ): Promise<{ account: string; pass: string }> {
-    const { sign, time, agentKey } = await this.createSign();
+    const { sign, time, agentKey } = await this.createFreshSign();
     const passHash = md5(pass);
 
     const url = `${this.apiUrl}?action=registerUser&account=${encodeURIComponent(
@@ -184,15 +175,22 @@ export class MilkyWayApiClient {
       this.agentName
     )}&agentkey=${encodeURIComponent(agentKey)}&time=${time}&sign=${sign}`;
 
-    console.log(`[MW] Starting registerUser | account: "${account}" | sign prefix: "${sign.slice(0, 8)}..."`);
+    console.log(`[MW Diagnostic] Sending registerUser request:`);
+    console.log(`  agentName: "${this.agentName}"`);
+    console.log(`  timestamp: ${time} (${time.length} digits, ms format)`);
+    console.log(`  API endpoint: ${this.apiUrl}`);
+    console.log(`  HTTP method: POST`);
+    console.log(`  signature length: ${sign.length}`);
+    console.log(`  agentKey source: fresh agentLogin response`);
+    console.log(`  account: "${account}"`);
 
     const json = await this.request(url);
 
-    console.log(`[MW] registerUser response received | code: ${json.code} | msg: "${json.msg || ""}" | userbalance: ${json.userbalance}`);
+    console.log(`[MW Diagnostic] registerUser raw API response | code: ${json.code} | msg: "${json.msg || ""}"`);
 
     if (String(json.code) !== "200") {
       const msg = json.msg || `Registration failed with code ${json.code}`;
-      throw new Error(`Milky Way registerUser error: ${msg}`);
+      throw new Error(`Milky Way registerUser error [code ${json.code}]: ${msg}`);
     }
 
     return { account, pass };
@@ -202,7 +200,7 @@ export class MilkyWayApiClient {
    * Query user information
    */
   public async queryInfo(account: string): Promise<MilkyWayQueryResponse> {
-    const { sign, time, agentKey } = await this.createSign();
+    const { sign, time, agentKey } = await this.createFreshSign();
 
     const url = `${this.apiUrl}?action=queryInfo&account=${encodeURIComponent(
       account
@@ -212,11 +210,11 @@ export class MilkyWayApiClient {
 
     console.log(`[MW] Starting queryInfo | account: "${account}"`);
     const json: MilkyWayQueryResponse = await this.request(url);
-    console.log(`[MW] queryInfo response received | code: ${json.code}`);
+    console.log(`[MW] queryInfo response received | code: ${json.code} | msg: "${json.msg || ""}"`);
 
     if (String(json.code) !== "200") {
       const msg = json.msg || `Query failed with code ${json.code}`;
-      throw new Error(`Milky Way queryInfo error: ${msg}`);
+      throw new Error(`Milky Way queryInfo error [code ${json.code}]: ${msg}`);
     }
 
     return json;
@@ -226,7 +224,7 @@ export class MilkyWayApiClient {
    * Recharge user balance
    */
   public async rechargePlayer(account: string, amount: number): Promise<{ success: boolean; account: string; amount: number }> {
-    const { sign, time, agentKey } = await this.createSign();
+    const { sign, time, agentKey } = await this.createFreshSign();
 
     const url = `${this.apiUrl}?action=recharge&account=${encodeURIComponent(
       account
@@ -240,7 +238,7 @@ export class MilkyWayApiClient {
 
     if (String(json.code) !== "200") {
       const msg = json.msg || `Recharge failed with code ${json.code}`;
-      throw new Error(`Milky Way recharge error: ${msg}`);
+      throw new Error(`Milky Way recharge error [code ${json.code}]: ${msg}`);
     }
 
     return { success: true, account, amount };
@@ -250,7 +248,7 @@ export class MilkyWayApiClient {
    * Redeem user balance back to agent account
    */
   public async withdrawPlayer(account: string, amount: number): Promise<{ success: boolean; account: string; amount: number }> {
-    const { sign, time, agentKey } = await this.createSign();
+    const { sign, time, agentKey } = await this.createFreshSign();
 
     const url = `${this.apiUrl}?action=redeem&account=${encodeURIComponent(
       account
@@ -264,7 +262,7 @@ export class MilkyWayApiClient {
 
     if (String(json.code) !== "200") {
       const msg = json.msg || `Redeem failed with code ${json.code}`;
-      throw new Error(`Milky Way redeem error: ${msg}`);
+      throw new Error(`Milky Way redeem error [code ${json.code}]: ${msg}`);
     }
 
     return { success: true, account, amount };
