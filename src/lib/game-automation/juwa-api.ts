@@ -117,7 +117,7 @@ export class JuwaApiClient {
     this.agentId = (
       config.agentId ||
       process.env.JUWA_AGENT_ID ||
-      "1"
+      "david1233321"
     ).trim();
 
     this.secretKey = (
