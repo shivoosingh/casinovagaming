@@ -22,8 +22,10 @@ import { autoFulfillOrionStarsRequest } from "@/lib/game-automation/orionstars-s
 import { isOrionStarsApiConfigured } from "@/lib/game-automation/orionstars-api";
 import { autoFulfillMilkyWayRequest } from "@/lib/game-automation/milkyway-service";
 import { isMilkyWayApiConfigured } from "@/lib/game-automation/milkyway-api";
+import { autoFulfillJuwaRequest } from "@/lib/game-automation/juwa-service";
+import { isJuwaApiConfigured } from "@/lib/game-automation/juwa-api";
 
-const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "orion-stars", "milky-way"];
+const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "orion-stars", "milky-way", "juwa"];
 
 async function autoFulfillGameRequest(
   gameSlug: string,
@@ -37,6 +39,19 @@ async function autoFulfillGameRequest(
     requestedPassword?: string | null;
   }
 ): Promise<{ success: boolean; error?: string } | null> {
+  if (gameSlug === "juwa" && isJuwaApiConfigured()) {
+    const targetAccount = input.gameUsername || input.requestedUsername || `juwa_${input.userId.slice(0, 8)}`;
+    const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
+    const res = await autoFulfillJuwaRequest({
+      requestId,
+      gameSlug,
+      loadType: mapType as any,
+      accountName: targetAccount,
+      password: input.requestedPassword || undefined,
+      amount: input.amount || 0,
+    });
+    return { success: res.success, error: res.success ? undefined : res.message };
+  }
   if (gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
     return autoFulfillCashMachineRequest(requestId, loadType, input);
   }
