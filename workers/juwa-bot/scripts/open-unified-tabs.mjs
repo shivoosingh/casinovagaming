@@ -5,7 +5,7 @@
 import { chromium } from "playwright";
 
 const CDP = process.env.SPINORA_CDP_URL?.trim() || "http://127.0.0.1:9222";
-const TAB_DELAY_MS = Number(process.env.SPINORA_TAB_DELAY_MS ?? 1500);
+const TAB_DELAY_MS = Number(process.env.SPINORA_TAB_DELAY_MS ?? 600);
 
 const PANELS = [
   { name: "Juwa", host: "juwa777.com", url: "https://ht.juwa777.com/login" },
@@ -44,7 +44,6 @@ async function openPanel(context, panel, force = false) {
 
   if (page && !force) {
     console.log(`[ok] ${panel.name} — ${page.url()}`);
-    await page.bringToFront().catch(() => {});
     return page;
   }
 
@@ -53,8 +52,8 @@ async function openPanel(context, panel, force = false) {
   }
 
   console.log(`[open] ${panel.name} → ${panel.url}`);
-  await page.bringToFront().catch(() => {});
-  await page.goto(panel.url, { waitUntil: "domcontentloaded", timeout: 120000 }).catch((e) => {
+  // commit = navigate started; don't wait for full admin SPA (that made unified Chrome feel slow)
+  await page.goto(panel.url, { waitUntil: "commit", timeout: 60000 }).catch((e) => {
     console.warn(`[warn] ${panel.name} goto: ${e instanceof Error ? e.message : e}`);
   });
   await sleep(TAB_DELAY_MS);

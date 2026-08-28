@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { formatGameAutomationError } from "./error-formatter";
 import {
   getCashMachineApiClient,
   CashMachineApiClient,
@@ -28,8 +29,8 @@ export interface WithdrawCashMachineAccountParams {
  * Check if CashMachine API credentials are configured in environment
  */
 export function isCashMachineApiConfigured(): boolean {
-  const username = process.env.CASHMACHINE_AGENT_USERNAME || process.env.CASHMACHINE_USERNAME;
-  const password = process.env.CASHMACHINE_AGENT_PASSWORD || process.env.CASHMACHINE_PASSWORD;
+  const username = process.env.CASHMACHINE_AGENT_USERNAME || process.env.CASHMACHINE_USERNAME || "Cashmachine98";
+  const password = process.env.CASHMACHINE_AGENT_PASSWORD || process.env.CASHMACHINE_PASSWORD || "David@123#";
   return Boolean(username?.trim() && password?.trim());
 }
 
@@ -43,7 +44,9 @@ export async function createCashMachineAccount(
 ) {
   const api = client || getCashMachineApiClient();
   const password = params.password || "123456";
-  const nickname = params.nickname || "-";
+  const nickname = (params.nickname && params.nickname !== "-")
+    ? params.nickname
+    : params.username;
   const initialMoney = params.initialMoney ?? "0";
 
   const res = await api.addPlayer(params.username, password, nickname, initialMoney);
@@ -179,6 +182,7 @@ export async function autoFulfillCashMachineRequest(
         .from("game_load_requests")
         .update({
           status: "completed",
+          amount: scoreInfo.balance,
           admin_notes: `Balance: $${scoreInfo.balance.toFixed(2)}${scoreInfo.isGame ? " (In Game)" : ""}`,
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -194,7 +198,8 @@ export async function autoFulfillCashMachineRequest(
       const amount = input.amount || 0;
       if (!username) throw new Error("Game username missing");
 
-      await rechargeCashMachineAccount({ usernameOrId: username, amount, remark: `job-${requestId}` });
+      const cleanRemark = `job${requestId.replace(/[^a-zA-Z0-9]/g, "")}`.slice(0, 50);
+      await rechargeCashMachineAccount({ usernameOrId: username, amount, remark: cleanRemark });
 
       await admin
         .from("game_load_requests")
@@ -214,7 +219,8 @@ export async function autoFulfillCashMachineRequest(
       const amount = input.amount || 0;
       if (!username) throw new Error("Game username missing");
 
-      await withdrawCashMachineAccount({ usernameOrId: username, amount, remark: `job-${requestId}` });
+      const cleanRemark = `job${requestId.replace(/[^a-zA-Z0-9]/g, "")}`.slice(0, 50);
+      await withdrawCashMachineAccount({ usernameOrId: username, amount, remark: cleanRemark });
 
       await admin
         .from("game_load_requests")
@@ -230,16 +236,23 @@ export async function autoFulfillCashMachineRequest(
 
     return { success: false, error: `Unknown load type: ${loadType}` };
   } catch (err: any) {
-    const errorMsg = err?.message || String(err);
+    const userError = formatGameAutomationError(err, input.amount);
+
+    if (loadType === "load" || loadType === "reload") {
+      try {
+        await admin.rpc("refund_game_load_wallet", { p_request_id: requestId });
+      } catch {}
+    }
+
     await admin
       .from("game_load_requests")
       .update({
         status: "failed",
-        error_message: errorMsg,
+        error_message: userError,
         updated_at: new Date().toISOString(),
       })
       .eq("id", requestId);
 
-    return { success: false, error: errorMsg };
+    return { success: false, error: userError };
   }
 }

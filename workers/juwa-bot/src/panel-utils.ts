@@ -1,6 +1,7 @@
 import type { Locator, Page } from "playwright";
 import { mkdirSync } from "fs";
 import { join } from "path";
+import { makeCredentialRefill, waitForPanelLogin } from "../../shared/panel-login-captcha.js";
 
 const DEBUG_DIR = join(process.cwd(), "debug");
 
@@ -10,6 +11,8 @@ export function log(step: string, detail?: string) {
 }
 
 export async function screenshot(page: Page, name: string) {
+  // Off by default ? fullPage PNG on every step was making jobs feel very slow.
+  if ((process.env.BOT_DEBUG_SCREENSHOTS ?? "").toLowerCase() !== "true") return;
   try {
     mkdirSync(DEBUG_DIR, { recursive: true });
     const path = join(DEBUG_DIR, `${Date.now()}-${name}.png`);
@@ -35,7 +38,7 @@ export async function clickByText(page: Page, patterns: RegExp[], timeout = 8000
         if ((await first.count()) > 0 && (await first.isVisible().catch(() => false))) {
           await first.click({ timeout: 5000 });
           log("clicked", pattern.source);
-          await page.waitForTimeout(800);
+          await page.waitForTimeout(150);
           return true;
         }
       }
@@ -82,7 +85,7 @@ export async function fillByLabelOrPlaceholder(page: Page, hints: RegExp[], valu
 }
 
 export async function submitForm(page: Page) {
-  const patterns = [/login|sign in|submit|confirm|ok|save|create|add|recharge|deposit|充值|确认|提交|登录/i];
+  const patterns = [/login|sign in|submit|confirm|ok|save|create|add|recharge|deposit/i];
   if (await clickByText(page, patterns, 3000)) return;
 
   const primary = page.locator('.el-button--primary, button[type="submit"], input[type="submit"]').first();
@@ -95,11 +98,11 @@ export async function submitForm(page: Page) {
 }
 
 export async function waitForDashboard(page: Page, loginUrl: string) {
-  await page.waitForLoadState("networkidle", { timeout: 20000 }).catch(() => {});
-  await page.waitForTimeout(1500);
+  await page.waitForLoadState("domcontentloaded", { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(150);
 
   if (await isLoginPage(page)) {
-    throw new Error("Login failed — still on login page. Check agent username/password.");
+    throw new Error("Login failed ? still on login page. Check agent username/password.");
   }
 }
 
@@ -110,12 +113,15 @@ export async function isLoginPage(page: Page): Promise<boolean> {
   return pwd > 0 && (await signIn.isVisible().catch(() => false));
 }
 
-export async function waitForManualLogin(page: Page, timeoutMs = 180_000) {
-  log("login", "CAPTCHA on page — log in manually in Chrome (enter code + click Sign in)");
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    if (!(await isLoginPage(page))) return;
-    await page.waitForTimeout(1000);
-  }
-  throw new Error("Login timeout — enter CAPTCHA and click Sign in in the Chrome window");
+export async function waitForManualLogin(page: Page, timeoutMs?: number) {
+  const allowManual =
+    process.env.JUWA_HEADLESS === "false" || Boolean(process.env.JUWA_CDP_URL);
+  await waitForPanelLogin(page, {
+    log,
+    isLoginPage,
+    allowManual,
+    ...(timeoutMs != null ? { manualTimeoutMs: timeoutMs } : {}),
+    loginButtonPatterns: [/sign in|login|log in/i],
+    refillCredentials: makeCredentialRefill(page, "JUWA_AGENT_USERNAME", "JUWA_AGENT_PASSWORD"),
+  });
 }

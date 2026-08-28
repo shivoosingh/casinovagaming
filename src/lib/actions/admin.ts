@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/actions/notifications";
 
 export async function updateUserRole(userId: string, role: "user" | "admin") {
@@ -144,23 +145,113 @@ export async function broadcastAdminNotice(input: {
   const message = input.message.trim();
   if (!title || !message) return { error: "Title and message are required" };
 
+  const type = input.type ?? "warning";
+  const sendChat = input.sendChat ?? true;
+
+  // Attempt RPC execution first
   const { data, error } = await auth.supabase.rpc("admin_broadcast_to_all_users", {
     p_title: title,
     p_message: message,
-    p_type: input.type ?? "warning",
-    p_send_chat: input.sendChat ?? true,
+    p_type: type,
+    p_send_chat: sendChat,
   });
 
-  if (error) {
-    if (error.message.includes("admin_broadcast_to_all_users")) {
-      return { error: "Run supabase/admin-broadcast-message.sql in Supabase SQL Editor first." };
-    }
-    return { error: error.message };
+  if (!error) {
+    revalidatePath("/admin");
+    revalidatePath("/admin/chat");
+    return { success: true, count: Number(data ?? 0) };
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/chat");
-  return { success: true, count: Number(data ?? 0) };
+  // Fallback: direct database operations if RPC is missing or fails
+  try {
+    const adminClient = createAdminClient() ?? auth.supabase;
+
+    // Fetch all non-admin profiles (role is not 'admin')
+    const { data: profiles, error: profileErr } = await adminClient
+      .from("profiles")
+      .select("id, role");
+
+    if (profileErr) {
+      return { error: profileErr.message };
+    }
+
+    const targetUsers = (profiles || []).filter((p) => p.role !== "admin");
+    const targetUserIds = targetUsers.map((p) => p.id);
+
+    if (targetUserIds.length === 0) {
+      return { success: true, count: 0 };
+    }
+
+    // Insert notifications in chunks of 500
+    const notificationRows = targetUserIds.map((userId) => ({
+      user_id: userId,
+      title,
+      message,
+      type,
+      is_read: false,
+    }));
+
+    const BATCH_SIZE = 500;
+    for (let i = 0; i < notificationRows.length; i += BATCH_SIZE) {
+      const chunk = notificationRows.slice(i, i + BATCH_SIZE);
+      const { error: notifErr } = await adminClient.from("notifications").insert(chunk);
+      if (notifErr) {
+        console.error("Direct notification insert error:", notifErr);
+      }
+    }
+
+    // If sendChat is requested, post a support message to each user's conversation
+    if (sendChat) {
+      const chatContent = `${title}\n\n${message}`;
+      const senderId = auth.user.id;
+
+      for (const userId of targetUserIds) {
+        try {
+          let conversationId: string | null = null;
+          const { data: existingConv } = await adminClient
+            .from("conversations")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("is_active", true)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (existingConv?.id) {
+            conversationId = existingConv.id;
+            await adminClient
+              .from("conversations")
+              .update({ admin_id: senderId, updated_at: new Date().toISOString() })
+              .eq("id", conversationId);
+          } else {
+            const { data: newConv } = await adminClient
+              .from("conversations")
+              .insert({ user_id: userId, admin_id: senderId })
+              .select("id")
+              .single();
+            if (newConv?.id) conversationId = newConv.id;
+          }
+
+          if (conversationId) {
+            await adminClient.from("messages").insert({
+              conversation_id: conversationId,
+              sender_id: senderId,
+              content: chatContent,
+              is_read: false,
+            });
+          }
+        } catch (chatErr) {
+          console.error(`Error broadcasting chat message to user ${userId}:`, chatErr);
+        }
+      }
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/chat");
+    return { success: true, count: targetUserIds.length };
+  } catch (fallbackErr: any) {
+    return { error: fallbackErr.message || "Failed to broadcast message." };
+  }
 }
 
 export async function broadcastMaintenanceNotice() {

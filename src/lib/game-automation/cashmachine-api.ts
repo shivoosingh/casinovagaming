@@ -115,13 +115,13 @@ export class CashMachineApiClient {
       config.username ||
       process.env.CASHMACHINE_AGENT_USERNAME ||
       process.env.CASHMACHINE_USERNAME ||
-      "";
+      "Cashmachine98";
 
     this.agentPassword =
       config.password ||
       process.env.CASHMACHINE_AGENT_PASSWORD ||
       process.env.CASHMACHINE_PASSWORD ||
-      "";
+      "David@123#";
   }
 
   /**
@@ -293,12 +293,18 @@ export class CashMachineApiClient {
   async addPlayer(
     username: string,
     password: string = "123456",
-    nickname: string = "-",
+    nickname?: string,
     money: string | number = "0"
   ): Promise<CashMachineAddPlayerResponse> {
+    const cleanUser = username.trim();
+    let cleanNick = (nickname && nickname !== "-" ? nickname : cleanUser)
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 20);
+    if (!cleanNick) cleanNick = "User" + Math.floor(1000 + Math.random() * 9000);
+
     const body = this.buildFormData({
-      username: username.trim(),
-      nickname: nickname.trim(),
+      username: cleanUser,
+      nickname: cleanNick,
       password: String(password).trim(),
       money: String(money),
     });
@@ -326,13 +332,17 @@ export class CashMachineApiClient {
   async rechargePlayer(
     idOrAccount: string | number,
     balance: number | string,
-    remark: string = "web-recharge"
+    remark: string = "webrecharge"
   ): Promise<CashMachineRechargeResponse> {
     const id = await this.resolvePlayerId(idOrAccount);
+    const cleanRemark = (remark || "webrecharge")
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 50) || "webrecharge";
+
     const body = this.buildFormData({
       id,
       balance: String(balance),
-      remark: remark.trim(),
+      remark: cleanRemark,
     });
 
     return this.request<CashMachineRechargeResponse>("/api/player/playerRecharge", {
@@ -348,13 +358,17 @@ export class CashMachineApiClient {
   async withdrawPlayer(
     idOrAccount: string | number,
     balance: number | string,
-    remark: string = "web-withdraw"
+    remark: string = "webwithdraw"
   ): Promise<CashMachineWithdrawResponse> {
     const id = await this.resolvePlayerId(idOrAccount);
+    const cleanRemark = (remark || "webwithdraw")
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .slice(0, 50) || "webwithdraw";
+
     const body = this.buildFormData({
       id,
       balance: String(balance),
-      remark: remark.trim(),
+      remark: cleanRemark,
     });
 
     return this.request<CashMachineWithdrawResponse>("/api/player/playerWithdraw", {

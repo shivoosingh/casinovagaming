@@ -1,6 +1,7 @@
 import type { Locator, Page } from "playwright";
 import { mkdirSync } from "fs";
 import { join } from "path";
+import { makeCredentialRefill, waitForPanelLogin } from "../../shared/panel-login-captcha.js";
 
 const DEBUG_DIR = join(process.cwd(), "debug");
 
@@ -10,6 +11,8 @@ export function log(step: string, detail?: string) {
 }
 
 export async function screenshot(page: Page, name: string) {
+  // Off by default � fullPage PNG on every step was making jobs feel very slow.
+  if ((process.env.BOT_DEBUG_SCREENSHOTS ?? "").toLowerCase() !== "true") return;
   try {
     mkdirSync(DEBUG_DIR, { recursive: true });
     const path = join(DEBUG_DIR, `${Date.now()}-${name}.png`);
@@ -122,14 +125,20 @@ export async function isLoginPage(page: Page): Promise<boolean> {
   return pwd > 0 && (await signIn.isVisible().catch(() => false));
 }
 
-export async function waitForManualLogin(page: Page, timeoutMs = 180_000) {
-  log("login", "CAPTCHA on page — log in manually in Chrome (enter code + click Login)");
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    if (!(await isLoginPage(page))) return;
-    await page.waitForTimeout(1000);
-  }
-  throw new Error("Login timeout — enter CAPTCHA and click Login in the Chrome window");
+export async function waitForManualLogin(page: Page, timeoutMs?: number) {
+  const allowManual =
+    process.env.CASHMACHINE_HEADLESS === "false" || Boolean(process.env.CASHMACHINE_CDP_URL);
+  await waitForPanelLogin(page, {
+    log,
+    isLoginPage,
+    allowManual,
+    ...(timeoutMs != null ? { manualTimeoutMs: timeoutMs } : {}),
+    refillCredentials: makeCredentialRefill(
+      page,
+      "CASHMACHINE_AGENT_USERNAME",
+      "CASHMACHINE_AGENT_PASSWORD"
+    ),
+  });
 }
 
 /** Parse a money string -> number, or null if it doesn't look like a number. */

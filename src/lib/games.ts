@@ -49,7 +49,9 @@ export const GAMES: Game[] = [
     bio: "Orion Stars is a top-rated arcade and fish game platform with fast deposits, daily bonuses, and big win potential. Create your Spinora account, download Orion Stars, and start playing slots, fish shooters, and classic arcade titles with 24/7 support.",
     players: 25053,
     gradient: "from-zinc-500 via-zinc-600 to-zinc-800",
-    upcoming: true,
+    popular: true,
+    trending: true,
+    topRated: true,
   },
   {
     id: "7",
@@ -93,7 +95,8 @@ export const GAMES: Game[] = [
     bio: "Fire Kirin is the legendary fish shooting game loved by players nationwide. Spinora makes it easy to get your Fire Kirin account, claim your welcome bonus, and dive into action-packed fish tables with explosive jackpots and non-stop excitement.",
     players: 19426,
     gradient: "from-red-500 via-orange-600 to-red-900",
-    upcoming: true,
+    popular: true,
+    trending: true,
   },
   {
     id: "16",
@@ -149,7 +152,8 @@ export const GAMES: Game[] = [
     bio: "Panda Master is a fan-favorite fish game app featuring colorful underwater battles and massive coin rewards. Create your account on Spinora, download Panda Master, and join thousands of players hunting jackpots on every table.",
     players: 17586,
     gradient: "from-pink-400 via-rose-500 to-pink-900",
-    upcoming: true,
+    popular: true,
+    trending: true,
   },
   {
     id: "13",
@@ -162,7 +166,8 @@ export const GAMES: Game[] = [
     bio: "Vblink offers a sleek arcade gaming experience with fish games, slots, and classic casino favorites. Spinora provides fast Vblink account creation, deposit bonuses, and dedicated support so you can focus on winning.",
     players: 17435,
     gradient: "from-cyan-400 via-sky-600 to-blue-900",
-    upcoming: true,
+    popular: true,
+    trending: true,
   },
   {
     id: "9",
@@ -175,7 +180,8 @@ export const GAMES: Game[] = [
     bio: "Milky Way takes you on a cosmic gaming adventure with space-themed slots and fish games. Request your Milky Way account through Spinora for a 50% first-time bonus, flexible $5–$500 loads, and 3x–8x redeem rules.",
     players: 17176,
     gradient: "from-violet-400 via-purple-600 to-indigo-900",
-    upcoming: true,
+    popular: true,
+    trending: true,
   },
   {
     id: "6",

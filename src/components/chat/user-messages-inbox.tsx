@@ -32,7 +32,7 @@ import { useDashboardProfile } from "@/lib/dashboard/dashboard-profile-context";
 import { appendMessage, mergeMessagesById } from "@/lib/chat/merge-messages";
 import { subscribeToConversationInserts, subscribeToMessageInserts } from "@/lib/chat/subscribe-messages";
 import { toast } from "sonner";
-import { ArrowLeft, Headphones, MessageCircle } from "lucide-react";
+import { ArrowLeft, Headphones, MessageCircle, Bot, UserCheck } from "lucide-react";
 import type { Message } from "@/types/database";
 
 interface UserChatPanelProps {
@@ -65,6 +65,7 @@ function UserChatPanel({
   onScrollMessages,
 }: UserChatPanelProps) {
   const closeViaBack = useMobileChatClose();
+  const [chatMode, setChatMode] = useState<"ai" | "human">("ai");
 
   function handleBack() {
     if (closeViaBack) {
@@ -85,30 +86,86 @@ function UserChatPanel({
     );
   }
 
+  async function handleSwitchToHuman() {
+    setChatMode("human");
+    onInputChange("🎧 I need to speak with a Real Human Agent.");
+  }
+
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-[rgba(0, 229, 255,0.1)] flex items-center gap-2 sm:gap-3 bg-[#050510] shrink-0">
-        {showMobileBack && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            onClick={handleBack}
-            aria-label="Back to chats"
+      <div className="p-3 sm:p-4 border-b border-[rgba(0, 229, 255,0.1)] flex flex-col gap-2 bg-[#050510] shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {showMobileBack && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              onClick={handleBack}
+              aria-label="Back to chats"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+          <div
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-all",
+              chatMode === "ai"
+                ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+            )}
           >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        )}
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-[#0099cc] flex items-center justify-center shrink-0">
-          <Headphones className="h-5 w-5 text-white" />
+            {chatMode === "ai" ? <Bot className="h-5 w-5" /> : <Headphones className="h-5 w-5" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-white truncate">
+              {chatMode === "ai" ? "Casinova AI Assistant" : "Human Live Support"}
+            </h2>
+            <p className="text-xs text-[#6b6d8f] truncate">
+              {chatMode === "ai" ? "Instant 24/7 AI Bot Answers" : "Direct line to Real Support Agents"}
+            </p>
+          </div>
+          <Badge
+            className={cn(
+              "shrink-0",
+              chatMode === "ai"
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+            )}
+          >
+            {chatMode === "ai" ? "AI Bot 24/7" : "Human Live"}
+          </Badge>
         </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-white truncate">{selectedConversation.title}</h2>
-          <p className="text-xs text-[#6b6d8f] truncate">{selectedConversation.subtitle}</p>
+
+        {/* Mode Selector Tabs */}
+        <div className="flex items-center gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => setChatMode("ai")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium transition-all",
+              chatMode === "ai"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm"
+                : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10"
+            )}
+          >
+            <Bot className="h-3.5 w-3.5" />
+            <span>AI Assistant</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSwitchToHuman}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium transition-all",
+              chatMode === "human"
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
+                : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10"
+            )}
+          >
+            <UserCheck className="h-3.5 w-3.5" />
+            <span>Real Support Agent</span>
+          </button>
         </div>
-        <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shrink-0">
-          Live
-        </Badge>
       </div>
 
       <div

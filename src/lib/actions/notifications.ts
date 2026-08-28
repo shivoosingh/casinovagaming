@@ -20,10 +20,17 @@ export async function createNotification(
   });
 
   if (error) {
-    if (error.message.includes("create_notification")) {
-      return { error: "Notifications not set up. Run supabase/notifications-rpc.sql in Supabase." };
+    // Fallback: direct insert into notifications table if RPC fails or is missing
+    const { error: insertError } = await supabase.from("notifications").insert({
+      user_id: userId,
+      title,
+      message,
+      type,
+      is_read: false,
+    });
+    if (insertError) {
+      return { error: insertError.message };
     }
-    return { error: error.message };
   }
 
   revalidatePath("/dashboard");

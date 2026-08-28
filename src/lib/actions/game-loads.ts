@@ -14,6 +14,72 @@ import {
   type DepositRolloverBounds,
 } from "@/lib/wallet/deposit-redeem-rollover";
 import { autoFulfillCashMachineRequest, isCashMachineApiConfigured } from "@/lib/game-automation/cashmachine-service";
+import { autoFulfillCashFrenzyRequest, isCashFrenzyApiConfigured } from "@/lib/game-automation/cashfrenzy-service";
+import { autoFulfillGameroomRequest, isGameroomApiConfigured } from "@/lib/game-automation/gameroom-service";
+import { autoFulfillGameVaultRequest, isGameVaultApiConfigured } from "@/lib/game-automation/gamevault-service";
+import { autoFulfillMafiaRequest, isMafiaApiConfigured } from "@/lib/game-automation/mafia-service";
+import { autoFulfillOrionStarsRequest } from "@/lib/game-automation/orionstars-service";
+import { isOrionStarsApiConfigured } from "@/lib/game-automation/orionstars-api";
+import { autoFulfillMilkyWayRequest } from "@/lib/game-automation/milkyway-service";
+import { isMilkyWayApiConfigured } from "@/lib/game-automation/milkyway-api";
+
+const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "orion-stars", "milky-way"];
+
+async function autoFulfillGameRequest(
+  gameSlug: string,
+  requestId: string,
+  loadType: "create_account" | "new_account" | "check_balance" | "load" | "reload" | "redeem",
+  input: {
+    userId: string;
+    gameUsername?: string | null;
+    amount?: number | null;
+    requestedUsername?: string | null;
+    requestedPassword?: string | null;
+  }
+): Promise<{ success: boolean; error?: string } | null> {
+  if (gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
+    return autoFulfillCashMachineRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "cash-frenzy" && isCashFrenzyApiConfigured()) {
+    return autoFulfillCashFrenzyRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "gameroom" && isGameroomApiConfigured()) {
+    return autoFulfillGameroomRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "game-vault" && isGameVaultApiConfigured()) {
+    return autoFulfillGameVaultRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "mafia" && isMafiaApiConfigured()) {
+    return autoFulfillMafiaRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "orion-stars" && isOrionStarsApiConfigured()) {
+    const targetAccount = input.gameUsername || input.requestedUsername || `os_${input.userId.slice(0, 8)}`;
+    const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
+    const res = await autoFulfillOrionStarsRequest({
+      requestId,
+      gameSlug,
+      loadType: mapType as any,
+      accountName: targetAccount,
+      password: input.requestedPassword || undefined,
+      amount: input.amount || 0,
+    });
+    return { success: res.success, error: res.success ? undefined : res.message };
+  }
+  if (gameSlug === "milky-way" && isMilkyWayApiConfigured()) {
+    const targetAccount = input.gameUsername || input.requestedUsername || `mw_${input.userId.slice(0, 8)}`;
+    const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
+    const res = await autoFulfillMilkyWayRequest({
+      requestId,
+      gameSlug,
+      loadType: mapType as any,
+      accountName: targetAccount,
+      password: input.requestedPassword || undefined,
+      amount: input.amount || 0,
+    });
+    return { success: res.success, error: res.success ? undefined : res.message };
+  }
+  return null;
+}
 
 export async function requestGameAccountCreate(input: {
   gameSlug: string;
@@ -106,12 +172,15 @@ export async function requestGameAccountCreate(input: {
     return { error: error.message };
   }
 
-  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
-    await autoFulfillCashMachineRequest(requestId as string, "create_account", {
-      userId: user.id,
-      requestedUsername: username,
-      requestedPassword: finalPassword,
-    });
+  const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "create_account", {
+    userId: user.id,
+    requestedUsername: username,
+    requestedPassword: finalPassword,
+  });
+  if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
+    revalidatePath(`/games/${input.gameSlug}`);
+    revalidatePath("/admin/game-loads");
+    return { error: fulfillResult.error, requestId: requestId as string };
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -147,6 +216,19 @@ export async function requestGameCheckBalance(input: {
     return { error: "Create your game account first." };
   }
 
+  if (API_CONFIGURED_GAMES.includes(input.gameSlug)) {
+    const admin = createAdminClient();
+    if (admin) {
+      await admin
+        .from("game_load_requests")
+        .update({ status: "cancelled", updated_at: new Date().toISOString() })
+        .eq("user_id", user.id)
+        .eq("game_slug", input.gameSlug)
+        .eq("load_type", "check_balance")
+        .in("status", ["pending", "processing"]);
+    }
+  }
+
   const { data: pending } = await supabase
     .from("game_load_requests")
     .select("id")
@@ -172,11 +254,14 @@ export async function requestGameCheckBalance(input: {
     return { error: error.message };
   }
 
-  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
-    await autoFulfillCashMachineRequest(requestId as string, "check_balance", {
-      userId: user.id,
-      gameUsername: input.gameUsername.trim(),
-    });
+  const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "check_balance", {
+    userId: user.id,
+    gameUsername: input.gameUsername.trim(),
+  });
+  if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
+    revalidatePath(`/games/${input.gameSlug}`);
+    revalidatePath("/admin/game-loads");
+    return { error: fulfillResult.error, requestId: requestId as string };
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -244,12 +329,15 @@ export async function requestGameLoad(input: {
     return { error: error.message };
   }
 
-  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
-    await autoFulfillCashMachineRequest(requestId as string, "load", {
-      userId: user.id,
-      gameUsername: input.gameUsername.trim(),
-      amount,
-    });
+  const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "load", {
+    userId: user.id,
+    gameUsername: input.gameUsername.trim(),
+    amount,
+  });
+  if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
+    revalidatePath(`/games/${input.gameSlug}`);
+    revalidatePath("/admin/game-loads");
+    return { error: fulfillResult.error, requestId: requestId as string };
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -372,12 +460,15 @@ export async function requestGameRedeem(input: {
     return { error: error.message };
   }
 
-  if (input.gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
-    await autoFulfillCashMachineRequest(requestId as string, "redeem", {
-      userId: user.id,
-      gameUsername: input.gameUsername.trim(),
-      amount: redeemAll ? null : input.amount,
-    });
+  const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "redeem", {
+    userId: user.id,
+    gameUsername: input.gameUsername.trim(),
+    amount: redeemAll ? null : input.amount,
+  });
+  if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
+    revalidatePath(`/games/${input.gameSlug}`);
+    revalidatePath("/admin/game-loads");
+    return { error: fulfillResult.error, requestId: requestId as string };
   }
 
   revalidatePath(`/games/${input.gameSlug}`);

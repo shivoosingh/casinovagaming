@@ -1,11 +1,13 @@
 @echo off
 setlocal EnableDelayedExpansion
-title Spinora - One Chrome, All Game Panels (tabs)
+title Casinova - One Chrome, All Game Panels (tabs)
 cd /d "%~dp0"
 
 set "PORT=9222"
-set "PROFILE=%LOCALAPPDATA%\SpinoraAllBots"
+set "PROFILE=%LOCALAPPDATA%\CasinovaAllBots"
 set "CDP=http://127.0.0.1:%PORT%"
+set "NOPAUSE=0"
+if /i "%~1"=="nopause" set "NOPAUSE=1"
 
 set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
 if not exist "%CHROME%" set "CHROME=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
@@ -13,15 +15,15 @@ if not exist "%CHROME%" set "CHROME=%LOCALAPPDATA%\Google\Chrome\Application\chr
 
 if not exist "%CHROME%" (
   echo Could not find Google Chrome.
-  pause
+  if "!NOPAUSE!"=="0" pause
   exit /b 1
 )
 
 echo.
 echo ============================================================
-echo   ONE CHROME — ALL 8 GAME PANELS (separate tabs)
+echo   CASINOVA - ONE CHROME, ALL 8 GAME PANELS
 echo ============================================================
-echo   Single window, port %PORT%, profile SpinoraAllBots
+echo   Single window, port %PORT%, profile CasinovaAllBots
 echo.
 echo   Tab 1 Juwa          https://ht.juwa777.com/login  (VPN ON)
 echo   Tab 2 Vegas Sweeps  https://agent.lasvegassweeps.com/login
@@ -32,8 +34,8 @@ echo   Tab 6 MR All-in-One https://agentserver.mrallinone777.com/admin
 echo   Tab 7 Mafia         https://agentserver.mafia77777.com/admin
 echo   Tab 8 Cash Frenzy   https://agentserver.cashfrenzy777.com/admin
 echo.
-echo   Log in on EACH tab. Juwa: turn VPN ON in this Chrome first.
-echo   Then run:  start-all-bots-unified.bat
+echo   Auto-login + CAPTCHA via start-all-advanced-free.bat
+echo   Or manual login, then: restart-bots-stable.bat
 echo ============================================================
 echo.
 
@@ -52,7 +54,7 @@ if errorlevel 1 (
   set /a TRIES+=1
   if !TRIES! LSS 15 goto :wait_port
   echo   ERROR: Chrome did not open debug port %PORT% in time.
-  pause
+  if "!NOPAUSE!"=="0" pause
   exit /b 1
 ) else (
   echo   Chrome already on port %PORT% — will add any missing tabs...
@@ -63,7 +65,7 @@ echo.
 echo   Disabling Chrome password breach popups for bot profile...
 node "%~dp0scripts\patch-chrome-prefs.mjs" "%PROFILE%" 2>nul
 echo.
-echo   Opening all 8 panel tabs (Juwa + Vegas Sweeps + 6 others)...
+echo   Opening all 8 panel tabs...
 echo.
 
 cd /d "%~dp0juwa-bot"
@@ -81,8 +83,8 @@ echo.
 if !TAB_EXIT! NEQ 0 (
   echo   Tab script failed. Close other Chrome on port 9222 and retry.
 ) else (
-  echo   Done — one Chrome window, 8 tabs. Log in on each, then start-all-bots-unified.bat
+  echo   Done - one Chrome window, 8 tabs.
 )
 echo.
-pause
+if "!NOPAUSE!"=="0" pause
 exit /b !TAB_EXIT!

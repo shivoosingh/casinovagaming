@@ -111,8 +111,11 @@ export async function POST(request: Request) {
         const botSenderId = await getBotSenderProfileId();
         const db = adminClient ?? supabase;
 
+        const isExplicitHumanRequest =
+          /human|real agent|live agent|support agent|agent|talk to human/i.test(content);
+
         if (
-          aiResult.shouldEscalateToHuman &&
+          (isExplicitHumanRequest || aiResult.shouldEscalateToHuman) &&
           chatSettings.telegram_escalation_enabled &&
           isTelegramConfigured()
         ) {
@@ -127,17 +130,26 @@ export async function POST(request: Request) {
 
           await sendTelegramMessage(
             [
-              "🚨 <b>CHAT ESCALATION</b>",
+              "🚨 <b>HUMAN AGENT REQUESTED</b>",
               `<b>Player:</b> ${escapeTelegramHtml(displayName)}`,
               `<b>Email:</b> ${escapeTelegramHtml(email)}`,
               `<b>Message:</b> ${escapeTelegramHtml(content.slice(0, 500))}`,
-              `<i>${SITE_URL}/admin/chat</i>`,
+              `👉 <a href="${SITE_URL}/admin/chat">Open Admin Chat Dashboard</a>`,
             ].join("\n")
           );
+
+          if (botSenderId && isExplicitHumanRequest) {
+            await db.from("messages").insert({
+              conversation_id: conversationId,
+              sender_id: botSenderId,
+              content: "🎧 You are now in the Real Human Support queue! A live support agent has been notified on Telegram and will reply shortly.",
+              is_read: false,
+            });
+          }
           return;
         }
 
-        if (aiResult.response && botSenderId) {
+        if (aiResult.response && botSenderId && !isExplicitHumanRequest) {
           await db.from("messages").insert({
             conversation_id: conversationId,
             sender_id: botSenderId,

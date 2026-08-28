@@ -1,5 +1,8 @@
 import type { Locator, Page } from "playwright";
+import { assertAmountFilled, findDialogAmountInput } from "../../shared/amount-input.js";
 import { CREATE_ACCOUNT_MAX_ATTEMPTS, DUPLICATE_USERNAME_RE } from "../../shared/panel-create.js";
+import { isCaptchaSolverConfigured } from "../../shared/panel-login-captcha.js";
+import { clearExpiryAndNeedRelogin } from "../../shared/dismiss-session-dialog.js";
 import { isLoginPage, log, screenshot, waitForManualLogin } from "./panel-utils.js";
 
 const ADMIN_URL = process.env.GAMEVAULT_ADMIN_URL?.trim() || "https://agent.gamevault999.com/login";
@@ -9,8 +12,15 @@ const USER_MGMT_URL = `${BASE_URL}/userManagement`;
 /* ------------------------------------------------------------------ login */
 
 export async function loginToPanel(page: Page): Promise<void> {
-  await page.goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 60000 }).catch(() => {});
-  await page.waitForTimeout(1500);
+  const expired = await clearExpiryAndNeedRelogin(page, log);
+  if (expired) log("login", "session timeout cleared — CAPTCHA re-login");
+
+  const alreadyOnPanel =
+    !expired && /userManagement/i.test(page.url()) && !(await isLoginPage(page));
+  if (!alreadyOnPanel) {
+    await page.goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 60000 }).catch(() => {});
+    await page.waitForTimeout(150);
+  }
 
   if (!(await isLoginPage(page))) {
     log("login", "already authenticated");
@@ -34,11 +44,11 @@ export async function loginToPanel(page: Page): Promise<void> {
 
   const interactive =
     process.env.GAMEVAULT_HEADLESS === "false" || Boolean(process.env.GAMEVAULT_CDP_URL);
-  if (interactive) {
+  if (interactive || isCaptchaSolverConfigured()) {
     await waitForManualLogin(page);
     await page.goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => {});
-    await page.waitForTimeout(1200);
-    log("login", "success (manual captcha)");
+    await page.waitForTimeout(250);
+    log("login", "success");
     return;
   }
 
@@ -67,7 +77,7 @@ async function closeOverlays(page: Page): Promise<void> {
       if (await x.isVisible().catch(() => false)) await x.click({ force: true }).catch(() => {});
       else await page.keyboard.press("Escape").catch(() => {});
     }
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(80);
   }
 }
 
@@ -92,7 +102,7 @@ async function gotoUserList(page: Page): Promise<void> {
     await page
       .goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 30000 })
       .catch(() => {});
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(300);
   }
 }
 
@@ -112,7 +122,7 @@ async function searchAccount(page: Page, account: string): Promise<void> {
   const btn = page.getByRole("button", { name: /^\s*search\s*$/i }).first();
   if (await btn.isVisible().catch(() => false)) await btn.click();
   else await search.press("Enter");
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(200);
 }
 
 /** Row in the main list whose Account cell exactly equals `account`. */
@@ -179,17 +189,31 @@ export async function readBalance(page: Page, account: string): Promise<number> 
 async function openEditor(page: Page, account: string): Promise<void> {
   const row = await findRow(page, account);
   await row.getByText(/^editor$/i).first().click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 }
 
 async function fillAmountDialog(page: Page, amount: number, kind: "recharge" | "redeem"): Promise<void> {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error(`Invalid ${kind} amount: ${amount}`);
+  }
+  const value = String(amount);
+
   const dlg = visibleDialog(page);
   await dlg.waitFor({ state: "visible", timeout: 10000 });
-  const amountInput = dlg.locator('input[type="number"]').first();
-  await typeInto(amountInput, String(amount));
+
+  // Never match bare "Please enter" — that hits Account/username first on Game Vault.
+  const amountInput = await findDialogAmountInput(dlg, kind);
+  await typeInto(amountInput, value);
+  try {
+    await assertAmountFilled(amountInput, amount, kind);
+  } catch (err) {
+    await screenshot(page, `${kind}-amount-mismatch`);
+    throw err;
+  }
+
   await page.waitForTimeout(300);
   await clickDialogButton(dlg, /^\s*confirm\s*$/i);
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(350);
   await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   log(kind, `${kind} confirmed for $${amount}`);
 }
@@ -201,7 +225,7 @@ export async function rechargeAccount(page: Page, account: string, amount: numbe
   const btn = page.getByRole("button", { name: /^\s*recharge\s*$/i }).first();
   await btn.waitFor({ state: "visible", timeout: 8000 });
   await btn.click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
   await fillAmountDialog(page, amount, "recharge");
 }
 
@@ -226,7 +250,7 @@ export async function redeemAccount(
   const btn = page.getByRole("button", { name: /^\s*redeem\s*$/i }).first();
   await btn.waitFor({ state: "visible", timeout: 8000 });
   await btn.click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
   await fillAmountDialog(page, target, "redeem");
   return target;
 }
@@ -262,7 +286,7 @@ type CreateOutcome =
 async function tryCreateOnce(page: Page, username: string, password: string): Promise<CreateOutcome> {
   await gotoUserList(page);
   await page.getByRole("button", { name: /new account/i }).first().click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const dlg = visibleDialog(page);
   await dlg.waitFor({ state: "visible", timeout: 10000 });
@@ -275,16 +299,20 @@ async function tryCreateOnce(page: Page, username: string, password: string): Pr
   await typeInto(passInputs.nth(1), password); // Confirm password
 
   await clickDialogButton(dlg, /^\s*save\s*$/i);
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(300);
 
   // Read any toast/validation message BEFORE it disappears.
   const messages = await readPanelMessages(page);
 
   // Success signal: the "Essential information" dialog closes only on success.
+  // Over VPN the close can lag — poll up to ~2.5s before declaring failure.
   let stillOpen = await createDialogOpen(page);
   if (stillOpen && !DUPLICATE_RE.test(messages)) {
-    await page.waitForTimeout(1200); // give a slow success a moment to close
-    stillOpen = await createDialogOpen(page);
+    const deadline = Date.now() + 2500;
+    while (stillOpen && Date.now() < deadline) {
+      await page.waitForTimeout(300);
+      stillOpen = await createDialogOpen(page);
+    }
   }
 
   if (!stillOpen) {
@@ -331,10 +359,11 @@ export async function createAccount(
       continue;
     }
 
-    // Panel sometimes leaves the dialog open after a duplicate — try the next number.
+    // The name was free before submit — if it's on the panel now, WE created it
+    // (dialog-close detection can misfire). Return it; don't spawn junk accounts.
     if (await accountExists(page, username)) {
-      log("create", `"${username}" still on panel after failed submit — trying next number`);
-      continue;
+      log("create", `"${username}" exists after submit — create actually succeeded`);
+      return { username, password: username };
     }
 
     // A real error (e.g. validation) — stop so we don't create junk accounts.

@@ -1,6 +1,9 @@
 import type { Frame, Locator, Page } from "playwright";
 import { normalizeUsername } from "./credentials.js";
+import { assertAmountFilled, findDialogAmountInput, findLayuiAmountInput } from "../../shared/amount-input.js";
 import { CREATE_ACCOUNT_MAX_ATTEMPTS, DUPLICATE_USERNAME_RE } from "../../shared/panel-create.js";
+import { isCaptchaSolverConfigured } from "../../shared/panel-login-captcha.js";
+import { clearExpiryAndNeedRelogin } from "../../shared/dismiss-session-dialog.js";
 import { isLoginPage, log, screenshot, waitForManualLogin } from "./panel-utils.js";
 
 const ADMIN_URL =
@@ -14,7 +17,10 @@ const USER_MGMT_URL = `${BASE_URL}/player/index`;
 export async function loginToPanel(page: Page): Promise<void> {
   await page.bringToFront().catch(() => {});
 
-  if (await isLoginPage(page)) {
+  const expired = await clearExpiryAndNeedRelogin(page, log);
+  if (expired) log("login", "session timeout cleared — CAPTCHA re-login");
+
+  if (expired || (await isLoginPage(page))) {
     const username = process.env.CASHFRENZY_AGENT_USERNAME?.trim();
     const password = process.env.CASHFRENZY_AGENT_PASSWORD?.trim();
     if (username) {
@@ -30,7 +36,7 @@ export async function loginToPanel(page: Page): Promise<void> {
 
     const interactive =
       process.env.CASHFRENZY_HEADLESS === "false" || Boolean(process.env.CASHFRENZY_CDP_URL);
-    if (interactive) {
+    if (interactive || isCaptchaSolverConfigured()) {
       await waitForManualLogin(page);
     } else {
       await screenshot(page, "login-captcha");
@@ -53,8 +59,12 @@ function insertFrame(page: Page): Frame | null {
 }
 
 function actionFrame(page: Page, kind: "recharge" | "redeem"): Frame | null {
-  const part = kind === "recharge" ? "recharge" : "redeem";
-  return page.frames().find((f) => new RegExp(`/player/${part}`, "i").test(f.url())) ?? null;
+  const parts = kind === "redeem" ? ["withdraw", "redeem"] : ["recharge"];
+  for (const part of parts) {
+    const frame = page.frames().find((f) => new RegExp(`/player/${part}`, "i").test(f.url()));
+    if (frame) return frame;
+  }
+  return null;
 }
 
 async function waitForActionFrame(page: Page, kind: "recharge" | "redeem"): Promise<Frame> {
@@ -64,11 +74,49 @@ async function waitForActionFrame(page: Page, kind: "recharge" | "redeem"): Prom
     if (frame && (await frame.locator("input").count()) > 0) return frame;
     await page.waitForTimeout(350);
   }
-  throw new Error(`${kind} iframe (/admin/player/${kind}) did not open`);
+  const pathHint = kind === "redeem" ? "/admin/player/redeem or /withdraw" : `/admin/player/${kind}`;
+  throw new Error(`${kind} iframe (${pathHint}) did not open`);
+}
+
+async function openActionIframe(page: Page, kind: "recharge" | "redeem"): Promise<void> {
+  if (actionFrame(page, kind)) return;
+
+  const layFilter = kind === "recharge" ? "recharge" : "redeem";
+  const label = kind === "recharge" ? /^\s*recharge\s*$/i : /^\s*redeem\s*$/i;
+  const btn = page
+    .locator(`#${layFilter}, button[lay-filter="${layFilter}"]`)
+    .first()
+    .or(page.getByRole("button", { name: label }).first());
+  await btn.waitFor({ state: "attached", timeout: 10000 });
+  await btn.click({ force: true });
+  await page.waitForTimeout(150);
+
+  await waitForActionFrame(page, kind);
+  log(kind, `opened layui iframe for ${kind}`);
 }
 
 function visibleDialog(page: Page): Locator {
   return page.locator(".el-overlay:not([style*='display: none']) .el-dialog").last();
+}
+
+/** Recharge/Redeem amount modal (not the account editor drawer). */
+function amountDialog(page: Page, kind: "recharge" | "redeem"): Locator {
+  const titleRe = kind === "recharge" ? /recharge/i : /redeem/i;
+  const labeled = page
+    .locator(".el-overlay:not([style*='display: none']) .el-dialog")
+    .filter({ hasText: titleRe })
+    .last();
+  return labeled.or(visibleDialog(page));
+}
+
+async function typeIntoEl(input: Locator, value: string): Promise<void> {
+  await input.waitFor({ state: "visible", timeout: 10000 });
+  await input.scrollIntoViewIfNeeded().catch(() => {});
+  await input.click({ clickCount: 3, force: true });
+  await input.fill("");
+  await input.pressSequentially(value, { delay: 30 });
+  await input.blur();
+  await input.page().waitForTimeout(200);
 }
 
 async function closeOverlays(page: Page): Promise<void> {
@@ -84,14 +132,14 @@ async function closeOverlays(page: Page): Promise<void> {
     const insert = insertFrame(page);
     if (insert) {
       await insert.getByRole("button", { name: /^\s*cancel\s*$/i }).click({ force: true }).catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(80);
       if (!insertFrame(page)) continue;
     }
 
     const layuiClose = page.locator(".layui-layer-close, .layui-layer-setwin .layui-layer-close1").first();
     if ((await layuiClose.count()) > 0) {
       await layuiClose.click({ force: true }).catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(80);
       continue;
     }
 
@@ -103,7 +151,7 @@ async function closeOverlays(page: Page): Promise<void> {
       const cancel = essential.locator("button").filter({ hasText: /^\s*cancel\s*$/i }).first();
       if ((await cancel.count()) > 0) {
         await cancel.click({ force: true }).catch(() => {});
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(80);
         continue;
       }
     }
@@ -118,7 +166,7 @@ async function closeOverlays(page: Page): Promise<void> {
       if (await x.isVisible().catch(() => false)) await x.click({ force: true }).catch(() => {});
       else await page.keyboard.press("Escape").catch(() => {});
     }
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(80);
   }
 }
 
@@ -150,41 +198,55 @@ function actionResponseOk(body: string): boolean {
   return /success|成功|ok|complete|recharge|redeem/i.test(body) && !/fail|error|insufficient|不足/i.test(body);
 }
 
+async function clickLayuiSubmitInFrame(frame: Frame, kind: "recharge" | "redeem"): Promise<string | null> {
+  const filters = kind === "redeem" ? ["withdraw", "redeem"] : ["recharge"];
+  for (const f of filters) {
+    const btn = frame.locator(`button[lay-submit][lay-filter="${f}"]`).first();
+    if ((await btn.count()) > 0) {
+      const text = (await btn.innerText().catch(() => "")).trim();
+      await btn.scrollIntoViewIfNeeded().catch(() => {});
+      await btn.click({ force: true });
+      return `${f}:${text}`;
+    }
+  }
+  const submit = frame
+    .locator("button[lay-submit], .layui-btn[lay-submit], .layui-btn")
+    .filter({ hasText: /^\s*(submit|confirm|save|ok)\s*$/i })
+    .first();
+  if ((await submit.count()) > 0) {
+    const text = (await submit.innerText().catch(() => "")).trim();
+    await submit.scrollIntoViewIfNeeded().catch(() => {});
+    await submit.click({ force: true });
+    return `lay-submit:${text}`;
+  }
+  return null;
+}
+
 async function submitActionForm(page: Page, frame: Frame, kind: "recharge" | "redeem"): Promise<string> {
+  const pathParts = kind === "redeem" ? ["withdraw", "redeem"] : ["recharge"];
+  const frameUrl = frame.url();
+  const responseMatches = (url: string, method: string): boolean => {
+    if (method === "GET") return false;
+    if (pathParts.some((p) => new RegExp(`/player/${p}`, "i").test(url))) return true;
+    if (frameUrl && url.startsWith(frameUrl.split("?")[0] ?? frameUrl)) return true;
+    return /\/player\//i.test(url) && /redeem|withdraw|recharge/i.test(url);
+  };
+
   const responsePromise = page
-    .waitForResponse(
-      (r) => new RegExp(`/player/${kind}`, "i").test(r.url()) && r.request().method() !== "GET",
-      { timeout: 25000 }
-    )
+    .waitForResponse((r) => responseMatches(r.url(), r.request().method()), { timeout: 25000 })
     .catch(() => null);
 
-  const layFilter = kind === "recharge" ? "recharge" : "redeem";
-  const submit = frame
-    .locator(`button[lay-submit][lay-filter="${layFilter}"], button[lay-submit]`)
-    .filter({ hasText: /^\s*confirm\s*$/i })
-    .first()
-    .or(frame.locator("button[lay-submit], .layui-btn[lay-submit]").filter({ hasText: /^\s*confirm\s*$/i }).first());
-
-  if ((await submit.count()) > 0) {
-    await submit.waitFor({ state: "visible", timeout: 8000 });
-    await submit.scrollIntoViewIfNeeded().catch(() => {});
-    await page.waitForTimeout(200);
-    await submit.click();
-  } else {
-    await frame.evaluate(() => {
-      const btn = [...document.querySelectorAll("button[lay-submit], button")].find((b) =>
-        /^\s*confirm\s*$/i.test((b.textContent ?? "").trim())
-      );
-      (btn as HTMLElement | undefined)?.click();
-    });
+  const clickedLabel = await clickLayuiSubmitInFrame(frame, kind);
+  if (!clickedLabel) {
+    await screenshot(page, `${kind}-submit-missing`);
+    throw new Error(`${kind} Submit/Confirm button not found in iframe (${frame.url()})`);
   }
-
-  log(kind, "clicked Confirm");
+  log(kind, `clicked iframe button ${clickedLabel}`);
 
   const resp = await responsePromise;
   if (resp) {
     const body = (await resp.text().catch(() => "")).trim();
-    log(kind, `HTTP ${resp.status()} ${body.slice(0, 280)}`);
+    log(kind, `HTTP ${resp.status()} ${resp.url()} ${body.slice(0, 280)}`);
     if (!actionResponseOk(body)) {
       throw new Error(`${kind} rejected: ${body.slice(0, 200) || `HTTP ${resp.status()}`}`);
     }
@@ -196,11 +258,14 @@ async function submitActionForm(page: Page, frame: Frame, kind: "recharge" | "re
     .last()
     .innerText()
     .catch(() => "");
-  if (msg && /fail|error|insufficient|不足|invalid/i.test(msg)) {
+  if (msg && /fail|error|insufficient|不足|invalid|cannot|exceed|required/i.test(msg)) {
     throw new Error(`${kind} failed: ${msg.trim()}`);
   }
-  await page.waitForTimeout(1500);
-  return msg;
+
+  await screenshot(page, `${kind}-no-response`);
+  throw new Error(
+    `${kind} submit got no server response (iframe ${frame.url()})${msg ? `: ${msg.trim()}` : ""}`
+  );
 }
 
 async function fillInsertForm(frame: Frame, username: string, password: string): Promise<void> {
@@ -265,7 +330,7 @@ async function clickSidebarUserList(page: Page): Promise<void> {
     const item = root.locator(".el-menu-item, a, li, span").filter({ hasText: /user list/i }).first();
     if ((await item.count()) > 0) {
       await item.click({ force: true }).catch(() => {});
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(350);
       log("nav", "clicked User List in sidebar");
       return;
     }
@@ -278,7 +343,7 @@ async function gotoUserList(page: Page): Promise<void> {
 
   if (!/\/player\/index/i.test(page.url())) {
     await page.goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(350);
   }
 
   if (!(await hasNewAccountButton(page))) {
@@ -287,7 +352,7 @@ async function gotoUserList(page: Page): Promise<void> {
 
   if (!(await hasNewAccountButton(page)) && !/\/player\/index/i.test(page.url())) {
     await page.goto(USER_MGMT_URL, { waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(350);
   }
 
   if (!(await hasNewAccountButton(page))) {
@@ -302,9 +367,10 @@ async function gotoUserList(page: Page): Promise<void> {
 
 function listTable(page: Page): Locator {
   return page
-    .locator(".layui-table, table")
-    .filter({ hasText: /Account|Register date/i })
-    .first();
+    .locator(".el-table")
+    .filter({ hasText: /Register date|Account/i })
+    .first()
+    .or(page.locator(".layui-table, table").filter({ hasText: /Account|Register date/i }).first());
 }
 
 async function searchAccount(page: Page, account: string): Promise<void> {
@@ -320,11 +386,31 @@ async function searchAccount(page: Page, account: string): Promise<void> {
   const btn = page.getByRole("button", { name: /^\s*search\s*$/i }).first();
   if ((await btn.count()) > 0) await btn.click({ force: true });
   else await search.press("Enter");
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(350);
 }
 
 function accountRow(page: Page, account: string): Locator {
-  return page.locator("tbody tr:not(#noData)").filter({ hasText: account }).first();
+  return listTable(page)
+    .locator(".el-table__body-wrapper tbody tr")
+    .filter({ has: page.locator(`.cell:text-is("${account}")`) })
+    .first()
+    .or(page.locator(".el-table__body-wrapper tbody tr").filter({ hasText: account }).first())
+    .or(page.locator("tbody tr:not(#noData)").filter({ hasText: account }).first());
+}
+
+async function clickEditorForAccount(page: Page, account: string): Promise<void> {
+  const row = await findRow(page, account);
+  const editor = row
+    .getByText(/^editor$/i)
+    .first()
+    .or(row.locator("a, button, .layui-btn, .el-button").filter({ hasText: /^editor$/i }).first());
+  if ((await editor.count()) === 0) {
+    await page.locator("a, button, .layui-btn, .el-button").filter({ hasText: /^editor$/i }).last().click();
+  } else {
+    await editor.click({ force: true });
+  }
+  await page.waitForTimeout(250);
+  log("nav", `opened editor for ${account}`);
 }
 
 async function findRow(page: Page, account: string): Promise<Locator> {
@@ -348,7 +434,7 @@ const BALANCE_CELL =
 
 async function balanceColumnIndex(page: Page): Promise<number> {
   const headers = await listTable(page)
-    .locator(".layui-table-header th, thead th")
+    .locator(".el-table__header th, .layui-table-header th, thead th")
     .allInnerTexts()
     .catch(() => [] as string[]);
   const idx = headers.findIndex((h) => /balance/i.test(h) && !/bonus|available|your/i.test(h));
@@ -375,7 +461,7 @@ export async function readBalance(page: Page, account: string): Promise<number> 
     }
   }
   const idx = await balanceColumnIndex(page);
-  const cell = row.locator("td").nth(idx);
+  const cell = row.locator("td .cell").nth(idx).or(row.locator("td").nth(idx));
   const text = (await cell.innerText().catch(() => "")).trim();
   const value = parseAmount(text);
   if (value === null) {
@@ -388,57 +474,27 @@ export async function readBalance(page: Page, account: string): Promise<number> 
 
 /* ------------------------------------------------ editor → action buttons */
 
-async function clickEditorForAccount(page: Page, account: string): Promise<void> {
-  await searchAccount(page, account);
-  const editor = page
-    .locator("tbody tr:not(#noData)")
-    .filter({ hasText: account })
-    .locator("a, button, .layui-btn")
-    .filter({ hasText: /^editor$/i })
-    .last();
-  if ((await editor.count()) === 0) {
-    await page.locator("a, button, .layui-btn").filter({ hasText: /^editor$/i }).last().click();
-  } else {
-    await editor.click();
-  }
-  await page.waitForTimeout(1000);
-}
-
 async function openEditor(page: Page, account: string): Promise<void> {
   await clickEditorForAccount(page, account);
 }
 
 async function visibleAmountInput(frame: Frame, kind: "recharge" | "redeem"): Promise<Locator> {
-  const labelRe = kind === "recharge" ? /recharge balance/i : /redeem balance/i;
-  const byLabel = frame
-    .locator(".layui-form-item")
-    .filter({ hasText: labelRe })
-    .locator('input:not([type="hidden"])')
-    .first();
-  if ((await byLabel.count()) > 0) return byLabel;
-
-  for (const name of ["money", "balance", "amount", "recharge_balance", "redeem_balance"]) {
-    const byName = frame.locator(`input[name="${name}"]:not([type="hidden"])`).first();
-    if ((await byName.count()) > 0) return byName;
-  }
-
-  const byNumber = frame.locator('input[type="number"]:not([type="hidden"])').first();
-  if ((await byNumber.count()) > 0) return byNumber;
-
-  return frame.locator('input:not([type="hidden"]):not([type="checkbox"]):not([name*="available"])').last();
+  return findLayuiAmountInput(frame, kind === "redeem" ? "withdraw" : "recharge");
 }
 
 async function fillAmountDialog(page: Page, amount: number, kind: "recharge" | "redeem"): Promise<void> {
   const frame = actionFrame(page, kind) ?? (await waitForActionFrame(page, kind));
+  log(kind, `iframe form at ${frame.url()}`);
 
   const amountInput = await visibleAmountInput(frame, kind);
   await typeInto(amountInput, String(amount));
-
-  const filled = await amountInput.inputValue().catch(() => "");
-  if (filled !== String(amount) && parseFloat(filled) !== amount) {
+  try {
+    await assertAmountFilled(amountInput, amount, kind);
+  } catch (err) {
     await screenshot(page, `${kind}-amount-mismatch`);
-    throw new Error(`${kind} amount not set (expected ${amount}, got "${filled}")`);
+    throw err;
   }
+  log(kind, `iframe amount set to ${amount}`);
 
   await submitActionForm(page, frame, kind);
 
@@ -458,33 +514,108 @@ async function verifyBalanceDelta(
   delta: number,
   kind: "recharge" | "redeem"
 ): Promise<void> {
-  await gotoUserList(page);
-  await page.waitForTimeout(800);
-  const after = await readBalance(page, account);
+  await closeOverlays(page);
   const expected = kind === "recharge" ? before + delta : before - delta;
-  if (Math.abs(after - expected) > 0.02) {
-    await screenshot(page, `${kind}-balance-verify-failed`);
-    throw new Error(
-      `${kind} did not apply on server: balance ${before} → ${after}, expected ~${expected.toFixed(2)}`
-    );
+  const deadline = Date.now() + 22000;
+
+  while (Date.now() < deadline) {
+    await gotoUserList(page);
+    await searchAccount(page, account);
+    await page.waitForTimeout(250);
+    const after = await readBalance(page, account);
+    if (Math.abs(after - expected) <= 0.02) {
+      log(kind, `verified balance ${before} → ${after}`);
+      return;
+    }
+    await page.waitForTimeout(300);
   }
-  log(kind, `verified balance ${before} → ${after}`);
+
+  const after = await readBalance(page, account);
+  await screenshot(page, `${kind}-balance-verify-failed`);
+  throw new Error(
+    `${kind} did not apply on server: balance ${before} → ${after}, expected ~${expected.toFixed(2)}`
+  );
 }
 
 async function selectAccountRow(page: Page, account: string): Promise<void> {
-  await searchAccount(page, account);
-  const row = page.locator("tbody tr:not(#noData)").filter({ hasText: account }).last();
-  await row.waitFor({ state: "attached", timeout: 10000 });
-  const editor = row.locator("a, button, .layui-btn").filter({ hasText: /^editor$/i }).first();
+  const row = await findRow(page, account);
+  const editor = row
+    .getByText(/^editor$/i)
+    .first()
+    .or(row.locator("a, button, .layui-btn, .el-button").filter({ hasText: /^editor$/i }).first());
   if ((await editor.count()) > 0) {
-    await editor.click();
+    await editor.click({ force: true });
     log("nav", `selected ${account} via editor`);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(200);
   }
 }
 
-async function openActionIframe(page: Page, kind: "recharge" | "redeem"): Promise<void> {
-  if (actionFrame(page, kind)) return;
+/** Element Plus modal (Game Vault style) — Cash Frenzy uses this after Editor → Recharge/Redeem. */
+async function amountInputInDialog(dlg: Locator, kind: "recharge" | "redeem"): Promise<Locator> {
+  return findDialogAmountInput(dlg, kind);
+}
+
+async function submitAmountDialogEl(page: Page, dlg: Locator, kind: "recharge" | "redeem"): Promise<void> {
+  const responsePromise = page
+    .waitForResponse(
+      (r) =>
+        r.request().method() !== "GET" &&
+        /recharge|redeem|withdraw|player|user/i.test(r.url()) &&
+        (r.status() === 200 || r.status() === 201),
+      { timeout: 25000 }
+    )
+    .catch(() => null);
+
+  const confirm = dlg.locator(".el-dialog__footer button, button").filter({ hasText: /^\s*confirm\s*$/i }).last();
+  await confirm.waitFor({ state: "attached", timeout: 8000 });
+  await confirm.scrollIntoViewIfNeeded().catch(() => {});
+  await confirm.click({ force: true });
+
+  const resp = await responsePromise;
+  if (resp) {
+    const body = (await resp.text().catch(() => "")).trim();
+    log(kind, `HTTP ${resp.status()} ${body.slice(0, 280)}`);
+    if (!actionResponseOk(body)) {
+      throw new Error(`${kind} rejected: ${body.slice(0, 200) || `HTTP ${resp.status()}`}`);
+    }
+  }
+
+  const msg = await readPanelMessages(page);
+  if (msg && /fail|error|insufficient|不足|invalid|cannot|exceed/i.test(msg)) {
+    throw new Error(`${kind} failed: ${msg}`);
+  }
+
+  const closeDeadline = Date.now() + 15000;
+  while (Date.now() < closeDeadline) {
+    if (!(await dlg.isVisible().catch(() => false))) break;
+    await page.waitForTimeout(350);
+  }
+
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+}
+
+async function fillAmountDialogEl(page: Page, amount: number, kind: "recharge" | "redeem"): Promise<void> {
+  const dlg = amountDialog(page, kind);
+  await dlg.waitFor({ state: "visible", timeout: 10000 });
+  const amountInput = await amountInputInDialog(dlg, kind);
+  await typeIntoEl(amountInput, String(amount));
+  try {
+    await assertAmountFilled(amountInput, amount, kind);
+  } catch (err) {
+    await screenshot(page, `${kind}-amount-mismatch`);
+    throw err;
+  }
+
+  await submitAmountDialogEl(page, dlg, kind);
+  await closeOverlays(page);
+  log(kind, `${kind} el-dialog confirmed for $${amount}`);
+}
+
+async function openActionDialog(page: Page, kind: "recharge" | "redeem"): Promise<void> {
+  if (actionFrame(page, kind)) {
+    log(kind, `reuse open layui iframe for ${kind}`);
+    return;
+  }
 
   const layFilter = kind === "recharge" ? "recharge" : "redeem";
   const label = kind === "recharge" ? /^\s*recharge\s*$/i : /^\s*redeem\s*$/i;
@@ -493,18 +624,32 @@ async function openActionIframe(page: Page, kind: "recharge" | "redeem"): Promis
     .first()
     .or(page.getByRole("button", { name: label }).first());
   await btn.waitFor({ state: "attached", timeout: 10000 });
-  await btn.click();
-  await page.waitForTimeout(800);
+  await btn.click({ force: true });
+  await page.waitForTimeout(180);
+
+  const dlg = amountDialog(page, kind);
+  if (await dlg.isVisible().catch(() => false)) {
+    log(kind, `opened ${kind} Element Plus dialog`);
+    return;
+  }
 
   await waitForActionFrame(page, kind);
-  log(kind, `opened /admin/player/${kind} iframe`);
+  log(kind, `opened layui iframe for ${kind}`);
 }
 
 export async function rechargeAccount(page: Page, account: string, amount: number): Promise<void> {
   const before = await readBalance(page, account);
-  await selectAccountRow(page, account);
-  await openActionIframe(page, "recharge");
-  await fillAmountDialog(page, amount, "recharge");
+  await clickEditorForAccount(page, account);
+  await openActionDialog(page, "recharge");
+
+  if (await amountDialog(page, "recharge").isVisible().catch(() => false)) {
+    await fillAmountDialogEl(page, amount, "recharge");
+  } else if (actionFrame(page, "recharge")) {
+    await fillAmountDialog(page, amount, "recharge");
+  } else {
+    await screenshot(page, "recharge-dialog-missing");
+    throw new Error("recharge dialog/iframe did not open after clicking Recharge");
+  }
   await verifyBalanceDelta(page, account, before, amount, "recharge");
 }
 
@@ -526,9 +671,17 @@ export async function redeemAccount(
     throw new Error(`Redeem amount $${target} exceeds balance $${before}`);
   }
 
-  await selectAccountRow(page, account);
-  await openActionIframe(page, "redeem");
-  await fillAmountDialog(page, target, "redeem");
+  await clickEditorForAccount(page, account);
+  await openActionDialog(page, "redeem");
+
+  if (await amountDialog(page, "redeem").isVisible().catch(() => false)) {
+    await fillAmountDialogEl(page, target, "redeem");
+  } else if (actionFrame(page, "redeem")) {
+    await fillAmountDialog(page, target, "redeem");
+  } else {
+    await screenshot(page, "redeem-dialog-missing");
+    throw new Error("redeem dialog/iframe did not open after clicking Redeem");
+  }
   await verifyBalanceDelta(page, account, before, target, "redeem");
   return target;
 }
@@ -990,12 +1143,12 @@ async function clickNewAccount(page: Page): Promise<void> {
     if (box && box.width > 0 && box.height > 0) {
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       log("create", "clicked New Account");
-      await page.waitForTimeout(800);
+      await page.waitForTimeout(150);
       return;
     }
     await loc.click({ force: true });
     log("create", "clicked New Account (force)");
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(150);
     return;
   }
   throw new Error("New Account button not found on User List");

@@ -1,6 +1,9 @@
 import type { Frame, Locator, Page } from "playwright";
 import { normalizeUsername, passwordForAccount } from "./credentials.js";
+import { assertAmountFilled, findLayuiAmountInput } from "../../shared/amount-input.js";
 import { CREATE_ACCOUNT_MAX_ATTEMPTS, DUPLICATE_USERNAME_RE } from "../../shared/panel-create.js";
+import { isCaptchaSolverConfigured } from "../../shared/panel-login-captcha.js";
+import { clearExpiryAndNeedRelogin } from "../../shared/dismiss-session-dialog.js";
 import { isLoginPage, log, parseMoney, screenshot, waitForManualLogin } from "./panel-utils.js";
 
 /**
@@ -39,8 +42,11 @@ function isAdminDashboard(url: string): boolean {
 /* ------------------------------------------------------------------ login */
 
 export async function loginToPanel(page: Page): Promise<void> {
+  const expired = await clearExpiryAndNeedRelogin(page, log);
+  if (expired) log("login", "session timeout cleared — CAPTCHA re-login");
+
   await page.goto(ADMIN_HOME, { waitUntil: "domcontentloaded", timeout: 60000 }).catch(() => {});
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(300);
 
   if (!(await isLoginPage(page))) {
     await getListScope(page);
@@ -63,10 +69,10 @@ export async function loginToPanel(page: Page): Promise<void> {
 
   const interactive =
     process.env.CASHMACHINE_HEADLESS === "false" || Boolean(process.env.CASHMACHINE_CDP_URL);
-  if (interactive) {
+  if (interactive || isCaptchaSolverConfigured()) {
     await waitForManualLogin(page);
     await getListScope(page);
-    log("login", "success (manual captcha)");
+    log("login", "success");
     return;
   }
 
@@ -93,7 +99,7 @@ async function ensureAdminDashboard(page: Page): Promise<void> {
     log("nav", `opening admin (${page.url()})`);
     await page.goto(ADMIN_HOME, { waitUntil: "domcontentloaded", timeout: 30000 });
   }
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 }
 
 /** Click Game User → User Management so the player list iframe loads on /admin. */
@@ -103,13 +109,13 @@ async function openUserManagementMenu(page: Page): Promise<void> {
   const gameUser = page.getByText("Game User", { exact: true }).first();
   if (await gameUser.isVisible().catch(() => false)) {
     await gameUser.click().catch(() => {});
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(180);
   }
 
   const um = page.getByText("User Management", { exact: true }).first();
   await um.waitFor({ state: "visible", timeout: 10000 });
   await um.click();
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(400);
 }
 
 /**
@@ -205,7 +211,7 @@ async function searchAccount(page: Page, account: string): Promise<ListScope> {
 
   await rootPage(scope).waitForTimeout(400);
   await scope
-    .locator(".layui-table-loading")
+    .locator(".layui-table-loading, .layui-table-init, .layui-icon-loading")
     .first()
     .waitFor({ state: "hidden", timeout: 12000 })
     .catch(() => {});
@@ -231,7 +237,7 @@ async function findRowIndex(scope: ListScope, account: string, timeout = 12000):
       if (cell.toLowerCase() === target) return i;
     }
     if (Date.now() > deadline) return -1;
-    await pg.waitForTimeout(500);
+    await pg.waitForTimeout(80);
   }
 }
 
@@ -359,12 +365,12 @@ async function dismissAllLayers(page: Page): Promise<void> {
       .last();
     if (await closeBtn.isVisible().catch(() => false)) {
       await closeBtn.click({ force: true }).catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(80);
       continue;
     }
     await page.locator(".layui-layer-close").last().click({ force: true }).catch(() => {});
     await page.keyboard.press("Escape").catch(() => {});
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(80);
   }
   await page.locator(".layui-layer-shade").first().waitFor({ state: "hidden", timeout: 8000 }).catch(() => {});
 }
@@ -383,7 +389,7 @@ async function waitForLayerClosed(page: Page, kind?: string, timeout = 20000): P
 async function waitForAccountListed(page: Page, username: string, timeoutMs = 22000): Promise<boolean> {
   await assertPageOpen(page);
   await dismissAllLayers(page);
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 
   const scope = await searchAccount(page, username);
   if ((await findRowIndex(scope, username, timeoutMs)) >= 0) return true;
@@ -391,8 +397,8 @@ async function waitForAccountListed(page: Page, username: string, timeoutMs = 22
   const reset = scope.locator(".layui-btn, button").filter({ hasText: /^\s*Reset\s*$/i }).first();
   if (await reset.isVisible().catch(() => false)) {
     await reset.click().catch(() => {});
-    await page.waitForTimeout(1200);
-    await scope.locator(".layui-table-loading").first().waitFor({ state: "hidden", timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(250);
+    await scope.locator(".layui-table-loading, .layui-table-init, .layui-icon-loading").first().waitFor({ state: "hidden", timeout: 8000 }).catch(() => {});
     if (await accountVisibleInTable(scope, username)) return true;
   }
 
@@ -459,7 +465,7 @@ async function submitFormAndWait(page: Page, frame: Frame, action: string): Prom
     log("submit", `HTTP ${resp.status()} ${body.slice(0, 280)}`);
     return body;
   }
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(350);
   return "";
 }
 
@@ -496,7 +502,7 @@ async function clickRowAction(page: Page, account: string, label: RegExp): Promi
   const btn = rowScope.locator("a, .layui-btn, button").filter({ hasText: label }).first();
   await btn.waitFor({ state: "visible", timeout: 8000 });
   await btn.click({ force: true });
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 }
 
 async function submitDialog(page: Page, frame: Frame, action: "recharge" | "withdraw"): Promise<void> {
@@ -508,7 +514,9 @@ async function submitDialog(page: Page, frame: Frame, action: "recharge" | "with
 export async function rechargeAccount(page: Page, account: string, amount: number): Promise<void> {
   await clickRowAction(page, account, /^\s*Recharge\s*$/i);
   const frame = await waitForDialogFrame(page, "recharge");
-  await typeInto(frame.locator('input[name="balance"]').first(), String(amount));
+  const amountInput = await findLayuiAmountInput(frame, "recharge");
+  await typeInto(amountInput, String(amount));
+  await assertAmountFilled(amountInput, amount, "recharge");
   await page.waitForTimeout(300);
   await submitDialog(page, frame, "recharge");
   await dismissAllLayers(page);
@@ -533,10 +541,12 @@ export async function redeemAccount(
 
   await clickRowAction(page, account, /^\s*Withdraw\s*$/i);
   const frame = await waitForDialogFrame(page, "withdraw");
-  await typeInto(frame.locator('input[name="balance"]').first(), String(target));
+  const amountInput = await findLayuiAmountInput(frame, "withdraw");
+  await typeInto(amountInput, String(target));
+  await assertAmountFilled(amountInput, target, "withdraw");
   await page.waitForTimeout(300);
   await submitDialog(page, frame, "withdraw");
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(350);
   log("redeem", `withdrew $${target} from ${account}`);
   await dismissAllLayers(page);
   return target;
@@ -596,7 +606,7 @@ async function tryCreateOnce(page: Page, username: string, password: string): Pr
   );
 
   const body = await submitFormAndWait(page, frame, "insert");
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 
   const summary = await waitForCredentialSummary(page, username);
   if (summary) {

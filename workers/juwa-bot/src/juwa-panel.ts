@@ -1,4 +1,5 @@
 import type { Locator, Page } from "playwright";
+import { assertAmountFilled, findDialogAmountInput } from "../../shared/amount-input.js";
 import { log, screenshot } from "./panel-utils.js";
 
 function sidebar(page: Page) {
@@ -21,7 +22,7 @@ async function clickSidebarText(page: Page, text: string): Promise<boolean> {
         if (box && box.x > 350) continue;
         await el.click({ timeout: 8000 });
         log("sidebar", text);
-        await page.waitForTimeout(900);
+        await page.waitForTimeout(180);
         return true;
       }
     }
@@ -43,16 +44,16 @@ export async function goToUserManagement(page: Page) {
   }
 
   await page.goto("https://ht.juwa777.com/userManagement", {
-    waitUntil: "domcontentloaded",
-    timeout: 60000,
+    waitUntil: "commit",
+    timeout: 30000,
   }).catch(() => {});
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(300);
 
   if (await isOnUserManagement(page)) return;
 
   await clickSidebarText(page, "Game User");
   await clickSidebarText(page, "User Management");
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 }
 
 function createDialog(page: Page) {
@@ -64,16 +65,12 @@ async function closeOpenDialogs(page: Page) {
     const closeBtn = page.locator(".el-dialog__wrapper:not([style*='display: none']) .el-dialog__headerbtn").first();
     if (!(await closeBtn.isVisible().catch(() => false))) break;
     await closeBtn.click({ force: true });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(80);
   }
 }
 
 async function openCreateDialog(page: Page): Promise<Locator> {
-  await page.goto("https://ht.juwa777.com/userManagement", {
-    waitUntil: "domcontentloaded",
-    timeout: 60000,
-  }).catch(() => {});
-  await page.waitForTimeout(2000);
+  await goToUserManagement(page);
 
   const existing = createDialog(page);
   if (await existing.isVisible().catch(() => false)) {
@@ -82,26 +79,24 @@ async function openCreateDialog(page: Page): Promise<Locator> {
   }
 
   await closeOpenDialogs(page);
-  await page.waitForTimeout(500);
 
   const createBtn = page.getByRole("button", { name: /create/i }).first();
 
-  await createBtn.waitFor({ state: "visible", timeout: 20000 });
+  await createBtn.waitFor({ state: "visible", timeout: 12000 });
   await createBtn.scrollIntoViewIfNeeded();
-  await createBtn.click({ timeout: 10000 });
+  await createBtn.click({ timeout: 8000 });
   log("action", "+ create");
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
   const dialog = createDialog(page);
-  await dialog.waitFor({ state: "visible", timeout: 15000 });
+  await dialog.waitFor({ state: "visible", timeout: 10000 });
   return dialog;
 }
 
 async function typeInto(input: Locator, value: string) {
-  await input.waitFor({ state: "visible", timeout: 10000 });
+  await input.waitFor({ state: "visible", timeout: 8000 });
   await input.click();
-  await input.fill("");
-  await input.pressSequentially(value, { delay: 30 });
+  await input.fill(value);
 }
 
 export async function fillCreateUserForm(page: Page, username: string, password: string) {
@@ -123,7 +118,7 @@ export async function fillCreateUserForm(page: Page, username: string, password:
 
   await dialog.locator(".el-dialog__footer").getByRole("button", { name: /^Save$/i }).click();
   await dialog.waitFor({ state: "hidden", timeout: 15000 }).catch(() => {});
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(300);
   log("create-user", `saved ${username}`);
 }
 
@@ -131,7 +126,7 @@ async function clickSearch(page: Page) {
   const btn = page.getByRole("button", { name: /^search$/i }).first();
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(350);
   }
 }
 
@@ -151,7 +146,7 @@ async function searchForUser(page: Page, username: string) {
   await search.fill(username);
   await clickSearch(page);
   // give the table time to re-render the filtered result
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(300);
 }
 
 async function findUserRow(page: Page, username: string) {
@@ -309,7 +304,7 @@ async function openRedeemDialog(page: Page, username: string) {
     await page.getByText(/^Redeem$/i).last().click();
   });
   log("action", `editor → Redeem for ${username}`);
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 
   const dialog = redeemDialog(page);
   return (await dialog.isVisible().catch(() => false)) ? dialog : page;
@@ -356,11 +351,12 @@ export async function redeemAccount(
   }
 
   const root = await openRedeemDialog(page, username);
-  const amountInput = root.locator('input.el-input__inner:not([readonly]), input[type="number"]').last();
+  const amountInput = await findDialogAmountInput(root, "redeem");
   await typeInto(amountInput, String(redeemAmount));
+  await assertAmountFilled(amountInput, Number(redeemAmount), "redeem");
 
   await root.locator("button, .el-button").filter({ hasText: /^Submit$|^Redeem$|^Confirm$|^OK$|^Save$/i }).last().click();
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(400);
   log("redeem", `${username} $${redeemAmount}`);
   return redeemAmount;
 }
@@ -377,15 +373,21 @@ export async function rechargeAccount(page: Page, username: string, amount: numb
     await page.getByText(/^Recharge$/i).last().click();
   });
   log("action", `editor → Recharge for ${username}`);
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(150);
 
   const dialog = rechargeDialog(page);
   const root = (await dialog.isVisible().catch(() => false)) ? dialog : page;
 
-  const amountInput = root.locator('input.el-input__inner:not([readonly]), input[type="number"]').last();
+  const amountInput = await findDialogAmountInput(root, "recharge");
   await typeInto(amountInput, String(amount));
+  try {
+    await assertAmountFilled(amountInput, amount, "recharge");
+  } catch (err) {
+    await screenshot(page, "recharge-amount-mismatch");
+    throw err;
+  }
 
   await root.locator("button, .el-button").filter({ hasText: /^Submit$|^Recharge$|^Confirm$|^OK$|^Save$/i }).last().click();
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(400);
   log("recharge", `${username} $${amount}`);
 }

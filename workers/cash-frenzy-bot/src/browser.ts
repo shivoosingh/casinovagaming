@@ -19,7 +19,7 @@ function launchOptions() {
 
   return {
     headless,
-    slowMo: headless ? 0 : 100,
+    slowMo: headless ? 0 : (process.env.BOT_SLOWMO ? Number(process.env.BOT_SLOWMO) : 0),
     ...(browserKind === "chromium" ? {} : { channel: browserKind as "chrome" }),
     proxy: proxy ? { server: proxy } : undefined,
     args: ["--disable-blink-features=AutomationControlled"],
@@ -54,24 +54,6 @@ async function findPanelPage(pages: Page[]): Promise<Page> {
     return page;
   }
 
-  for (const page of pages) {
-    const title = await page.title().catch(() => "");
-    if (/backend|management|frenzy/i.test(title)) {
-      console.log("[cf] Using tab by title:", title);
-      await page.bringToFront();
-      return page;
-    }
-  }
-
-  const fallback = pages.find(
-    (p) => !p.url().includes("about:blank") && !p.url().startsWith("chrome-extension:")
-  );
-  if (fallback) {
-    console.log("[cf] Using first non-blank tab:", fallback.url());
-    await fallback.bringToFront();
-    return fallback;
-  }
-
   throw new Error(
     "No Cash Frenzy tab found in Chrome. Open the agent panel (agentserver.cashfrenzy777.com) in the bot Chrome, then retry."
   );
@@ -85,7 +67,7 @@ export async function openBrowserSession(): Promise<BrowserSession> {
   if (cdpUrl) {
     console.log("[cf] Connecting to your Chrome via CDP (VPN should already be on)…");
     try {
-      const browser = await chromium.connectOverCDP(cdpUrl, { slowMo: 100 });
+      const browser = await chromium.connectOverCDP(cdpUrl, { slowMo: process.env.BOT_SLOWMO ? Number(process.env.BOT_SLOWMO) : 0 });
       const allPages = browser.contexts().flatMap((ctx) => ctx.pages());
       const page = allPages.length > 0 ? await findPanelPage(allPages) : await browser.contexts()[0]!.newPage();
       return {

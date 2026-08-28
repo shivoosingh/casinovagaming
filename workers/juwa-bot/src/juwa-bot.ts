@@ -14,16 +14,15 @@ import {
   userExists,
 } from "./juwa-panel.js";
 import {
-  clickByText,
   fillFirstTextInput,
   fillPasswordInput,
   log,
   screenshot,
-  submitForm,
-  waitForDashboard,
   waitForManualLogin,
   isLoginPage,
 } from "./panel-utils.js";
+import { ensureLoggedInForJob } from "../../shared/fast-panel-login.js";
+import { clearExpiryAndNeedRelogin } from "../../shared/dismiss-session-dialog.js";
 
 function env(name: string): string {
   const v = process.env[name]?.trim();
@@ -88,20 +87,34 @@ async function checkBalance(page: Page, job: GameLoadJob): Promise<number> {
   return balance;
 }
 
-async function hasCaptcha(page: Page): Promise<boolean> {
-  const captchaInput = page.locator(
-    'input[placeholder*="vc" i], input[placeholder*="captcha" i], input[placeholder*="verify" i], input[placeholder*="code" i]'
-  );
-  if ((await captchaInput.count()) > 0) return true;
-  return page.getByText(/verification code|captcha|vc/i).isVisible().catch(() => false);
+async function fillLoginCredentials(page: Page, username: string, password: string) {
+  const customUser = envOptional("JUWA_SEL_LOGIN_USER");
+  const customPass = envOptional("JUWA_SEL_LOGIN_PASS");
+
+  if (customUser) {
+    await page.fill(customUser, username);
+  } else {
+    await fillFirstTextInput(page, username, 0);
+  }
+
+  if (customPass) {
+    await page.fill(customPass, password);
+  } else {
+    await fillPasswordInput(page, password, 0);
+  }
 }
 
 async function login(page: Page) {
-  const url = env("JUWA_ADMIN_URL");
-  const username = env("JUWA_AGENT_USERNAME");
-  const password = env("JUWA_AGENT_PASSWORD");
+  const url = envOptional("JUWA_ADMIN_URL") ?? "https://ht.juwa777.com/login";
+  const username = envOptional("JUWA_AGENT_USERNAME") ?? envOptional("PANEL_USERNAME") ?? "";
+  const password = envOptional("JUWA_AGENT_PASSWORD") ?? envOptional("PANEL_PASSWORD") ?? "";
 
-  if (!(await isLoginPage(page)) && page.url().includes("juwa")) {
+  const expired = await clearExpiryAndNeedRelogin(page, log);
+  if (expired) {
+    log("login", "session timeout dialog cleared — re-login required");
+  }
+
+  if (!expired && !(await isLoginPage(page)) && page.url().includes("juwa")) {
     log("login", "already logged in — skipping");
     return;
   }
@@ -117,37 +130,8 @@ async function login(page: Page) {
     return;
   }
 
-  if (await hasCaptcha(page)) {
-    await waitForManualLogin(page);
-    await screenshot(page, "02-after-login");
-    log("login", "success (manual)");
-    return;
-  }
-
-  const customUser = envOptional("JUWA_SEL_LOGIN_USER");
-  const customPass = envOptional("JUWA_SEL_LOGIN_PASS");
-
-  if (customUser) {
-    await page.fill(customUser, username);
-  } else {
-    await fillFirstTextInput(page, username, 0);
-  }
-
-  if (customPass) {
-    await page.fill(customPass, password);
-  } else {
-    await fillPasswordInput(page, password, 0);
-  }
-
-  const customSubmit = envOptional("JUWA_SEL_LOGIN_SUBMIT");
-  if (customSubmit) {
-    await page.click(customSubmit);
-  } else {
-    const clicked = await clickByText(page, [/sign in|login|log in|登[录陆]/i], 5000);
-    if (!clicked) await submitForm(page);
-  }
-
-  await waitForDashboard(page, url);
+  await fillLoginCredentials(page, username, password);
+  await waitForManualLogin(page);
   await screenshot(page, "02-after-login");
   log("login", "success");
 }
@@ -175,12 +159,29 @@ async function redeemUser(
   return { username, redeemedAmount };
 }
 
+export async function ensurePanelLoggedIn(): Promise<void> {
+  const session = await openBrowserSession();
+  try {
+    const expired = await clearExpiryAndNeedRelogin(session.page, log);
+    if (!expired && !(await isLoginPage(session.page))) return;
+    await login(session.page);
+  } finally {
+    if (!process.env.JUWA_CDP_URL) {
+      await session.close();
+    }
+  }
+}
+
 export async function runJuwaJob(job: GameLoadJob, supabase: SupabaseClient): Promise<JuwaBotResult> {
   const session = await openBrowserSession();
   const { page, close } = session;
 
   try {
-    await login(page);
+    await ensureLoggedInForJob(page, {
+      isLoginPage,
+      loginToPanel: login,
+      readyUrlTest: /userManagement|HomeDetail/i,
+    });
 
     if (job.load_type === "create_account" || job.load_type === "new_account") {
       const creds = await createUser(page, job);
