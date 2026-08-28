@@ -108,16 +108,7 @@ export async function requestGameAccountCreate(input: {
 
   const existing = await getMyGameAccount(input.gameSlug);
   const hasAccount = Boolean(existing?.game_username);
-
-  if (hasAccount && !input.replaceAccount) {
-    return {
-      error: "You already have a game account. Use Replace Account to get new login details.",
-    };
-  }
-
-  if (!hasAccount && input.replaceAccount) {
-    return { error: "No account to replace yet. Create your first account instead." };
-  }
+  const shouldReplace = input.replaceAccount || hasAccount;
 
   const rawUsername = input.username?.trim() || undefined;
   const password = input.password?.trim() || undefined;
@@ -159,7 +150,7 @@ export async function requestGameAccountCreate(input: {
     p_game_name: input.gameName,
     p_username: username ?? null,
     p_password: finalPassword ?? password ?? null,
-    p_replace: input.replaceAccount ?? false,
+    p_replace: shouldReplace,
   });
 
   if (error) {
