@@ -41,9 +41,9 @@ export async function autoFulfillMilkyWayRequest(
       console.log(`[MW Strict Flow] Calling client.createAccount(registerUser)...`);
       const created = await client.createAccount(cleanAccount, passToUse);
 
-      // 2. Strict Verification: Call queryInfo to confirm account exists on Milky Way server
+      // 2. Strict Verification: Call queryInfo to confirm account exists on Milky Way server using exact same session
       console.log(`[MW Strict Flow] registerUser code 200 received! Verifying via queryInfo...`);
-      const verifiedInfo = await client.queryInfo(created.account);
+      const verifiedInfo = await client.queryInfo(created.account, created.session);
 
       if (String(verifiedInfo.code) !== "200") {
         throw new Error(`Milky Way account verification failed via queryInfo [code ${verifiedInfo.code}]: ${verifiedInfo.msg || "Account not found on provider server"}`);

@@ -33,6 +33,11 @@ export interface OrionStarsConfig {
   proxyUrl?: string;
 }
 
+export interface OrionStarsSession {
+  agentKey: string;
+  time: string;
+}
+
 function md5(str: string): string {
   return crypto.createHash("md5").update(str).digest("hex").toLowerCase();
 }
@@ -128,17 +133,8 @@ export class OrionStarsApiClient {
     return json;
   }
 
-  private agentKey: string | null = null;
-  private sessionTime: string | null = null;
-  private agentKeyExpiresAt: number = 0;
-
-  public async getValidSession(): Promise<{ agentKey: string; time: string }> {
-    const now = Date.now();
-    if (this.agentKey && this.sessionTime && this.agentKeyExpiresAt > now) {
-      return { agentKey: this.agentKey, time: this.sessionTime };
-    }
-
-    const time = now.toString();
+  public async getValidSession(): Promise<OrionStarsSession> {
+    const time = Date.now().toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(
       this.agentName
     )}&agentPasswd=${encodeURIComponent(this.agentPasswdHash)}&time=${time}`;
@@ -154,43 +150,23 @@ export class OrionStarsApiClient {
       throw new Error(`Orion Stars agentLogin failed: ${msg}`);
     }
 
-    this.agentKey = json.agentkey;
-    this.sessionTime = time;
-    this.agentKeyExpiresAt = now + 2 * 60 * 1000;
     this.lastAgentBalance = parseFloat(String(json.balance || "0"));
-    return { agentKey: this.agentKey, time: this.sessionTime };
+    return { agentKey: json.agentkey, time };
   }
 
-  private async createSign(): Promise<{ sign: string; time: string; agentKey: string }> {
-    const session = await this.getValidSession();
+  private createSignFromSession(session: OrionStarsSession): { sign: string; time: string; agentKey: string } {
     const rawSignStr = (this.agentName + session.time + session.agentKey).toLowerCase();
     const sign = md5(rawSignStr);
     return { sign, time: session.time, agentKey: session.agentKey };
   }
 
-  public async checkAccountName(account: string): Promise<{ available: boolean }> {
-    const { sign, time, agentKey } = await this.createSign();
-
-    const url = `${this.apiUrl}?action=checkAccountName&account=${encodeURIComponent(
-      account
-    )}&agentName=${encodeURIComponent(this.agentName)}&agentkey=${encodeURIComponent(
-      agentKey
-    )}&time=${time}&sign=${sign}`;
-
-    const json = await this.request(url);
-    if (String(json.code) !== "200") {
-      const errMsg = json.msg || `checkAccountName failed with code ${json.code}`;
-      throw new Error(`Orion Stars checkAccountName error: ${errMsg}`);
-    }
-
-    return { available: Number(json.status) === 0 };
-  }
-
   public async createAccount(
     account: string,
-    pass: string
-  ): Promise<{ account: string; pass: string }> {
-    const { sign, time, agentKey } = await this.createSign();
+    pass: string,
+    existingSession?: OrionStarsSession
+  ): Promise<{ account: string; pass: string; session: OrionStarsSession }> {
+    const session = existingSession || (await this.getValidSession());
+    const { sign, time, agentKey } = this.createSignFromSession(session);
     const passHash = md5(pass);
 
     const url = `${this.apiUrl}?action=registerUser&account=${encodeURIComponent(
@@ -206,15 +182,19 @@ export class OrionStarsApiClient {
     console.log(`[OrionStars API] registerUser response | code: ${json.code} | msg: "${json.msg || ""}"`);
 
     if (String(json.code) !== "200") {
-      const errMsg = json.msg || `Registration failed with code ${json.code}`;
+      let errMsg = json.msg || `Registration failed with code ${json.code}`;
+      if (String(json.code) === "201") {
+        errMsg = `${errMsg} (Verify agent store balance on Orion Stars admin panel)`;
+      }
       throw new Error(`Orion Stars registerUser error [code ${json.code}]: ${errMsg}`);
     }
 
-    return { account, pass };
+    return { account, pass, session };
   }
 
-  public async queryInfo(account: string): Promise<OrionStarsQueryResponse> {
-    const { sign, time, agentKey } = await this.createSign();
+  public async queryInfo(account: string, existingSession?: OrionStarsSession): Promise<OrionStarsQueryResponse> {
+    const session = existingSession || (await this.getValidSession());
+    const { sign, time, agentKey } = this.createSignFromSession(session);
 
     const url = `${this.apiUrl}?action=queryInfo&account=${encodeURIComponent(
       account
@@ -224,15 +204,19 @@ export class OrionStarsApiClient {
 
     const json: OrionStarsQueryResponse = await this.request(url);
     if (String(json.code) !== "200") {
-      const errMsg = json.msg || `Query failed with code ${json.code}`;
+      let errMsg = json.msg || `Query failed with code ${json.code}`;
+      if (String(json.code) === "201") {
+        errMsg = `${errMsg} (Session timeout)`;
+      }
       throw new Error(`Orion Stars queryInfo error [code ${json.code}]: ${errMsg}`);
     }
 
     return json;
   }
 
-  public async rechargePlayer(account: string, amount: number): Promise<{ success: boolean; account: string; amount: number }> {
-    const { sign, time, agentKey } = await this.createSign();
+  public async rechargePlayer(account: string, amount: number, existingSession?: OrionStarsSession): Promise<{ success: boolean; account: string; amount: number }> {
+    const session = existingSession || (await this.getValidSession());
+    const { sign, time, agentKey } = this.createSignFromSession(session);
 
     const url = `${this.apiUrl}?action=recharge&account=${encodeURIComponent(
       account
@@ -249,8 +233,9 @@ export class OrionStarsApiClient {
     return { success: true, account, amount };
   }
 
-  public async withdrawPlayer(account: string, amount: number): Promise<{ success: boolean; account: string; amount: number }> {
-    const { sign, time, agentKey } = await this.createSign();
+  public async withdrawPlayer(account: string, amount: number, existingSession?: OrionStarsSession): Promise<{ success: boolean; account: string; amount: number }> {
+    const session = existingSession || (await this.getValidSession());
+    const { sign, time, agentKey } = this.createSignFromSession(session);
 
     const url = `${this.apiUrl}?action=redeem&account=${encodeURIComponent(
       account
