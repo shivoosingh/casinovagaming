@@ -98,10 +98,16 @@ export interface GameVaultApiConfig {
 }
 
 /**
- * Clean HTTP chunked encoding bytes if present (e.g. "2d\r\n{...}\r\n0")
+ * Clean HTTP chunked encoding bytes if present (extract clean JSON body between '{' and '}')
  */
 function cleanChunkedResponse(text: string): string {
-  return text.replace(/^[0-9a-fA-F]+\r\n|\r\n0$/g, "").trim();
+  const s = text.trim();
+  const start = s.indexOf("{");
+  const end = s.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    return s.slice(start, end + 1);
+  }
+  return s;
 }
 
 /**
