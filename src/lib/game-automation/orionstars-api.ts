@@ -128,8 +128,17 @@ export class OrionStarsApiClient {
     return json;
   }
 
+  private agentKey: string | null = null;
+  private sessionTime: string | null = null;
+  private agentKeyExpiresAt: number = 0;
+
   public async getValidSession(): Promise<{ agentKey: string; time: string }> {
-    const time = Date.now().toString();
+    const now = Date.now();
+    if (this.agentKey && this.sessionTime && this.agentKeyExpiresAt > now) {
+      return { agentKey: this.agentKey, time: this.sessionTime };
+    }
+
+    const time = now.toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(
       this.agentName
     )}&agentPasswd=${encodeURIComponent(this.agentPasswdHash)}&time=${time}`;
@@ -145,8 +154,11 @@ export class OrionStarsApiClient {
       throw new Error(`Orion Stars agentLogin failed: ${msg}`);
     }
 
+    this.agentKey = json.agentkey;
+    this.sessionTime = time;
+    this.agentKeyExpiresAt = now + 2 * 60 * 1000;
     this.lastAgentBalance = parseFloat(String(json.balance || "0"));
-    return { agentKey: json.agentkey, time };
+    return { agentKey: this.agentKey, time: this.sessionTime };
   }
 
   private async createSign(): Promise<{ sign: string; time: string; agentKey: string }> {

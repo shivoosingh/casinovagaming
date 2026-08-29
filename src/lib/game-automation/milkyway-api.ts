@@ -127,8 +127,17 @@ export class MilkyWayApiClient {
     return json;
   }
 
+  private agentKey: string | null = null;
+  private sessionTime: string | null = null;
+  private agentKeyExpiresAt: number = 0;
+
   public async getFreshSession(): Promise<{ agentKey: string; time: string; balance: number }> {
-    const time = Date.now().toString();
+    const now = Date.now();
+    if (this.agentKey && this.sessionTime && this.agentKeyExpiresAt > now) {
+      return { agentKey: this.agentKey, time: this.sessionTime, balance: this.lastAgentBalance };
+    }
+
+    const time = now.toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(
       this.agentName
     )}&agentPasswd=${encodeURIComponent(this.agentPasswdHash)}&time=${time}`;
@@ -145,9 +154,12 @@ export class MilkyWayApiClient {
     }
 
     const bal = parseFloat(String(json.balance || "0"));
+    this.agentKey = json.agentkey;
+    this.sessionTime = time;
+    this.agentKeyExpiresAt = now + 2 * 60 * 1000;
     this.lastAgentBalance = bal;
 
-    return { agentKey: json.agentkey, time, balance: bal };
+    return { agentKey: this.agentKey, time: this.sessionTime, balance: bal };
   }
 
   private async createFreshSign(): Promise<{ sign: string; time: string; agentKey: string }> {
