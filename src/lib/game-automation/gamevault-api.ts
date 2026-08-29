@@ -5,7 +5,11 @@ import net from "net";
 import { URL } from "url";
 
 /**
- * Game Vault Direct REST API Client
+ * Game Vault Official External REST API v1.0 Client
+ * 
+ * Signature Specification:
+ * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
+ * Content-Type: multipart/form-data
  */
 
 export interface GameVaultAddUserResponse {
@@ -55,6 +59,15 @@ export interface GameVaultUserBalanceResponse {
   count?: number;
 }
 
+export interface GameVaultAgentBalanceResponse {
+  code: number;
+  msg: string;
+  data: {
+    agent_balance: string;
+  };
+  count?: number;
+}
+
 export interface GameVaultGetUserIDResponse {
   code: number;
   msg: string;
@@ -62,6 +75,18 @@ export interface GameVaultGetUserIDResponse {
     user_id: string;
   };
   count?: number;
+}
+
+export interface GameVaultResetPasswordResponse {
+  code: number;
+  msg: string;
+  data?: any;
+}
+
+export interface GameVaultPlayerOfflineResponse {
+  code: number;
+  msg: string;
+  data?: any;
 }
 
 export interface GameVaultApiConfig {
@@ -72,22 +97,28 @@ export interface GameVaultApiConfig {
 }
 
 /**
- * Execute form-encoded HTTPS POST via HTTP CONNECT proxy tunnel
+ * Execute multipart/form-data HTTPS POST via HTTP CONNECT proxy tunnel
  */
-function httpsPostFormViaProxy(
+function httpsPostMultipartViaProxy(
   targetUrlStr: string,
   formData: Record<string, string>,
-  proxyUrlStr?: string
-): Promise<string> {
+  proxyUrlStr?: string,
+  timeoutMs: number = 15000
+): Promise<{ text: string; statusCode: number }> {
   return new Promise((resolve, reject) => {
     try {
       const targetUrl = new URL(targetUrlStr);
 
-      const bodyParams = new URLSearchParams();
+      const boundary = "----WebKitFormBoundary" + createHash("md5").update(Date.now().toString()).digest("hex").slice(0, 16);
+      let bodyParts: Buffer[] = [];
+
       for (const [k, v] of Object.entries(formData)) {
-        bodyParams.append(k, v);
+        const header = `--${boundary}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`;
+        bodyParts.push(Buffer.from(header, "utf8"));
       }
-      const bodyStr = bodyParams.toString();
+      bodyParts.push(Buffer.from(`--${boundary}--\r\n`, "utf8"));
+
+      const bodyBuffer = Buffer.concat(bodyParts);
 
       if (proxyUrlStr) {
         const proxyUrl = new URL(proxyUrlStr);
@@ -142,20 +173,25 @@ function httpsPostFormViaProxy(
                 let httpReq = `POST ${reqPath} HTTP/1.1\r\n` +
                   `Host: ${targetHost}\r\n` +
                   `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n` +
-                  `Content-Type: application/x-www-form-urlencoded\r\n` +
-                  `Content-Length: ${Buffer.byteLength(bodyStr)}\r\n` +
-                  `Connection: close\r\n\r\n` +
-                  bodyStr;
+                  `Content-Type: multipart/form-data; boundary=${boundary}\r\n` +
+                  `Content-Length: ${bodyBuffer.length}\r\n` +
+                  `Connection: close\r\n\r\n`;
 
                 tlsSocket.write(httpReq);
+                tlsSocket.write(bodyBuffer);
               });
 
               let resText = "";
               tlsSocket.on("data", (data: Buffer) => (resText += data.toString("utf8")));
               tlsSocket.on("end", () => {
                 const parts = resText.split("\r\n\r\n");
+                const head = parts[0] || "";
                 const body = parts.slice(1).join("\r\n\r\n");
-                resolve(body);
+
+                const statusMatch = head.match(/HTTP\/\d\.\d\s+(\d+)/i);
+                const statusCode = statusMatch ? parseInt(statusMatch[1], 10) : 200;
+
+                resolve({ text: body, statusCode });
               });
 
               tlsSocket.on("error", (e: any) => reject(e));
@@ -174,21 +210,22 @@ function httpsPostFormViaProxy(
         path: targetUrl.pathname + targetUrl.search,
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Content-Length": Buffer.byteLength(bodyStr),
+          "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          "Content-Length": bodyBuffer.length,
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         },
         rejectUnauthorized: false,
+        timeout: timeoutMs,
       };
 
       const req = https.request(options, (res) => {
         let data = "";
         res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => resolve(data));
+        res.on("end", () => resolve({ text: data, statusCode: res.statusCode || 200 }));
       });
 
       req.on("error", (e) => reject(e));
-      req.write(bodyStr);
+      req.write(bodyBuffer);
       req.end();
     } catch (err) {
       reject(err);
@@ -229,10 +266,14 @@ export class GameVaultApiClient {
     ).trim();
   }
 
+  /**
+   * Generate signature according to official specification:
+   * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
+   */
   private generateAuthParams(): { agent_id: string; timestamp: string; token: string } {
     const timestamp = String(Math.floor(Date.now() / 1000));
     const rawSig = `${this.agentId}:${timestamp}:${this.secretKey}`;
-    const token = createHash("md5").update(rawSig).digest("hex").toLowerCase();
+    const token = createHash("md5").update(rawSig).digest("hex").toUpperCase();
     return {
       agent_id: this.agentId,
       timestamp,
@@ -254,42 +295,48 @@ export class GameVaultApiClient {
       formData[key] = String(value);
     }
 
-    const text = await httpsPostFormViaProxy(url, formData, this.proxyUrl);
+    const { text, statusCode } = await httpsPostMultipartViaProxy(url, formData, this.proxyUrl);
 
     let json: any;
     try {
       json = JSON.parse(text);
     } catch (e) {
-      throw new Error(`Invalid JSON response from Game Vault API: ${text.slice(0, 200)}`);
+      throw new Error(`Invalid JSON response from Game Vault API (HTTP ${statusCode}): ${text.slice(0, 200)}`);
     }
 
     const code = json.code ?? json.status;
-    if (code !== 0 && code !== 200) {
+    if (code !== 0) {
       const errorMsg = json.msg || json.message || `Game Vault API error code: ${code}`;
-      throw new Error(errorMsg);
+      const err = new Error(errorMsg) as any;
+      err.code = code;
+      err.rawResponse = json;
+      throw err;
     }
 
     return json as T;
   }
 
+  /**
+   * 1. Check Agent Store Balance (POST /api/external/agentBalance)
+   */
+  async getAgentBalance(): Promise<GameVaultAgentBalanceResponse> {
+    return this.request<GameVaultAgentBalanceResponse>("/api/external/agentBalance");
+  }
+
+  /**
+   * 2. Lookup User ID by account name (POST /api/external/getUserID)
+   */
   async getUserID(accountName: string): Promise<string> {
     const res = await this.request<GameVaultGetUserIDResponse>("/api/external/getUserID", {
       account_name: accountName.trim(),
     });
     if (!res.data?.user_id) throw new Error(`User ID not found for account '${accountName}'`);
-    return res.data.user_id;
+    return String(res.data.user_id);
   }
 
-  async resolveUserId(accountOrId: string | number): Promise<string> {
-    const strVal = String(accountOrId).trim();
-    if (/^\d{5,}$/.test(strVal)) return strVal;
-    try {
-      return await this.getUserID(strVal);
-    } catch {
-      return strVal;
-    }
-  }
-
+  /**
+   * 3. Add Player Account (POST /api/external/addUser)
+   */
   async addUser(account: string, loginPwd: string = "123123"): Promise<GameVaultAddUserResponse> {
     const cleanAccount = account.trim();
     return this.request<GameVaultAddUserResponse>("/api/external/addUser", {
@@ -298,32 +345,57 @@ export class GameVaultApiClient {
     });
   }
 
-  async recharge(userIdOrAccount: string | number, amount: number | string, orderId?: string): Promise<GameVaultRechargeResponse> {
-    const userId = await this.resolveUserId(userIdOrAccount);
+  /**
+   * 4. Recharge Player Balance (POST /api/external/recharge)
+   */
+  async recharge(userId: string | number, amount: number | string, orderId?: string): Promise<GameVaultRechargeResponse> {
     const order = orderId || `ord_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     return this.request<GameVaultRechargeResponse>("/api/external/recharge", {
-      user_id: userId,
+      user_id: String(userId).trim(),
       amount: String(amount),
       order_id: order,
     });
   }
 
-  async withdraw(userIdOrAccount: string | number, amount: number | string, orderId?: string): Promise<GameVaultWithdrawResponse> {
-    const userId = await this.resolveUserId(userIdOrAccount);
+  /**
+   * 5. Withdraw Player Balance (POST /api/external/withdraw)
+   */
+  async withdraw(userId: string | number, amount: number | string, orderId?: string): Promise<GameVaultWithdrawResponse> {
     const order = orderId || `ord_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     return this.request<GameVaultWithdrawResponse>("/api/external/withdraw", {
-      user_id: userId,
+      user_id: String(userId).trim(),
       amount: String(amount),
       order_id: order,
     });
   }
 
-  async getUserBalance(userIdOrAccount: string | number): Promise<GameVaultUserBalanceResponse> {
-    const userId = await this.resolveUserId(userIdOrAccount);
+  /**
+   * 6. Check Player Balance (POST /api/external/userBalance)
+   */
+  async getUserBalance(userId: string | number): Promise<GameVaultUserBalanceResponse> {
     return this.request<GameVaultUserBalanceResponse>("/api/external/userBalance", {
-      user_id: userId,
+      user_id: String(userId).trim(),
+    });
+  }
+
+  /**
+   * 7. Reset Player Password (POST /api/external/resetPassword)
+   */
+  async resetPassword(userId: string | number, newPassword: string): Promise<GameVaultResetPasswordResponse> {
+    return this.request<GameVaultResetPasswordResponse>("/api/external/resetPassword", {
+      user_id: String(userId).trim(),
+      login_pwd: String(newPassword).trim(),
+    });
+  }
+
+  /**
+   * 8. Force Player Offline (POST /api/external/playerOffline)
+   */
+  async playerOffline(userId: string | number): Promise<GameVaultPlayerOfflineResponse> {
+    return this.request<GameVaultPlayerOfflineResponse>("/api/external/playerOffline", {
+      user_id: String(userId).trim(),
     });
   }
 }
