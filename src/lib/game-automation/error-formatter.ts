@@ -24,9 +24,14 @@ export function formatGameAutomationError(
     return "Account format error. Please try again with letters and numbers.";
   }
 
-  // Game Vault System Abnormal Error (Numeric Agent ID / Secret Key / IP Whitelist required)
-  if (/system is abnormal|abnormal|code 21/i.test(msg)) {
+  // Game Vault IP Whitelist Error
+  if (/not white ip|whitelist|access ip/i.test(msg)) {
     return "Game Vault Store API authorization required: Please add your exact server IP in Game Vault Admin (agent.gamevault999.com) -> API Settings or contact your Master Agent to activate API store permissions. Your funds have been 100% refunded to your wallet balance.";
+  }
+
+  // Game Vault System Abnormal Error (Account already exists or invalid username)
+  if (/system is abnormal|abnormal|code 21|code 20/i.test(msg)) {
+    return "Account name is already taken or unavailable on Game Vault. Please try a different username or use Replace Account.";
   }
 
   return msg;
