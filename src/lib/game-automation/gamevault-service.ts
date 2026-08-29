@@ -53,6 +53,56 @@ export async function getGameVaultAccountBalance(
   return { success: true, balance: parseFloat(res.data.user_balance) || 0 };
 }
 
+/**
+ * Resolve numeric Game Vault user_id from DB or input
+ */
+async function resolveGameVaultUserId(
+  admin: any,
+  inputUsername: string,
+  userId?: string
+): Promise<string> {
+  const clean = inputUsername.trim();
+  if (/^\d{5,}$/.test(clean)) return clean;
+
+  // Check admin_notes or game_username in recent requests
+  if (admin && userId) {
+    const { data: userAccounts } = await admin
+      .from("user_game_accounts")
+      .select("game_username, admin_notes")
+      .eq("user_id", userId)
+      .eq("game_slug", "game-vault")
+      .maybeSingle();
+
+    if (userAccounts?.admin_notes && /^\d{5,}$/.test(userAccounts.admin_notes.trim())) {
+      return userAccounts.admin_notes.trim();
+    }
+    if (userAccounts?.game_username && /^\d{5,}$/.test(userAccounts.game_username.trim())) {
+      return userAccounts.game_username.trim();
+    }
+
+    const { data: pastReqs } = await admin
+      .from("game_load_requests")
+      .select("admin_notes, game_username")
+      .eq("user_id", userId)
+      .eq("status", "completed")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (pastReqs) {
+      for (const r of pastReqs) {
+        if (r.admin_notes && /^\d{5,}$/.test(r.admin_notes.trim())) {
+          return r.admin_notes.trim();
+        }
+        if (r.game_username && /^\d{5,}$/.test(r.game_username.trim())) {
+          return r.game_username.trim();
+        }
+      }
+    }
+  }
+
+  return clean;
+}
+
 export async function autoFulfillGameVaultRequest(
   requestId: string,
   loadType: "create_account" | "new_account" | "check_balance" | "load" | "reload" | "redeem",
@@ -83,19 +133,32 @@ export async function autoFulfillGameVaultRequest(
           status: "completed",
           game_username: created.account,
           game_password: created.password,
+          admin_notes: created.userId,
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq("id", requestId);
 
+      // Also upsert user_game_accounts with numeric user_id in admin_notes
+      try {
+        await admin.from("user_game_accounts").upsert({
+          user_id: input.userId,
+          game_slug: "game-vault",
+          game_username: created.account,
+          admin_notes: created.userId,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (e) {}
+
       return { success: true };
     }
 
     if (loadType === "check_balance") {
-      const username = input.gameUsername?.trim();
-      if (!username) throw new Error("Game username missing");
+      const inputUsername = input.gameUsername?.trim();
+      if (!inputUsername) throw new Error("Game username missing");
 
-      const scoreInfo = await getGameVaultAccountBalance(username);
+      const targetId = await resolveGameVaultUserId(admin, inputUsername, input.userId);
+      const scoreInfo = await getGameVaultAccountBalance(targetId);
 
       await admin
         .from("game_load_requests")
@@ -112,12 +175,13 @@ export async function autoFulfillGameVaultRequest(
     }
 
     if (loadType === "load" || loadType === "reload") {
-      const username = input.gameUsername?.trim();
+      const inputUsername = input.gameUsername?.trim();
       const amount = input.amount || 0;
-      if (!username) throw new Error("Game username missing");
+      if (!inputUsername) throw new Error("Game username missing");
 
+      const targetId = await resolveGameVaultUserId(admin, inputUsername, input.userId);
       const orderId = `job_${requestId.replace(/[^a-zA-Z0-9]/g, "")}`.slice(0, 32);
-      await rechargeGameVaultAccount({ usernameOrId: username, amount, orderId });
+      await rechargeGameVaultAccount({ usernameOrId: targetId, amount, orderId });
 
       await admin
         .from("game_load_requests")
@@ -132,12 +196,13 @@ export async function autoFulfillGameVaultRequest(
     }
 
     if (loadType === "redeem") {
-      const username = input.gameUsername?.trim();
+      const inputUsername = input.gameUsername?.trim();
       const amount = input.amount || 0;
-      if (!username) throw new Error("Game username missing");
+      if (!inputUsername) throw new Error("Game username missing");
 
+      const targetId = await resolveGameVaultUserId(admin, inputUsername, input.userId);
       const orderId = `job_${requestId.replace(/[^a-zA-Z0-9]/g, "")}`.slice(0, 32);
-      await withdrawGameVaultAccount({ usernameOrId: username, amount, orderId });
+      await withdrawGameVaultAccount({ usernameOrId: targetId, amount, orderId });
 
       await admin
         .from("game_load_requests")
