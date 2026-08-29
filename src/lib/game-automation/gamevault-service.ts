@@ -16,8 +16,12 @@ export async function createGameVaultAccount(
   client?: GameVaultApiClient
 ) {
   const api = client || getGameVaultApiClient();
+  // Ensure username is strictly alphanumeric (Game Vault requirement)
+  const cleanUsername = params.username.replace(/[^a-zA-Z0-9]/g, "");
+  const finalUsername = cleanUsername.length >= 4 ? cleanUsername : `GV${Math.floor(100000 + Math.random() * 900000)}`;
+
   const password = params.password || "123123";
-  const res = await api.addUser(params.username, password);
+  const res = await api.addUser(finalUsername, password);
   return {
     success: true,
     account: res.data.account_name,
@@ -64,7 +68,6 @@ async function resolveGameVaultUserId(
   const clean = inputUsername.trim();
   if (/^\d{5,}$/.test(clean)) return clean;
 
-  // Check admin_notes or game_username in recent requests
   if (admin && userId) {
     const { data: userAccounts } = await admin
       .from("user_game_accounts")
@@ -123,8 +126,10 @@ export async function autoFulfillGameVaultRequest(
 
   try {
     if (loadType === "create_account" || loadType === "new_account") {
-      const username = input.requestedUsername || `GV${Math.floor(100000 + Math.random() * 900000)}`;
-      const password = input.requestedPassword || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
+      const rawUser = input.requestedUsername || "";
+      const cleanUser = rawUser.replace(/[^a-zA-Z0-9]/g, "");
+      const username = cleanUser.length >= 4 ? cleanUser : `GV${Math.floor(100000 + Math.random() * 900000)}`;
+      const password = input.requestedPassword || `Pass${Math.floor(1000 + Math.random() * 9000)}`;
       const created = await createGameVaultAccount({ username, password });
 
       await admin
@@ -139,7 +144,6 @@ export async function autoFulfillGameVaultRequest(
         })
         .eq("id", requestId);
 
-      // Also upsert user_game_accounts with numeric user_id in admin_notes
       try {
         await admin.from("user_game_accounts").upsert({
           user_id: input.userId,
