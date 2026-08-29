@@ -39,95 +39,95 @@ export function formatGameAutomationError(
   const amtStr = amount ? ` $${amount.toFixed(2)}` : "";
 
   if (code === 1 || /code 1\b|invalid agent id/i.test(msg)) {
-    return "Game Vault API authentication failed: Invalid agent ID. Please check store agent credentials.";
+    return "GameVault rejected the request: Invalid agent ID (code 1).";
   }
 
   if (code === 2 || /code 2\b|invalid request parameters/i.test(msg)) {
-    return "Invalid request parameters sent to Game Vault API.";
+    return "GameVault rejected the request: Invalid request parameters (code 2).";
   }
 
   if (code === 3 || /code 3\b|invalid token/i.test(msg)) {
-    return "Game Vault API authentication failed: Invalid token / MD5 signature mismatch.";
+    return "GameVault rejected the API token (code 3).";
   }
 
   if (code === 4 || /code 4\b|token expired/i.test(msg)) {
-    return "Game Vault API token expired. Please try again.";
+    return "GameVault API session/token expired (code 4).";
   }
 
   if (code === 5 || /code 5\b|not white ip|whitelist|access ip/i.test(msg)) {
-    return "Game Vault Store API authorization required: Access IP is not in Game Vault whitelist (Code 5).";
+    return "GameVault rejected the server IP because it is not whitelisted (code 5).";
   }
 
   if (code === 6 || /code 6\b|insufficient agent balance|insufficient balance/i.test(msg)) {
-    return `Agent store wallet limit reached: The game agent server has insufficient credits to process your${amtStr} load right now (Code 6). Your funds have been 100% refunded to your wallet balance.`;
+    return `GameVault agent balance is insufficient (code 6). Your funds have been 100% refunded to your wallet balance.`;
   }
 
   if (code === 7 || /code 7\b|insufficient user balance/i.test(msg)) {
-    return "Insufficient player balance in your Game Vault account for this redeem amount (Code 7).";
+    return "GameVault user balance is insufficient for this withdrawal (code 7).";
   }
 
   if (code === 8 || /code 8\b|invalid user id/i.test(msg)) {
-    return "Invalid Game Vault user ID. Account not found on Game Vault server (Code 8).";
+    return "GameVault user ID is invalid (code 8).";
   }
 
   if (code === 9 || /code 9\b|user account frozen|account frozen/i.test(msg)) {
-    return "Your Game Vault player account is frozen on provider server (Code 9).";
+    return "GameVault user account is frozen on provider server (code 9).";
   }
 
   if (code === 10 || /code 10\b|still in the game|return to the game lobby|user is in game|in game/i.test(msg)) {
-    return "Player is currently active inside a game room. Please exit to the game lobby in your app and try again (Code 10).";
+    return "Player is currently active inside a game room (code 10). Please exit to game lobby and try again.";
   }
 
   if (code === 11 || /code 11\b|invalid amount/i.test(msg)) {
-    return "Invalid load or redeem amount for Game Vault (Code 11).";
+    return "GameVault load/redeem amount is invalid (code 11).";
   }
 
   if (code === 12 || /code 12\b|recharge failed/i.test(msg)) {
-    return "Game Vault deposit failed on provider server (Code 12).";
+    return "GameVault recharge failed (code 12).";
   }
 
   if (code === 13 || /code 13\b|recharge permission denied/i.test(msg)) {
-    return "Deposit permission denied for this Game Vault agent account (Code 13).";
+    return "GameVault agent has no recharge permission (code 13).";
   }
 
   if (code === 14 || /code 14\b|withdrawal failed/i.test(msg)) {
-    return "Game Vault redeem/withdrawal failed on provider server (Code 14).";
+    return "GameVault withdrawal failed (code 14).";
   }
 
   if (code === 15 || /code 15\b|withdrawal amount exceeds daily limit/i.test(msg)) {
-    return "Redeem amount exceeds Game Vault daily withdrawal limit (Code 15).";
+    return "GameVault withdrawal amount exceeds daily limit (code 15).";
   }
 
   if (code === 16 || /code 16\b|withdrawal under review/i.test(msg)) {
-    return "Game Vault withdrawal is currently under review by provider (Code 16).";
+    return "GameVault withdrawal is under review (code 16).";
   }
 
   if (code === 17 || /code 17\b|withdrawal permission denied/i.test(msg)) {
-    return "Redeem permission denied for this Game Vault agent account (Code 17).";
+    return "GameVault agent has no withdrawal permission (code 17).";
   }
 
-  if (code === 18 || /code 18\b|account name format error|nickname can only be letters/i.test(msg)) {
-    return "Account name format error (Code 18). Game Vault account names must contain only letters and numbers (no underscores or special characters).";
+  if (code === 18 || /code 18\b|account name format error/i.test(msg)) {
+    return "GameVault rejected the username format (code 18).";
   }
 
   if (code === 19 || /code 19\b|no register-user permission|no register user permission/i.test(msg)) {
-    return "Agent has no register-user permission on Game Vault provider (Code 19).";
+    return "GameVault agent does not have register-user permission (code 19).";
   }
 
   if (code === 20 || /code 20\b|account name already exists/i.test(msg)) {
-    return "Account name already exists on Game Vault (Code 20).";
+    return "GameVault account already exists (code 20).";
   }
 
   if (code === 21 || code === 400 || /code 21\b|system failed|system is abnormal|abnormal/i.test(msg)) {
-    return "GameVault provider returned a system error (code 21 / status 400). Please ensure account username contains only letters and numbers.";
+    return "GameVault provider returned a system error (code 21 / status 400).";
   }
 
   if (code === 22 || /code 22\b|number of registration ips exceeds upper limit/i.test(msg)) {
-    return "Registration limit reached: Number of registration IPs exceeds upper limit (Code 22).";
+    return "GameVault registration IP limit exceeded (code 22).";
   }
 
   if (code === 23 || /code 23\b|password must be 6-32 characters|password digits 6 to 32/i.test(msg)) {
-    return "Password format error: Password must be 6 to 32 characters (Code 23).";
+    return "GameVault rejected the password format (code 23). Password must be 6-32 characters.";
   }
 
   return msg;

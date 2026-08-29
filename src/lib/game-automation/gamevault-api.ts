@@ -10,6 +10,7 @@ import { URL } from "url";
  * Signature Specification:
  * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
  * Content-Type: multipart/form-data
+ * Timestamp: 13-digit timestamp (milliseconds)
  */
 
 export interface GameVaultAddUserResponse {
@@ -94,6 +95,13 @@ export interface GameVaultApiConfig {
   agentId?: string;
   secretKey?: string;
   proxyUrl?: string;
+}
+
+/**
+ * Clean HTTP chunked encoding bytes if present (e.g. "2d\r\n{...}\r\n0")
+ */
+function cleanChunkedResponse(text: string): string {
+  return text.replace(/^[0-9a-fA-F]+\r\n|\r\n0$/g, "").trim();
 }
 
 /**
@@ -269,9 +277,10 @@ export class GameVaultApiClient {
   /**
    * Generate signature according to official specification:
    * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
+   * Using official 13-digit timestamp (milliseconds)
    */
   private generateAuthParams(): { agent_id: string; timestamp: string; token: string } {
-    const timestamp = String(Math.floor(Date.now() / 1000));
+    const timestamp = String(Date.now()); // 13-digit timestamp
     const rawSig = `${this.agentId}:${timestamp}:${this.secretKey}`;
     const token = createHash("md5").update(rawSig).digest("hex").toUpperCase();
     return {
@@ -296,10 +305,11 @@ export class GameVaultApiClient {
     }
 
     const { text, statusCode } = await httpsPostMultipartViaProxy(url, formData, this.proxyUrl);
+    const cleanedText = cleanChunkedResponse(text);
 
     let json: any;
     try {
-      json = JSON.parse(text);
+      json = JSON.parse(cleanedText);
     } catch (e) {
       throw new Error(`Invalid JSON response from Game Vault API (HTTP ${statusCode}): ${text.slice(0, 200)}`);
     }
@@ -337,7 +347,7 @@ export class GameVaultApiClient {
   /**
    * 3. Add Player Account (POST /api/external/addUser)
    */
-  async addUser(account: string, loginPwd: string = "123123"): Promise<GameVaultAddUserResponse> {
+  async addUser(account: string, loginPwd: string = "Pass1234"): Promise<GameVaultAddUserResponse> {
     const cleanAccount = account.trim();
     return this.request<GameVaultAddUserResponse>("/api/external/addUser", {
       account: cleanAccount,
