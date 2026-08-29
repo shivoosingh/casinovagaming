@@ -1,16 +1,9 @@
 import crypto from "crypto";
 import https from "https";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 /**
  * Orion Stars Official Terminal API v1.2.6 Client
- * 
- * Endpoints:
- * 1. Agent Login: /ws/service.ashx?action=agentLogin
- * 2. Register User Account: /ws/service.ashx?action=registerUser
- * 3. Query User Info: /ws/service.ashx?action=queryInfo
- * 4. Recharge: /ws/service.ashx?action=recharge
- * 5. Redeem: /ws/service.ashx?action=redeem
- * 6. Check Account Name: /ws/service.ashx?action=checkAccountName
  */
 
 export interface OrionStarsLoginResponse {
@@ -37,6 +30,7 @@ export interface OrionStarsConfig {
   apiUrl?: string;
   agentName?: string;
   agentPassword?: string;
+  proxyUrl?: string;
 }
 
 function md5(str: string): string {
@@ -44,30 +38,39 @@ function md5(str: string): string {
 }
 
 /**
- * Perform HTTPS POST with custom SSL agent bypass for Vercel/Node environment
+ * Perform HTTPS POST with Webshare Proxy support
  */
-function httpsPost(urlStr: string): Promise<string> {
+function httpsPost(urlStr: string, hostHeader: string, proxyUrlStr?: string, timeoutMs: number = 15000): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       const parsed = new URL(urlStr);
 
+      const agent = proxyUrlStr ? new HttpsProxyAgent(proxyUrlStr, { rejectUnauthorized: false }) : undefined;
+
       const options: https.RequestOptions = {
         hostname: parsed.hostname,
-        port: parsed.port || 443,
+        port: parsed.port ? Number(parsed.port) : 8033,
         path: parsed.pathname + parsed.search,
         method: "POST",
         headers: {
-          Host: "orionstars.vip",
+          Host: hostHeader,
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         },
-        servername: "orionstars.vip",
+        servername: hostHeader,
         rejectUnauthorized: false,
+        timeout: timeoutMs,
+        agent: agent,
       };
 
       const req = https.request(options, (res) => {
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => resolve(data));
+      });
+
+      req.on("timeout", () => {
+        req.destroy();
+        reject(new Error(`Orion Stars API connection timed out after ${timeoutMs / 1000}s`));
       });
 
       req.on("error", (e) => reject(e));
@@ -82,9 +85,7 @@ export class OrionStarsApiClient {
   private apiUrl: string;
   private agentName: string;
   private agentPasswdHash: string;
-  private agentKey: string | null = null;
-  private sessionTime: string | null = null;
-  private agentKeyExpiresAt: number = 0;
+  private proxyUrl?: string;
   public lastAgentBalance: number = 0;
 
   constructor(config: OrionStarsConfig = {}) {
@@ -94,7 +95,6 @@ export class OrionStarsApiClient {
       "https://34.212.168.0:8033/ws/service.ashx"
     ).trim();
 
-    // Orion Stars agentName
     this.agentName = (
       config.agentName ||
       process.env.ORIONSTARS_AGENT_USERNAME ||
@@ -107,10 +107,17 @@ export class OrionStarsApiClient {
       "Re3set@123#";
 
     this.agentPasswdHash = md5(rawPass.trim());
+
+    this.proxyUrl = (
+      config.proxyUrl ||
+      process.env.ORIONSTARS_PROXY_URL ||
+      process.env.GAMEVAULT_PROXY_URL ||
+      "http://sbhxwsxp:xn5frycnonl5@198.23.243.226:6361"
+    ).trim();
   }
 
   private async request(url: string): Promise<any> {
-    const text = await httpsPost(url);
+    const text = await httpsPost(url, "orionstars.vip", this.proxyUrl);
     let json: any = {};
     try {
       json = JSON.parse(text);
@@ -121,41 +128,25 @@ export class OrionStarsApiClient {
     return json;
   }
 
-  /**
-   * Perform agentLogin to obtain fresh agentKey and balance.
-   */
   public async getValidSession(): Promise<{ agentKey: string; time: string }> {
-    const now = Date.now();
-    if (this.agentKey && this.sessionTime && this.agentKeyExpiresAt > now) {
-      return { agentKey: this.agentKey, time: this.sessionTime };
-    }
-
-    const time = now.toString();
+    const time = Date.now().toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(
       this.agentName
     )}&agentPasswd=${encodeURIComponent(this.agentPasswdHash)}&time=${time}`;
 
-    console.log(`[OrionStars API Diagnostic] agentLogin call | agentName: "${this.agentName}" | endpoint: ${this.apiUrl}`);
+    console.log(`[OrionStars API] agentLogin call | agentName: "${this.agentName}" | proxy: ${this.proxyUrl ? "ENABLED" : "DIRECT"}`);
 
     const json: OrionStarsLoginResponse = await this.request(loginUrl);
 
-    console.log(`[OrionStars API Diagnostic] agentLogin response | code: ${json.code} | raw balance: "${json.balance}" | agentKey prefix: ${json.agentkey ? json.agentkey.slice(0, 6) + "..." : "NONE"}`);
+    console.log(`[OrionStars API] agentLogin response | code: ${json.code} | balance: "${json.balance}" | agentKey: ${json.agentkey ? json.agentkey.slice(0, 6) + "..." : "NONE"}`);
 
     if (String(json.code) !== "200" || !json.agentkey) {
       const msg = json.msg || `code ${json.code}`;
       throw new Error(`Orion Stars agentLogin failed: ${msg}`);
     }
 
-    this.agentKey = json.agentkey;
-    this.sessionTime = time;
     this.lastAgentBalance = parseFloat(String(json.balance || "0"));
-    this.agentKeyExpiresAt = now + 3 * 60 * 1000;
-    return { agentKey: this.agentKey, time: this.sessionTime };
-  }
-
-  public async getValidAgentKey(): Promise<string> {
-    const session = await this.getValidSession();
-    return session.agentKey;
+    return { agentKey: json.agentkey, time };
   }
 
   private async createSign(): Promise<{ sign: string; time: string; agentKey: string }> {
@@ -196,15 +187,15 @@ export class OrionStarsApiClient {
       this.agentName
     )}&agentkey=${encodeURIComponent(agentKey)}&time=${time}&sign=${sign}`;
 
-    console.log(`[OrionStars API Diagnostic] registerUser call | account: "${account}" | sign prefix: "${sign.slice(0, 8)}..."`);
+    console.log(`[OrionStars API] registerUser calling for account: "${account}"...`);
 
     const json = await this.request(url);
 
-    console.log(`[OrionStars API Diagnostic] registerUser response | code: ${json.code} | msg: "${json.msg || ""}" | userbalance: ${json.userbalance}`);
+    console.log(`[OrionStars API] registerUser response | code: ${json.code} | msg: "${json.msg || ""}"`);
 
     if (String(json.code) !== "200") {
       const errMsg = json.msg || `Registration failed with code ${json.code}`;
-      throw new Error(`Orion Stars registerUser error: ${errMsg}`);
+      throw new Error(`Orion Stars registerUser error [code ${json.code}]: ${errMsg}`);
     }
 
     return { account, pass };
@@ -222,7 +213,7 @@ export class OrionStarsApiClient {
     const json: OrionStarsQueryResponse = await this.request(url);
     if (String(json.code) !== "200") {
       const errMsg = json.msg || `Query failed with code ${json.code}`;
-      throw new Error(`Orion Stars queryInfo error: ${errMsg}`);
+      throw new Error(`Orion Stars queryInfo error [code ${json.code}]: ${errMsg}`);
     }
 
     return json;
@@ -240,7 +231,7 @@ export class OrionStarsApiClient {
     const json = await this.request(url);
     if (String(json.code) !== "200") {
       const errMsg = json.msg || `Recharge failed with code ${json.code}`;
-      throw new Error(`Orion Stars recharge error: ${errMsg}`);
+      throw new Error(`Orion Stars recharge error [code ${json.code}]: ${errMsg}`);
     }
 
     return { success: true, account, amount };
@@ -258,7 +249,7 @@ export class OrionStarsApiClient {
     const json = await this.request(url);
     if (String(json.code) !== "200") {
       const errMsg = json.msg || `Redeem failed with code ${json.code}`;
-      throw new Error(`Orion Stars redeem error: ${errMsg}`);
+      throw new Error(`Orion Stars redeem error [code ${json.code}]: ${errMsg}`);
     }
 
     return { success: true, account, amount };
