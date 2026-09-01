@@ -32,10 +32,11 @@ export const DOLLARPAY_SUPPORTED_AMOUNTS_CARD: string[] = [
 ];
 
 export function getDollarPayConfig(): DollarPayConfig {
-  const baseUrl = process.env.DOLLARPAY_API_BASE_URL || "https://h5.dollarpaywallet.com";
+  const baseUrl = process.env.DOLLARPAY_API_BASE_URL || "https://mh.dollarpaywallet.com";
   const merchantId = process.env.DOLLARPAY_MERCHANT_ID || "1097176799";
   const merchantKey = process.env.DOLLARPAY_MERCHANT_KEY || "bd4bd89b1a726ac54ff4107b42aca8a3";
   const tenantDomain = process.env.DOLLARPAY_TENANT_DOMAIN || "www.casinovasgaming.com";
+
 
   return {
     baseUrl: baseUrl.replace(/\/+$/, ""),
