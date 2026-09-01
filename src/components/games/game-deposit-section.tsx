@@ -19,6 +19,8 @@ import {
   DEPOSIT_PAYMENT_METHODS,
   type DepositPaymentMethodId,
 } from "@/lib/payments/methods";
+import { DollarPayDepositSection } from "@/components/payments/dollarpay-deposit-modal";
+import { Zap } from "lucide-react";
 import type { Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -34,7 +36,9 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
   const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [depositMode, setDepositMode] = useState<"instant" | "manual">("instant");
   const [selectedMethod, setSelectedMethod] = useState<DepositPaymentMethodId>("paypal");
+
   const [amount, setAmount] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -130,15 +134,52 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
       id={hideSectionAnchor ? undefined : "deposit"}
       className="rounded-2xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] p-4 sm:p-5 scroll-mt-24"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <Banknote className="h-5 w-5 text-emerald-400" />
-        <h2 className="font-bold text-white">Deposit</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Banknote className="h-5 w-5 text-emerald-400" />
+          <h2 className="font-bold text-white">Deposit to {game.name}</h2>
+        </div>
       </div>
 
-      <p className="text-xs text-[#6b6d8f] mb-4">
-        Choose a payment method, send your deposit, then upload a screenshot. Our team will credit your{" "}
-        {game.name} account after verification.
-      </p>
+      {/* Mode Switcher Tabs */}
+      <div className="grid grid-cols-2 gap-2 mb-5 p-1 bg-[#090915] rounded-xl border border-white/10">
+        <button
+          type="button"
+          onClick={() => setDepositMode("instant")}
+          className={cn(
+            "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all",
+            depositMode === "instant"
+              ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 text-emerald-300 shadow-md"
+              : "text-[#6b6d8f] hover:text-white"
+          )}
+        >
+          <Zap className="h-3.5 w-3.5 text-emerald-400" />
+          Instant Auto Deposit
+        </button>
+        <button
+          type="button"
+          onClick={() => setDepositMode("manual")}
+          className={cn(
+            "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all",
+            depositMode === "manual"
+              ? "bg-[rgba(0,229,255,0.12)] border border-[rgba(0,229,255,0.3)] text-[#7af5ff] shadow-md"
+              : "text-[#6b6d8f] hover:text-white"
+          )}
+        >
+          <Banknote className="h-3.5 w-3.5" />
+          Manual QR Upload
+        </button>
+      </div>
+
+      {depositMode === "instant" ? (
+        <DollarPayDepositSection gameSlug={game.slug} gameName={game.name} />
+      ) : (
+        <>
+          <p className="text-xs text-[#6b6d8f] mb-4">
+            Choose a payment method, send your deposit, then upload a screenshot. Our team will credit your{" "}
+            {game.name} account after verification.
+          </p>
+
 
       <div className="flex flex-wrap gap-2 mb-5">
         {DEPOSIT_PAYMENT_METHODS.map((m) => (
@@ -283,6 +324,9 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           Submit deposit proof
         </button>
       </div>
+        </>
+      )}
     </section>
   );
 }
+
