@@ -44,7 +44,7 @@ const DEFAULT_BLOG: BlogAiSettings = {
   posting_frequency_hours: 24,
   ai_provider: "smart_auto",
   ai_model: "gpt-4o-mini",
-  auto_publish: false,
+  auto_publish: true,
   auto_telegram_broadcast: true,
   last_generated_at: null,
 };

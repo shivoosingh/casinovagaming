@@ -16,6 +16,7 @@ import {
 import { autoFulfillCashMachineRequest, isCashMachineApiConfigured } from "@/lib/game-automation/cashmachine-service";
 import { autoFulfillCashFrenzyRequest, isCashFrenzyApiConfigured } from "@/lib/game-automation/cashfrenzy-service";
 import { autoFulfillGameroomRequest, isGameroomApiConfigured } from "@/lib/game-automation/gameroom-service";
+import { autoFulfillMrAllInOneRequest, isMrAllInOneApiConfigured } from "@/lib/game-automation/mrallinone-service";
 import { autoFulfillGameVaultRequest, isGameVaultApiConfigured } from "@/lib/game-automation/gamevault-service";
 import { autoFulfillMafiaRequest, isMafiaApiConfigured } from "@/lib/game-automation/mafia-service";
 import { autoFulfillOrionStarsRequest } from "@/lib/game-automation/orionstars-service";
@@ -24,8 +25,10 @@ import { autoFulfillMilkyWayRequest } from "@/lib/game-automation/milkyway-servi
 import { isMilkyWayApiConfigured } from "@/lib/game-automation/milkyway-api";
 import { autoFulfillJuwaRequest } from "@/lib/game-automation/juwa-service";
 import { isJuwaApiConfigured } from "@/lib/game-automation/juwa-api";
+import { autoFulfillVegasRequest } from "@/lib/game-automation/vegas-service";
+import { isVegasApiConfigured } from "@/lib/game-automation/vegas-api";
 
-const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "orion-stars", "milky-way", "juwa"];
+const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "juwa", "vegas-sweeps", "mr-all-in-one", "orion-stars", "milky-way"];
 
 async function autoFulfillGameRequest(
   gameSlug: string,
@@ -52,6 +55,19 @@ async function autoFulfillGameRequest(
     });
     return { success: res.success, error: res.success ? undefined : res.message };
   }
+  if (gameSlug === "vegas-sweeps" && isVegasApiConfigured()) {
+    const targetAccount = input.gameUsername || input.requestedUsername || `vegas_${input.userId.slice(0, 8)}`;
+    const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
+    const res = await autoFulfillVegasRequest({
+      requestId,
+      gameSlug,
+      loadType: mapType as any,
+      accountName: targetAccount,
+      password: input.requestedPassword || undefined,
+      amount: input.amount || 0,
+    });
+    return { success: res.success, error: res.success ? undefined : res.message };
+  }
   if (gameSlug === "cash-machine" && isCashMachineApiConfigured()) {
     return autoFulfillCashMachineRequest(requestId, loadType, input);
   }
@@ -60,6 +76,9 @@ async function autoFulfillGameRequest(
   }
   if (gameSlug === "gameroom" && isGameroomApiConfigured()) {
     return autoFulfillGameroomRequest(requestId, loadType, input);
+  }
+  if (gameSlug === "mr-all-in-one" && isMrAllInOneApiConfigured()) {
+    return autoFulfillMrAllInOneRequest(requestId, loadType, input);
   }
   if (gameSlug === "game-vault" && isGameVaultApiConfigured()) {
     return autoFulfillGameVaultRequest(requestId, loadType, input);
@@ -115,7 +134,7 @@ export async function requestGameAccountCreate(input: {
   }
 
   // Fail jobs stuck in pending/processing (no-op if SQL migration not applied yet).
-  await supabase.rpc("fail_stale_game_loads", {
+  void supabase.rpc("fail_stale_game_loads", {
     p_stale_minutes: 5,
     p_user_id: user.id,
     p_game_slug: input.gameSlug,
@@ -192,7 +211,7 @@ export async function requestGameAccountCreate(input: {
   revalidatePath(`/games/${input.gameSlug}`);
   revalidatePath("/admin/game-loads");
 
-  await notifyAdminOfWalletActivity({
+  void notifyAdminOfWalletActivity({
     userId: user.id,
     gameName: input.gameName,
     gameSlug: input.gameSlug,
@@ -350,7 +369,7 @@ export async function requestGameLoad(input: {
   revalidatePath("/dashboard");
   revalidatePath("/admin/game-loads");
 
-  await notifyAdminOfWalletActivity({
+  void notifyAdminOfWalletActivity({
     userId: user.id,
     gameName: input.gameName,
     gameSlug: input.gameSlug,
@@ -481,7 +500,7 @@ export async function requestGameRedeem(input: {
   revalidatePath("/dashboard");
   revalidatePath("/admin/game-loads");
 
-  await notifyAdminOfWalletActivity({
+  void notifyAdminOfWalletActivity({
     userId: user.id,
     gameName: input.gameName,
     gameSlug: input.gameSlug,

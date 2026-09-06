@@ -1,14 +1,17 @@
 import crypto from "crypto";
-import http from "http";
 import https from "https";
+import http from "http";
+import tls from "tls";
+import net from "net";
+import { URL } from "url";
 
 /**
- * Juwa External API v1.0 Client Specification
- * 
- * Global Parameters:
- * - agent_id: Agent ID (e.g. 1)
- * - timestamp: 10-digit seconds timestamp
- * - token: MD5(agent_id + ":" + timestamp + ":" + secret_key)
+ * Juwa External API client
+ *
+ * Host: https://external.juwa777.com
+ * Signature: MD5(agent_id + ":" + unix_seconds + ":" + secret_key) lowercase
+ * Content-Type: application/x-www-form-urlencoded
+ * Requests must exit from a whitelisted IP when JUWA_PROXY_URL is set
  */
 
 export interface JuwaBaseResponse {
@@ -69,6 +72,7 @@ export interface JuwaConfig {
   apiUrl?: string;
   agentId?: string;
   secretKey?: string;
+  proxyUrl?: string;
 }
 
 const JUWA_ERROR_MESSAGES: Record<number, string> = {
@@ -102,109 +106,220 @@ function md5(str: string): string {
   return crypto.createHash("md5").update(str).digest("hex").toLowerCase();
 }
 
+function cleanChunkedResponse(text: string): string {
+  const s = text.trim();
+  const start = s.indexOf("{");
+  const end = s.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    return s.slice(start, end + 1);
+  }
+  return s;
+}
+
+function httpsPostUrlencodedViaProxy(
+  targetUrlStr: string,
+  formData: Record<string, string>,
+  proxyUrlStr?: string,
+  timeoutMs: number = 15000
+): Promise<{ text: string; statusCode: number }> {
+  return new Promise((resolve, reject) => {
+    try {
+      const targetUrl = new URL(targetUrlStr);
+      const postData = Object.entries(formData)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+      const bodyBuffer = Buffer.from(postData, "utf8");
+
+      const timer = setTimeout(() => {
+        reject(new Error("Juwa API connection timed out after 15s"));
+      }, timeoutMs);
+
+      const finish = (text: string, statusCode: number) => {
+        clearTimeout(timer);
+        resolve({ text, statusCode });
+      };
+
+      if (proxyUrlStr) {
+        const proxyUrl = new URL(proxyUrlStr);
+        const targetHost = targetUrl.hostname;
+        const targetPort = targetUrl.port ? Number(targetUrl.port) : 443;
+        const proxyHost = proxyUrl.hostname;
+        const proxyPort = Number(proxyUrl.port || 80);
+        const proxyAuth =
+          proxyUrl.username && proxyUrl.password
+            ? Buffer.from(
+                `${decodeURIComponent(proxyUrl.username)}:${decodeURIComponent(proxyUrl.password)}`
+              ).toString("base64")
+            : null;
+
+        const socket = net.connect(proxyPort, proxyHost, () => {
+          let connectReq =
+            `CONNECT ${targetHost}:${targetPort} HTTP/1.1\r\n` +
+            `Host: ${targetHost}:${targetPort}\r\n`;
+          if (proxyAuth) connectReq += `Proxy-Authorization: Basic ${proxyAuth}\r\n`;
+          connectReq += `\r\n`;
+          socket.write(connectReq);
+        });
+
+        let connectHeaderBuf = "";
+        let isTunnelEstablished = false;
+
+        socket.on("data", onSocketData);
+        socket.on("error", (err) => {
+          if (!isTunnelEstablished) {
+            clearTimeout(timer);
+            reject(err);
+          }
+        });
+
+        function onSocketData(chunk: Buffer) {
+          if (isTunnelEstablished) return;
+          connectHeaderBuf += chunk.toString("utf8");
+          if (!connectHeaderBuf.includes("\r\n\r\n")) return;
+          const firstLine = connectHeaderBuf.split("\r\n")[0];
+          if (!/HTTP\/\d\.\d\s+200/i.test(firstLine)) {
+            clearTimeout(timer);
+            reject(new Error(`Proxy CONNECT failed: ${firstLine}`));
+            return;
+          }
+          isTunnelEstablished = true;
+          socket.removeListener("data", onSocketData);
+
+          const tlsSocket = tls.connect(
+            { socket, servername: targetHost, rejectUnauthorized: false },
+            () => {
+              const reqPath = targetUrl.pathname + targetUrl.search;
+              const httpReq =
+                `POST ${reqPath} HTTP/1.1\r\n` +
+                `Host: ${targetHost}\r\n` +
+                `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n` +
+                `Content-Type: application/x-www-form-urlencoded\r\n` +
+                `Content-Length: ${bodyBuffer.length}\r\n` +
+                `Connection: close\r\n\r\n`;
+              tlsSocket.write(httpReq);
+              tlsSocket.write(bodyBuffer);
+            }
+          );
+
+          let resText = "";
+          tlsSocket.on("data", (data: Buffer) => (resText += data.toString("utf8")));
+          tlsSocket.on("end", () => {
+            const parts = resText.split("\r\n\r\n");
+            const head = parts[0] || "";
+            const body = parts.slice(1).join("\r\n\r\n");
+            const statusMatch = head.match(/HTTP\/\d\.\d\s+(\d+)/i);
+            const statusCode = statusMatch ? parseInt(statusMatch[1], 10) : 200;
+            finish(body, statusCode);
+          });
+          tlsSocket.on("error", (e) => {
+            clearTimeout(timer);
+            reject(e);
+          });
+        }
+        return;
+      }
+
+      const isHttps = targetUrl.protocol === "https:";
+      const lib = isHttps ? https : http;
+      const options = {
+        hostname: targetUrl.hostname,
+        port: targetUrl.port ? Number(targetUrl.port) : isHttps ? 443 : 80,
+        path: targetUrl.pathname + targetUrl.search,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Length": bodyBuffer.length,
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        rejectUnauthorized: false,
+        timeout: timeoutMs,
+      };
+
+      const req = lib.request(options, (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => finish(data, res.statusCode || 200));
+      });
+      req.on("timeout", () => {
+        req.destroy();
+        clearTimeout(timer);
+        reject(new Error("Juwa API connection timed out after 15s"));
+      });
+      req.on("error", (e) => {
+        clearTimeout(timer);
+        reject(e);
+      });
+      req.write(bodyBuffer);
+      req.end();
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 export class JuwaApiClient {
   private apiUrl: string;
   private agentId: string;
   private secretKey: string;
+  private proxyUrl?: string;
 
   constructor(config: JuwaConfig = {}) {
     this.apiUrl = (
       config.apiUrl ||
       process.env.JUWA_API_URL ||
-      "https://ht.juwa777.com"
-    ).trim().replace(/\/+$/, "");
+      process.env.JUWA_API_BASE_URL ||
+      "https://external.juwa777.com"
+    )
+      .trim()
+      .replace(/\/+$/, "");
 
     this.agentId = (
       config.agentId ||
       process.env.JUWA_AGENT_ID ||
-      "david1233321"
+      ""
     ).trim();
 
     this.secretKey = (
       config.secretKey ||
       process.env.JUWA_SECRET_KEY ||
-      "f835a908189a2a3dea0ca89b1d48d98b"
+      ""
     ).trim();
+
+    this.proxyUrl = (
+      config.proxyUrl ||
+      process.env.JUWA_PROXY_URL ||
+      process.env.GAMEVAULT_PROXY_URL ||
+      ""
+    ).trim() || undefined;
   }
 
-  /**
-   * Generate 10-digit timestamp and MD5 token: MD5(agent_id:timestamp:secret_key)
-   */
   private getAuthParams(): { agent_id: string; timestamp: string; token: string } {
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const rawTokenStr = `${this.agentId}:${timestamp}:${this.secretKey}`;
-    const token = md5(rawTokenStr);
+    const token = md5(`${this.agentId}:${timestamp}:${this.secretKey}`);
     return { agent_id: this.agentId, timestamp, token };
   }
 
-  /**
-   * Make Form POST Request to Juwa API endpoint
-   */
-  private postForm(endpointPath: string, formData: Record<string, string>): Promise<JuwaBaseResponse> {
-    return new Promise((resolve, reject) => {
-      try {
-        const fullUrl = `${this.apiUrl}${endpointPath.startsWith("/") ? "" : "/"}${endpointPath}`;
-        const parsed = new URL(fullUrl);
-        const isHttps = parsed.protocol === "https:";
-        const lib = isHttps ? https : http;
+  private async postForm(endpointPath: string, formData: Record<string, string>): Promise<JuwaBaseResponse> {
+    const fullUrl = `${this.apiUrl}${endpointPath.startsWith("/") ? "" : "/"}${endpointPath}`;
+    const auth = this.getAuthParams();
+    const fullPayload = { ...auth, ...formData };
 
-        const auth = this.getAuthParams();
-        const fullPayload = {
-          ...auth,
-          ...formData,
-        };
+    console.log(`[Juwa API] POST ${endpointPath} | agent_id: ${auth.agent_id} | timestamp: ${auth.timestamp}`);
 
-        const postData = Object.entries(fullPayload)
-          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-          .join("&");
+    const { text, statusCode } = await httpsPostUrlencodedViaProxy(fullUrl, fullPayload, this.proxyUrl);
+    const cleaned = cleanChunkedResponse(text);
 
-        console.log(`[Juwa API] POST ${endpointPath} | agent_id: ${auth.agent_id} | timestamp: ${auth.timestamp}`);
+    let json: JuwaBaseResponse;
+    try {
+      json = JSON.parse(cleaned);
+    } catch {
+      throw new Error(`Juwa API invalid JSON response (HTTP ${statusCode}): ${text.slice(0, 200)}`);
+    }
 
-        const options: any = {
-          hostname: parsed.hostname,
-          port: parsed.port ? Number(parsed.port) : isHttps ? 443 : 80,
-          path: parsed.pathname + parsed.search,
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Content-Length": Buffer.byteLength(postData),
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          },
-          rejectUnauthorized: false,
-          timeout: 15000,
-        };
-
-        const req = lib.request(options, (res) => {
-          let text = "";
-          res.on("data", (chunk) => (text += chunk));
-          res.on("end", () => {
-            try {
-              const json: JuwaBaseResponse = JSON.parse(text);
-              console.log(`[Juwa API] Response from ${endpointPath} | code: ${json.code} | msg: "${json.msg || ""}"`);
-              resolve(json);
-            } catch (err) {
-              reject(new Error(`Juwa API invalid JSON response: ${text.slice(0, 200)}`));
-            }
-          });
-        });
-
-        req.on("timeout", () => {
-          req.destroy();
-          reject(new Error("Juwa API connection timed out after 15s"));
-        });
-
-        req.on("error", (err) => reject(err));
-        req.write(postData);
-        req.end();
-      } catch (err) {
-        reject(err);
-      }
-    });
+    console.log(`[Juwa API] Response from ${endpointPath} | code: ${json.code} | msg: "${json.msg || ""}"`);
+    return json;
   }
 
-  /**
-   * Helper to format Juwa response errors using status code dictionary
-   */
   private formatError(json: JuwaBaseResponse): string {
     const code = Number(json.code);
     const mapped = JUWA_ERROR_MESSAGES[code];
@@ -212,9 +327,6 @@ export class JuwaApiClient {
     return json.msg || `Juwa API operation failed with code ${code}`;
   }
 
-  /**
-   * 2.1.1 Add Player Account
-   */
   public async addUser(account: string, loginPwd: string): Promise<{ userId: string; accountName: string }> {
     const res = (await this.postForm("/api/external/addUser", {
       account,
@@ -231,9 +343,6 @@ export class JuwaApiClient {
     };
   }
 
-  /**
-   * 2.1.6 Login name to get player ID
-   */
   public async getUserID(accountName: string): Promise<string> {
     const res = (await this.postForm("/api/external/getUserID", {
       account_name: accountName,
@@ -246,9 +355,6 @@ export class JuwaApiClient {
     return String(res.data.user_id);
   }
 
-  /**
-   * 2.1.2 Recharge (Deposit)
-   */
   public async recharge(userId: string, amount: number, orderId?: string): Promise<JuwaRechargeResponse> {
     const orderIdToUse = orderId || `req_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -265,9 +371,6 @@ export class JuwaApiClient {
     return res;
   }
 
-  /**
-   * 2.1.3 Withdraw (Redeem)
-   */
   public async withdraw(userId: string, amount: number, orderId?: string): Promise<JuwaWithdrawResponse> {
     const orderIdToUse = orderId || `wdw_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -284,9 +387,6 @@ export class JuwaApiClient {
     return res;
   }
 
-  /**
-   * 2.1.4 Get Player Balance
-   */
   public async getPlayerBalance(userId: string): Promise<number> {
     const res = (await this.postForm("/api/external/userBalance", {
       user_id: userId,
@@ -299,9 +399,6 @@ export class JuwaApiClient {
     return parseFloat(res.data.user_balance || "0");
   }
 
-  /**
-   * 2.1.5 Get Agent Balance
-   */
   public async getAgentBalance(): Promise<number> {
     const res = (await this.postForm("/api/external/agentBalance", {})) as JuwaAgentBalanceResponse;
 
@@ -312,9 +409,6 @@ export class JuwaApiClient {
     return parseFloat(res.data.agent_balance || "0");
   }
 
-  /**
-   * 2.1.8 Reset Player Password
-   */
   public async resetPassword(userId: string, newPwd: string): Promise<boolean> {
     const res = await this.postForm("/api/external/resetPassword", {
       user_id: userId,
@@ -328,9 +422,6 @@ export class JuwaApiClient {
     return true;
   }
 
-  /**
-   * 2.1.9 Force Player Offline
-   */
   public async forceOffline(userId: string): Promise<boolean> {
     const res = await this.postForm("/api/external/playerOffline", {
       user_id: userId,
@@ -345,6 +436,5 @@ export class JuwaApiClient {
 }
 
 export function isJuwaApiConfigured(): boolean {
-  const secretKey = process.env.JUWA_SECRET_KEY || "f835a908189a2a3dea0ca89b1d48d98b";
-  return Boolean(secretKey?.trim());
+  return Boolean(process.env.JUWA_SECRET_KEY?.trim() && process.env.JUWA_AGENT_ID?.trim());
 }

@@ -1,5 +1,9 @@
 import { DepositPageClient } from "@/components/dashboard/deposit-page-client";
+import { getActivePaymentMethods } from "@/lib/data/payments";
 
-export default function DepositPage() {
-  return <DepositPageClient />;
+export const dynamic = "force-dynamic";
+
+export default async function DepositPage() {
+  const paymentMethods = await getActivePaymentMethods();
+  return <DepositPageClient paymentMethods={paymentMethods} />;
 }

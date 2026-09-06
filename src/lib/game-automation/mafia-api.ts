@@ -163,11 +163,21 @@ export class MafiaApiClient {
   public async findPlayerByAccount(account: string): Promise<MafiaPlayer | null> {
     const target = account.trim();
     if (!target) return null;
+    if (/^\d+$/.test(target)) {
+      return { id: Number(target), Account: target } as MafiaPlayer;
+    }
+
+    const { getCachedPlayerId, cachePlayerId } = await import("./layui-player-resolve");
+    const cached = getCachedPlayerId("mafia", target);
+    if (cached) return { id: Number(cached), Account: target } as MafiaPlayer;
 
     const players = await this.getPlayerList(1, 10, target);
     const match = players.find(
-      (p) => p.Account.trim().toLowerCase() === target.toLowerCase() || p.nickname.trim().toLowerCase() === target.toLowerCase()
+      (p) =>
+        p.Account.trim().toLowerCase() === target.toLowerCase() ||
+        p.nickname.trim().toLowerCase() === target.toLowerCase()
     );
+    if (match) cachePlayerId("mafia", target, match.id);
     return match || null;
   }
 
@@ -195,6 +205,9 @@ export class MafiaApiClient {
     if (json.status_code !== 200) {
       throw new Error(`Mafia createAccount error: ${json.message}`);
     }
+
+    const { cachePlayerId } = await import("./layui-player-resolve");
+    if (json.data?.id) cachePlayerId("mafia", json.data.account || account, json.data.id);
 
     return {
       id: json.data.id,

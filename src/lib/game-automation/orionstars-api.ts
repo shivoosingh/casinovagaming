@@ -20,10 +20,19 @@ export interface OrionStarsBaseResponse {
 }
 
 export interface OrionStarsQueryResponse extends OrionStarsBaseResponse {
-  agentBalance?: number;
-  gameId?: number;
-  userbalance?: number;
+  agentBalance?: number | string;
+  gameId?: number | string;
+  /** API returns camelCase `userBalance` (e.g. "10.00"). */
+  userBalance?: number | string;
+  /** Legacy lowercase field seen in some docs — kept for compatibility. */
+  userbalance?: number | string;
   webLoginUrl?: string;
+}
+
+export function parseOrionStarsUserBalance(info: OrionStarsQueryResponse): number {
+  const raw = info.userBalance ?? info.userbalance;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : 0;
 }
 
 export interface OrionStarsConfig {
@@ -109,7 +118,7 @@ export class OrionStarsApiClient {
     const rawPass =
       config.agentPassword ||
       process.env.ORIONSTARS_AGENT_PASSWORD ||
-      "Re3set@123#";
+      "Re3set@123!";
 
     this.agentPasswdHash = md5(rawPass.trim());
 
@@ -155,9 +164,11 @@ export class OrionStarsApiClient {
   }
 
   private createSignFromSession(session: OrionStarsSession): { sign: string; time: string; agentKey: string } {
-    const rawSignStr = (this.agentName + session.time + session.agentKey).toLowerCase();
+    // Orion Stars requires a fresh timestamp per signed request (not the agentLogin time).
+    const time = Date.now().toString();
+    const rawSignStr = (this.agentName + time + session.agentKey).toLowerCase();
     const sign = md5(rawSignStr);
-    return { sign, time: session.time, agentKey: session.agentKey };
+    return { sign, time, agentKey: session.agentKey };
   }
 
   public async createAccount(
@@ -183,7 +194,7 @@ export class OrionStarsApiClient {
 
     if (String(json.code) !== "200") {
       let errMsg = json.msg || `Registration failed with code ${json.code}`;
-      if (String(json.code) === "201") {
+      if (String(json.code) === "201" && !/session timeout/i.test(errMsg)) {
         errMsg = `${errMsg} (Verify agent store balance on Orion Stars admin panel)`;
       }
       throw new Error(`Orion Stars registerUser error [code ${json.code}]: ${errMsg}`);
@@ -255,6 +266,6 @@ export class OrionStarsApiClient {
 
 export function isOrionStarsApiConfigured(): boolean {
   const username = process.env.ORIONSTARS_AGENT_USERNAME || "Darklord1121";
-  const password = process.env.ORIONSTARS_AGENT_PASSWORD || "Re3set@123#";
+  const password = process.env.ORIONSTARS_AGENT_PASSWORD || "Re3set@123!";
   return Boolean(username?.trim() && password?.trim());
 }

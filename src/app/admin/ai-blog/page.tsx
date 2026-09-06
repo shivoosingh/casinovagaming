@@ -68,14 +68,18 @@ export default async function AdminAIBlogPage() {
             (posts ?? []).map((post) => (
               <div key={post.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-2">
                 <div>
-                  <a
-                    href={`/blog/${post.slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-foreground hover:text-ws-green transition-colors"
-                  >
-                    {post.title}
-                  </a>
+                  {post.is_published ? (
+                    <a
+                      href={`/blog/${post.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-foreground hover:text-ws-green transition-colors"
+                    >
+                      {post.title}
+                    </a>
+                  ) : (
+                    <p className="font-medium text-foreground">{post.title}</p>
+                  )}
                   <p className="text-xs text-muted-foreground line-clamp-1">{post.excerpt || post.slug}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">

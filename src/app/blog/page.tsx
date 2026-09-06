@@ -8,7 +8,7 @@ import { BlogPostCard } from "@/components/marketing/blog-post-card";
 import { getPublishedBlogPosts } from "@/lib/data/marketing";
 import { SITE_NAME } from "@/lib/constants";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: `Game Guides, Bonuses & Tips | ${SITE_NAME} Blog`,

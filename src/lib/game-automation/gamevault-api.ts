@@ -5,12 +5,13 @@ import net from "net";
 import { URL } from "url";
 
 /**
- * Game Vault Official External REST API v1.0 Client
- * 
- * Signature Specification:
- * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
+ * Game Vault Official External REST API client
+ *
+ * Host: https://apius.gamevault999.com (not the agent panel host)
+ * Signature: MD5(agent_id + ":" + timestamp + ":" + secret_key) — lowercase hex
+ * Timestamp: unix seconds (10-digit)
  * Content-Type: multipart/form-data
- * Timestamp: 13-digit timestamp (milliseconds)
+ * Requests must exit from a whitelisted IP (GAMEVAULT_PROXY_URL)
  */
 
 export interface GameVaultAddUserResponse {
@@ -257,20 +258,19 @@ export class GameVaultApiClient {
     this.baseUrl = (
       config.baseUrl ||
       process.env.GAMEVAULT_API_BASE_URL ||
-      process.env.GAMEVAULT_ADMIN_URL?.replace(/\/login.*$/i, "") ||
-      "https://agent.gamevault999.com"
+      "https://apius.gamevault999.com"
     ).replace(/\/+$/, "");
 
     this.agentId = (
       config.agentId ||
       process.env.GAMEVAULT_AGENT_ID ||
-      "158408"
+      "160496"
     ).trim();
 
     this.secretKey = (
       config.secretKey ||
       process.env.GAMEVAULT_SECRET_KEY ||
-      "352a22adfdc2675cf6b90e621fa687dd"
+      "6f56ce873171c0a455a8a60c039b3b90"
     ).trim();
 
     this.proxyUrl = (
@@ -281,14 +281,13 @@ export class GameVaultApiClient {
   }
 
   /**
-   * Generate signature according to official specification:
-   * MD5(agent_id + ":" + timestamp + ":" + secret_key).toUpperCase()
-   * Using official 13-digit timestamp (milliseconds)
+   * MD5(agent_id + ":" + unix_seconds + ":" + secret_key) as lowercase hex.
+   * Uppercase MD5 / millisecond timestamps are rejected by apius.gamevault999.com.
    */
   private generateAuthParams(): { agent_id: string; timestamp: string; token: string } {
-    const timestamp = String(Date.now()); // 13-digit timestamp
+    const timestamp = String(Math.floor(Date.now() / 1000));
     const rawSig = `${this.agentId}:${timestamp}:${this.secretKey}`;
-    const token = createHash("md5").update(rawSig).digest("hex").toUpperCase();
+    const token = createHash("md5").update(rawSig).digest("hex");
     return {
       agent_id: this.agentId,
       timestamp,

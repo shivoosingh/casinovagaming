@@ -6,11 +6,16 @@ import { Gamepad2 } from "lucide-react";
 import { GameDepositSection } from "@/components/games/game-deposit-section";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
 import { GAMES } from "@/lib/games";
+import type { DepositPaymentMethod } from "@/lib/payments/methods";
 import { cn } from "@/lib/utils";
 
 const PLAYABLE_GAMES = GAMES.filter((g) => !g.upcoming);
 
-export function DepositPageClient() {
+export function DepositPageClient({
+  paymentMethods,
+}: {
+  paymentMethods?: DepositPaymentMethod[];
+}) {
   const defaultSlug = PLAYABLE_GAMES[0]?.slug ?? "game-vault";
   const [gameSlug, setGameSlug] = useState(defaultSlug);
 
@@ -66,7 +71,7 @@ export function DepositPageClient() {
         </p>
       </div>
 
-      <GameDepositSection game={game} hideSectionAnchor />
+      <GameDepositSection game={game} paymentMethods={paymentMethods} hideSectionAnchor />
     </div>
   );
 }

@@ -61,7 +61,9 @@ export async function upsertPaymentMethodAction(input: {
   });
 
   revalidatePath("/admin/payments");
-  revalidatePath("/deposit");
+  revalidatePath("/dashboard/deposit");
+  revalidatePath("/dashboard/deposits");
+  revalidatePath("/games", "layout");
   return { ok: true, message: "Payment method saved." };
 }
 
@@ -77,8 +79,69 @@ export async function deletePaymentMethodAction(id: string): Promise<AdminAction
     entityId: id,
   });
   revalidatePath("/admin/payments");
-  revalidatePath("/deposit");
+  revalidatePath("/dashboard/deposit");
+  revalidatePath("/dashboard/deposits");
+  revalidatePath("/games", "layout");
   return { ok: true, message: "Deleted." };
+}
+
+/** Upload a CashApp/BTC QR (or tag screenshot) to cms-media and optionally attach to a method. */
+export async function uploadPaymentQrAction(formData: FormData): Promise<AdminActionResult & { url?: string }> {
+  const auth = await authorize("cms.manage");
+  if ("error" in auth) return { ok: false, error: auth.error };
+
+  const file = formData.get("file");
+  const methodId = String(formData.get("methodId") || "").trim();
+  if (!(file instanceof File) || file.size < 1) {
+    return { ok: false, error: "Choose an image file." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { ok: false, error: "File must be an image." };
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    return { ok: false, error: "Image must be under 5MB." };
+  }
+
+  const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+  const path = `payments/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const db = adminDb();
+
+  const { error: uploadError } = await db.storage.from("cms-media").upload(path, bytes, {
+    contentType: file.type || "image/png",
+    upsert: true,
+  });
+  if (uploadError) return { ok: false, error: uploadError.message };
+
+  const { data: pub } = db.storage.from("cms-media").getPublicUrl(path);
+  const url = pub.publicUrl;
+
+  if (methodId) {
+    const { error } = await db
+      .from("payment_methods")
+      .update({
+        qr_image_url: url,
+        updated_by: auth.staff.userId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", methodId);
+    if (error) return { ok: false, error: error.message };
+
+    await writeAudit({
+      actorId: auth.staff.userId,
+      action: "payment_method.qr_upload",
+      entityType: "payment_method",
+      entityId: methodId,
+      after: { qr_image_url: url },
+    });
+
+    revalidatePath("/admin/payments");
+    revalidatePath("/dashboard/deposit");
+    revalidatePath("/dashboard/deposits");
+    revalidatePath("/games", "layout");
+  }
+
+  return { ok: true, message: "QR image uploaded.", url };
 }
 
 export async function updateSettingAction(input: {

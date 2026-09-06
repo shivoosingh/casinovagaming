@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getActivePaymentMethods } from "@/lib/data/payments";
 import { getDepositMethod, type DepositPaymentMethodId } from "@/lib/payments/methods";
 import { notifyAdminOfDeposit } from "@/lib/telegram/notify-admin-deposit";
 import { createNotification } from "@/lib/actions/notifications";
@@ -35,7 +36,11 @@ export async function submitDepositRequest(input: {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Please log in to submit a deposit." };
 
-  if (!getDepositMethod(input.paymentMethod)) {
+  const activeMethods = await getActivePaymentMethods();
+  const methodOk =
+    activeMethods.some((m) => m.id === input.paymentMethod) ||
+    Boolean(getDepositMethod(input.paymentMethod));
+  if (!methodOk) {
     return { error: "Invalid payment method." };
   }
 

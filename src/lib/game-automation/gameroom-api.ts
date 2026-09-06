@@ -201,34 +201,56 @@ export class GameroomApiClient {
     return this.token;
   }
 
-  async getPlayerList(limit: number = 50, page: number = 1): Promise<GameroomPlayerListResponse> {
-    const params = new URLSearchParams({ limit: String(limit), page: String(page) });
+  async getPlayerList(
+    limit: number = 50,
+    page: number = 1,
+    extra: Record<string, string> = {}
+  ): Promise<GameroomPlayerListResponse> {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      page: String(page),
+      ...extra,
+    });
     return this.request<GameroomPlayerListResponse>(`/api/player/playerList?${params.toString()}`);
   }
 
   async findPlayerByAccount(accountOrId: string | number): Promise<GameroomPlayer | null> {
-    const target = String(accountOrId).trim().toLowerCase();
-    let listRes = await this.getPlayerList(100, 1);
-    let match = listRes.data?.find((p) => p.Account.toLowerCase() === target || String(p.id) === target);
-    if (match) return match;
-
-    const totalCount = listRes.count || 0;
-    const maxPages = Math.ceil(totalCount / 100);
-    for (let p = 2; p <= Math.min(maxPages, 10); p++) {
-      listRes = await this.getPlayerList(100, p);
-      match = listRes.data?.find((player) => player.Account.toLowerCase() === target || String(player.id) === target);
-      if (match) return match;
+    const { resolveLayuiPlayerId, getCachedPlayerId } = await import("./layui-player-resolve");
+    const strVal = String(accountOrId).trim();
+    if (/^\d+$/.test(strVal)) {
+      return { id: Number(strVal), Account: strVal } as GameroomPlayer;
     }
-
-    return null;
+    const cached = getCachedPlayerId("gameroom", strVal);
+    if (cached) return { id: Number(cached), Account: strVal } as GameroomPlayer;
+    try {
+      const id = await resolveLayuiPlayerId({
+        agentKey: "gameroom",
+        accountOrId: strVal,
+        fetchList: async (params) => {
+          const limit = Number(params.limit || 20);
+          const page = Number(params.page || 1);
+          const { limit: _l, page: _p, ...extra } = params;
+          return this.getPlayerList(limit, page, extra);
+        },
+      });
+      return { id: Number(id), Account: strVal } as GameroomPlayer;
+    } catch {
+      return null;
+    }
   }
 
   async resolvePlayerId(accountOrId: string | number): Promise<string> {
-    const strVal = String(accountOrId).trim();
-    const player = await this.findPlayerByAccount(strVal);
-    if (player) return String(player.id);
-    if (/^\d+$/.test(strVal)) return strVal;
-    throw new Error(`Player '${strVal}' not found on Gameroom agent account.`);
+    const { resolveLayuiPlayerId } = await import("./layui-player-resolve");
+    return resolveLayuiPlayerId({
+      agentKey: "gameroom",
+      accountOrId,
+      fetchList: async (params) => {
+        const limit = Number(params.limit || 20);
+        const page = Number(params.page || 1);
+        const { limit: _l, page: _p, ...extra } = params;
+        return this.getPlayerList(limit, page, extra);
+      },
+    });
   }
 
   async addPlayer(
@@ -248,7 +270,16 @@ export class GameroomApiClient {
       money: String(money),
     });
 
-    return this.request<GameroomAddPlayerResponse>("/api/player/insertPlayer", { method: "POST", body });
+    return this.request<GameroomAddPlayerResponse>("/api/player/insertPlayer", { method: "POST", body }).then(
+      async (res) => {
+        try {
+          const { cachePlayerId } = await import("./layui-player-resolve");
+          const id = (res.data as any)?.id;
+          if (id) cachePlayerId("gameroom", res.data.account || cleanUser, id);
+        } catch {}
+        return res;
+      }
+    );
   }
 
   async getPlayerScore(idOrAccount: string | number): Promise<GameroomGetScoreResponse> {

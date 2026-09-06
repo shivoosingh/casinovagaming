@@ -34,11 +34,13 @@ import { GameWalletLoadSection } from "@/components/games/game-wallet-load-secti
 import { LiveBadge } from "@/components/ui/LiveBadge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import type { DepositPaymentMethod } from "@/lib/payments/methods";
 
 interface GameLandingClientProps {
   game: Game;
   autoCreate?: boolean;
   walletLoadEnabled?: boolean;
+  paymentMethods?: DepositPaymentMethod[];
   initialGameAccount?: {
     game_username: string;
     game_password: string | null;
@@ -49,6 +51,7 @@ export function GameLandingClient({
   game,
   autoCreate,
   walletLoadEnabled,
+  paymentMethods,
   initialGameAccount,
 }: GameLandingClientProps) {
   const router = useRouter();
@@ -410,7 +413,7 @@ export function GameLandingClient({
         </div>
       </section>
 
-      {!game.upcoming && <GameDepositSection game={game} />}
+      {!game.upcoming && <GameDepositSection game={game} paymentMethods={paymentMethods} />}
 
       {/* How it works (expandable) */}
       {showHowItWorks && (

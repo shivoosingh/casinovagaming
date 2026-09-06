@@ -17,10 +17,11 @@ import {
 
 const PERMISSION = "cms.manage";
 
-function revalidateCms() {
+function revalidateCms(slug?: string) {
   revalidatePath("/admin/cms");
   revalidatePath("/blog");
   revalidatePath("/");
+  if (slug) revalidatePath(`/blog/${slug}`);
 }
 
 const announcementSchema = z.object({
@@ -107,6 +108,7 @@ export async function upsertBlogPostAction(
     content: parsed.data.content,
     cover_image_url: parsed.data.cover_image_url || null,
     is_published: parsed.data.is_published,
+    status: parsed.data.is_published ? "published" : "draft",
     published_at: parsed.data.is_published
       ? parsed.data.published_at
         ? new Date(parsed.data.published_at).toISOString()
@@ -131,7 +133,7 @@ export async function upsertBlogPostAction(
     entityId: input.id ?? null,
     after: payload,
   });
-  revalidateCms();
+  revalidateCms(payload.slug);
   return { ok: true, message: "Blog post saved." };
 }
 
@@ -216,6 +218,7 @@ export async function generateBlogPostAction(
       content: draft.content,
       cover_image_url,
       is_published: false,
+      status: "draft",
       published_at: null as string | null,
       seo_title: draft.seo_title,
       seo_description: draft.seo_description,

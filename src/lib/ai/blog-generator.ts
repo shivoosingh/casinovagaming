@@ -23,6 +23,8 @@ export interface BlogGeneratorOptions {
   customPrompt?: string;
   aiProvider?: "smart_auto" | "openai" | "openrouter" | "gemini";
   aiModel?: string;
+  /** When true, always set is_published=true (manual Generate & Publish). */
+  forcePublish?: boolean;
 }
 
 /** 10,000+ Topic Matrix Generators */
@@ -618,24 +620,25 @@ ${options.customPrompt || "None"}
     return { ok: false, error: "Database client unavailable" };
   }
 
-  const status = settings.auto_publish ? "published" : "draft";
+  const forcePublish = options.forcePublish === true || settings.auto_publish;
+  const status = forcePublish ? "published" : "draft";
+  const publishedAt = forcePublish ? new Date().toISOString() : null;
 
-  const { data, error } = await db
-    .from("blog_posts")
-    .insert({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt,
-      content: post.content,
-      cover_image_url: post.cover_image,
-      seo_title: post.seo_title,
-      seo_description: post.seo_description,
-      tags: post.tags,
-      status,
-      published_at: status === "published" ? new Date().toISOString() : null,
-    })
-    .select("id")
-    .single();
+  const row = {
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    content: post.content,
+    cover_image_url: post.cover_image,
+    seo_title: post.seo_title,
+    seo_description: post.seo_description,
+    tags: post.tags,
+    status,
+    is_published: forcePublish,
+    published_at: publishedAt,
+  };
+
+  const { data, error } = await db.from("blog_posts").insert(row).select("id").single();
 
   if (error) {
     if (error.message.includes("duplicate") || error.message.includes("unique")) {
@@ -645,18 +648,7 @@ ${options.customPrompt || "None"}
 
       const { data: retryData, error: retryErr } = await db
         .from("blog_posts")
-        .insert({
-          title: post.title,
-          slug: uniqueSlug,
-          excerpt: post.excerpt,
-          content: post.content,
-          cover_image_url: post.cover_image,
-          seo_title: post.seo_title,
-          seo_description: post.seo_description,
-          tags: post.tags,
-          status,
-          published_at: status === "published" ? new Date().toISOString() : null,
-        })
+        .insert({ ...row, slug: uniqueSlug })
         .select("id")
         .single();
 

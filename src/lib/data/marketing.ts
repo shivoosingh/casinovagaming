@@ -103,9 +103,9 @@ export async function getPublishedBlogPosts(): Promise<MarketingPost[]> {
     const { data, error } = await supabase
       .from("blog_posts")
       .select(
-        "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description"
+        "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description, is_published, status"
       )
-      .eq("is_published", true)
+      .or("is_published.eq.true,status.eq.published")
       .order("published_at", { ascending: false })
       .limit(100);
     if (error || !data?.length) return FALLBACK_POSTS.map(brandPost);
@@ -121,12 +121,16 @@ export async function getBlogPost(slug: string): Promise<MarketingPostFull | nul
     const { data } = await supabase
       .from("blog_posts")
       .select(
-        "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description, content"
+        "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description, content, is_published, status"
       )
       .eq("slug", slug)
-      .eq("is_published", true)
       .maybeSingle();
-    if (data) return brandPostFull(data as MarketingPostFull);
+
+    if (data) {
+      const row = data as MarketingPostFull & { is_published?: boolean; status?: string };
+      const live = row.is_published === true || row.status === "published";
+      if (live) return brandPostFull(row);
+    }
   } catch {
     // fall through
   }

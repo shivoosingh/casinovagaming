@@ -19,10 +19,17 @@ export interface MilkyWayBaseResponse {
 }
 
 export interface MilkyWayQueryResponse extends MilkyWayBaseResponse {
-  agentBalance?: number;
-  gameId?: number;
-  userbalance?: number;
+  agentBalance?: number | string;
+  gameId?: number | string;
+  userBalance?: number | string;
+  userbalance?: number | string;
   webLoginUrl?: string;
+}
+
+export function parseMilkyWayUserBalance(info: MilkyWayQueryResponse): number {
+  const raw = info.userBalance ?? info.userbalance;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : 0;
 }
 
 export interface MilkyWayConfig {
@@ -97,7 +104,7 @@ export class MilkyWayApiClient {
     this.apiUrl = (
       config.apiUrl ||
       process.env.MILKYWAY_API_URL ||
-      "https://47.252.40.52:8033/ws/service.ashx"
+      "https://milkywayapp.xyz:8033/ws/service.ashx"
     ).trim();
 
     this.agentName = (
@@ -157,9 +164,11 @@ export class MilkyWayApiClient {
   }
 
   private createSignFromSession(session: MilkyWaySession): { sign: string; time: string; agentKey: string } {
-    const rawSignStr = (this.agentName + session.time + session.agentKey).toLowerCase();
+    // Milky Way requires a fresh timestamp per signed request (not the agentLogin time).
+    const time = Date.now().toString();
+    const rawSignStr = (this.agentName + time + session.agentKey).toLowerCase();
     const sign = md5(rawSignStr);
-    return { sign, time: session.time, agentKey: session.agentKey };
+    return { sign, time, agentKey: session.agentKey };
   }
 
   public async createAccount(
@@ -186,7 +195,13 @@ export class MilkyWayApiClient {
     if (String(json.code) !== "200") {
       let msg = json.msg || `Registration failed with code ${json.code}`;
       if (String(json.code) === "201") {
-        msg = `${msg} (Verify store balance on Milky Way agent panel)`;
+        if (/session timeout/i.test(msg)) {
+          msg = `${msg} (Retry the request — session expired)`;
+        } else if (/signature/i.test(msg)) {
+          msg = `${msg} (Check agent store balance and API permissions on Milky Way panel)`;
+        } else {
+          msg = `${msg} (Verify store balance on Milky Way agent panel)`;
+        }
       }
       throw new Error(`Milky Way registerUser error [code ${json.code}]: ${msg}`);
     }

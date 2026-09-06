@@ -10,34 +10,41 @@ import {
   Download,
   ExternalLink,
   Loader2,
+  Lock,
   Upload,
+  Zap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { submitDepositRequest } from "@/lib/actions/deposits";
 import { uploadDepositProofImage } from "@/lib/deposits/proof-upload";
 import {
   DEPOSIT_PAYMENT_METHODS,
+  type DepositPaymentMethod,
   type DepositPaymentMethodId,
 } from "@/lib/payments/methods";
-import { DollarPayDepositSection } from "@/components/payments/dollarpay-deposit-modal";
-import { Zap } from "lucide-react";
 import type { Game } from "@/lib/games";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface GameDepositSectionProps {
   game: Game;
+  /** Active payment methods from admin (DB). Falls back to code defaults. */
+  paymentMethods?: DepositPaymentMethod[];
   /** Hide scroll anchor when rendered on /dashboard/deposit */
   hideSectionAnchor?: boolean;
 }
 
-export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSectionProps) {
+export function GameDepositSection({
+  game,
+  paymentMethods,
+  hideSectionAnchor,
+}: GameDepositSectionProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [depositMode, setDepositMode] = useState<"instant" | "manual">("instant");
-  const [selectedMethod, setSelectedMethod] = useState<DepositPaymentMethodId>("paypal");
+  const methods = paymentMethods?.length ? paymentMethods : DEPOSIT_PAYMENT_METHODS;
+  const [selectedMethod, setSelectedMethod] = useState<DepositPaymentMethodId>(methods[0]?.id ?? "cashapp");
 
   const [amount, setAmount] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -45,16 +52,18 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
   const [submitting, setSubmitting] = useState(false);
   const [qrError, setQrError] = useState(false);
 
-  const method = DEPOSIT_PAYMENT_METHODS.find((m) => m.id === selectedMethod)!;
+  const method = methods.find((m) => m.id === selectedMethod) ?? methods[0];
 
   function handleCopyUsername() {
+    if (!method) return;
     void navigator.clipboard.writeText(method.username);
     toast.success(`${method.copyLabel} copied!`);
   }
 
   function handleDownloadQr() {
+    if (!method) return;
     if (qrError) {
-      toast.error("QR image not uploaded yet — add it to /public/payments/");
+      toast.error("QR image not available yet — ask admin to set it in Payment Methods.");
       return;
     }
     const link = document.createElement("a");
@@ -77,6 +86,10 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
   }
 
   async function handleSubmit() {
+    if (!method) {
+      toast.error("No payment method available.");
+      return;
+    }
     if (!proofFile) {
       toast.error("Upload a screenshot of your payment.");
       return;
@@ -84,7 +97,9 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
 
     setSubmitting(true);
 
-    const { data: { user } } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
+    const {
+      data: { user },
+    } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
     if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(`/games/${game.slug}`)}`);
       setSubmitting(false);
@@ -129,10 +144,18 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
     router.push("/dashboard/deposits");
   }
 
+  if (!method) {
+    return (
+      <section className="rounded-2xl border border-[rgba(0,229,255,0.1)] bg-[#0d0d1f] p-4 sm:p-5">
+        <p className="text-sm text-[#6b6d8f]">Deposit methods are being updated. Please check back soon.</p>
+      </section>
+    );
+  }
+
   return (
     <section
       id={hideSectionAnchor ? undefined : "deposit"}
-      className="rounded-2xl border border-[rgba(0, 229, 255,0.1)] bg-[#0d0d1f] p-4 sm:p-5 scroll-mt-24"
+      className="rounded-2xl border border-[rgba(0,229,255,0.1)] bg-[#0d0d1f] p-4 sm:p-5 scroll-mt-24"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -141,48 +164,27 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
         </div>
       </div>
 
-      {/* Mode Switcher Tabs */}
-      <div className="grid grid-cols-2 gap-2 mb-5 p-1 bg-[#090915] rounded-xl border border-white/10">
-        <button
-          type="button"
-          onClick={() => setDepositMode("instant")}
-          className={cn(
-            "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all",
-            depositMode === "instant"
-              ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 text-emerald-300 shadow-md"
-              : "text-[#6b6d8f] hover:text-white"
-          )}
-        >
-          <Zap className="h-3.5 w-3.5 text-emerald-400" />
-          Instant Auto Deposit
-        </button>
-        <button
-          type="button"
-          onClick={() => setDepositMode("manual")}
-          className={cn(
-            "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all",
-            depositMode === "manual"
-              ? "bg-[rgba(0,229,255,0.12)] border border-[rgba(0,229,255,0.3)] text-[#7af5ff] shadow-md"
-              : "text-[#6b6d8f] hover:text-white"
-          )}
-        >
-          <Banknote className="h-3.5 w-3.5" />
-          Manual QR Upload
-        </button>
+      {/* Instant deposit locked until automation is ready */}
+      <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 px-3.5 py-3">
+        <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+        <div>
+          <p className="flex items-center gap-1.5 text-xs font-bold text-amber-200">
+            <Zap className="h-3.5 w-3.5" />
+            Instant Auto Deposit — coming soon
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-100/70">
+            Use manual deposit below (Cash App, BTC, etc.). Instant payments will unlock after API setup.
+          </p>
+        </div>
       </div>
 
-      {depositMode === "instant" ? (
-        <DollarPayDepositSection gameSlug={game.slug} gameName={game.name} />
-      ) : (
-        <>
-          <p className="text-xs text-[#6b6d8f] mb-4">
-            Choose a payment method, send your deposit, then upload a screenshot. Our team will credit your{" "}
-            {game.name} account after verification.
-          </p>
-
+      <p className="text-xs text-[#6b6d8f] mb-4">
+        Choose a payment method, send your deposit, then upload a screenshot. Our team will credit your{" "}
+        {game.name} account after verification.
+      </p>
 
       <div className="flex flex-wrap gap-2 mb-5">
-        {DEPOSIT_PAYMENT_METHODS.map((m) => (
+        {methods.map((m) => (
           <button
             key={m.id}
             type="button"
@@ -193,8 +195,8 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
             className={cn(
               "rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors",
               selectedMethod === m.id
-                ? "bg-[rgba(0, 229, 255,0.12)] border-orange-500/50 text-[#7af5ff]"
-                : "bg-[rgba(255,255,255,0.03)] border-[rgba(0, 229, 255,0.1)] text-[#6b6d8f] hover:text-white hover:border-white/20"
+                ? "bg-[rgba(0,229,255,0.12)] border-orange-500/50 text-[#7af5ff]"
+                : "bg-[rgba(255,255,255,0.03)] border-[rgba(0,229,255,0.1)] text-[#6b6d8f] hover:text-white hover:border-white/20"
             )}
           >
             {m.label}
@@ -202,14 +204,9 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
         ))}
       </div>
 
-      <div
-        className={cn(
-          "rounded-xl border p-4 sm:p-6 mb-4 flex flex-col items-center text-center",
-          method.accent
-        )}
-      >
+      <div className={cn("rounded-xl border p-4 sm:p-6 mb-4 flex flex-col items-center text-center", method.accent)}>
         <div className="flex flex-col items-center w-full max-w-sm mx-auto">
-          <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl overflow-hidden border border-[rgba(0, 229, 255,0.1)] bg-white shadow-lg">
+          <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[320px] rounded-2xl overflow-hidden border border-[rgba(0,229,255,0.1)] bg-white shadow-lg">
             {!qrError ? (
               <Image
                 src={method.qrImage}
@@ -223,9 +220,9 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-3 text-center">
                 <p className="text-[10px] text-gray-500">
-                  Add your {method.label} QR to
+                  QR image not set yet.
                   <br />
-                  <code className="text-[9px]">public/payments/{method.id}-qr.png</code>
+                  Admin can add it under Payment Methods.
                 </p>
               </div>
             )}
@@ -240,14 +237,14 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           </button>
         </div>
 
-        <div className="flex flex-col items-center w-full max-w-sm mx-auto mt-5 pt-5 border-t border-[rgba(0, 229, 255,0.1)]">
+        <div className="flex flex-col items-center w-full max-w-sm mx-auto mt-5 pt-5 border-t border-[rgba(0,229,255,0.1)]">
           <p className="text-xs text-[#6b6d8f] mb-1">{method.copyLabel}</p>
           <p className="font-mono text-base sm:text-lg text-white break-all mb-4">{method.username}</p>
           <div className="flex flex-col gap-2 w-full">
             <button
               type="button"
               onClick={handleCopyUsername}
-              className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-[#10102a] border border-[rgba(0, 229, 255,0.1)] hover:border-white/20 text-white transition-colors w-full"
+              className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-[#10102a] border border-[rgba(0,229,255,0.1)] hover:border-white/20 text-white transition-colors w-full"
             >
               <Copy className="h-4 w-4" />
               Copy {method.label} details
@@ -257,7 +254,7 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
                 href={method.payLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-orange-500/15 border border-[rgba(0, 229, 255,0.25)] hover:border-orange-500/60 text-orange-200 transition-colors w-full"
+                className="inline-flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 text-sm font-semibold bg-orange-500/15 border border-[rgba(0,229,255,0.25)] hover:border-orange-500/60 text-orange-200 transition-colors w-full"
               >
                 <ExternalLink className="h-4 w-4" />
                 Pay using link
@@ -280,14 +277,12 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
             placeholder="e.g. 50"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-xl border border-[rgba(0, 229, 255,0.1)] bg-[#0f0f22] px-4 py-3 text-sm text-white placeholder:text-[#6b6d8f] focus:outline-none focus:border-[rgba(0, 229, 255,0.25)]"
+            className="w-full rounded-xl border border-[rgba(0,229,255,0.1)] bg-[#0f0f22] px-4 py-3 text-sm text-white placeholder:text-[#6b6d8f] focus:outline-none focus:border-[rgba(0,229,255,0.25)]"
           />
         </div>
 
         <div>
-          <label className="text-xs text-[#6b6d8f] block mb-1.5">
-            Payment screenshot (required)
-          </label>
+          <label className="text-xs text-[#6b6d8f] block mb-1.5">Payment screenshot (required)</label>
           <input
             ref={fileInputRef}
             type="file"
@@ -298,13 +293,13 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold bg-[#10102a] border border-dashed border-white/15 hover:border-[rgba(0, 229, 255,0.25)] text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-4 text-sm font-semibold bg-[#10102a] border border-dashed border-white/15 hover:border-[rgba(0,229,255,0.25)] text-white transition-colors"
           >
             <Upload className="h-4 w-4" />
             {proofFile ? proofFile.name : "Upload payment screenshot"}
           </button>
           {proofPreview && (
-            <div className="mt-3 relative h-32 w-full max-w-xs rounded-lg overflow-hidden border border-[rgba(0, 229, 255,0.1)]">
+            <div className="mt-3 relative h-32 w-full max-w-xs rounded-lg overflow-hidden border border-[rgba(0,229,255,0.1)]">
               <Image src={proofPreview} alt="Payment proof preview" fill className="object-cover" unoptimized />
             </div>
           )}
@@ -316,17 +311,10 @@ export function GameDepositSection({ game, hideSectionAnchor }: GameDepositSecti
           disabled={submitting || !proofFile}
           className="w-full flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold text-black bg-gradient-to-r from-emerald-400 to-teal-500 hover:opacity-95 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Check className="h-5 w-5" />
-          )}
+          {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
           Submit deposit proof
         </button>
       </div>
-        </>
-      )}
     </section>
   );
 }
-

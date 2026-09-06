@@ -10,12 +10,7 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { resolveBlogCoverUrl } from "@/lib/blog-cover";
 import { getBlogPost, getPublishedBlogPosts } from "@/lib/data/marketing";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-  const posts = await getPublishedBlogPosts();
-  return posts.slice(0, 20).map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

@@ -11,6 +11,7 @@ import {
   deletePaymentMethodAction,
   upsertPaymentMethodAction,
 } from "@/lib/actions/admin/payments";
+import { PaymentQrUploadButton } from "@/components/admin/payment-qr-upload-button";
 import { requirePermission } from "@/lib/data/admin";
 
 export const metadata: Metadata = { title: "Payment Methods" };
@@ -125,9 +126,13 @@ export default async function AdminPaymentsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <AdminPageHeader
         title="Payment Methods"
-        description="Add, edit, hide, or delete deposit options — changes go live immediately"
+        description="Edit Cash App tags, BTC addresses, QR images, and links — changes show instantly on deposit pages"
       />
 
+      <div className="rounded-xl border border-violet-400/20 bg-violet-500/5 px-4 py-3 text-sm text-slate-300">
+        Tip: Edit a method’s <span className="text-white">Handle / address</span> for the cashtag or BTC wallet,
+        then use <span className="text-white">Upload QR</span> for the image players see. Toggle Active to hide a method.
+      </div>
       <EntityEditDialog
         title="Add payment method"
         triggerLabel="Add payment method"
@@ -164,6 +169,7 @@ export default async function AdminPaymentsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <PaymentQrUploadButton methodId={m.id} />
                 <EntityEditDialog
                   title={`Edit — ${m.label}`}
                   triggerLabel="Edit"

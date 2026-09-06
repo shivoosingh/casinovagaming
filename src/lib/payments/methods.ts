@@ -1,10 +1,4 @@
-export type DepositPaymentMethodId =
-  | "paypal"
-  | "chime"
-  | "cashapp"
-  | "bitcoin"
-  | "usdt"
-  | "venmo";
+export type DepositPaymentMethodId = string;
 
 export interface DepositPaymentMethod {
   id: DepositPaymentMethodId;
@@ -14,7 +8,7 @@ export interface DepositPaymentMethod {
   copyLabel: string;
   /** Opens in browser / app when user taps Pay using link */
   payLink?: string;
-  /** Public path under /public */
+  /** Public path under /public or absolute URL */
   qrImage: string;
   accent: string;
 }

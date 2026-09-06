@@ -7,6 +7,7 @@ import { SITE_URL } from "@/lib/constants";
 import { GAMES, getGameBySlug } from "@/lib/games";
 import { isWalletLoadEnabledForGame } from "@/lib/game-automation/config";
 import { getMyGameAccount } from "@/lib/actions/game-loads";
+import { getActivePaymentMethods } from "@/lib/data/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,10 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   if (!game) notFound();
 
   const walletLoadEnabled = isWalletLoadEnabledForGame(game.slug);
-  const initialGameAccount = walletLoadEnabled ? await getMyGameAccount(game.slug) : null;
+  const [initialGameAccount, paymentMethods] = await Promise.all([
+    walletLoadEnabled ? getMyGameAccount(game.slug) : Promise.resolve(null),
+    game.upcoming ? Promise.resolve([]) : getActivePaymentMethods(),
+  ]);
 
   return (
     <>
@@ -56,6 +60,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
         game={game}
         autoCreate={create === "1"}
         walletLoadEnabled={walletLoadEnabled}
+        paymentMethods={paymentMethods}
         initialGameAccount={initialGameAccount}
       />
     </>

@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { OrionStarsApiClient } from "./orionstars-api";
+import { OrionStarsApiClient, parseOrionStarsUserBalance } from "./orionstars-api";
 
 export interface AutoFulfillOrionStarsOptions {
   requestId?: string;
@@ -49,7 +49,7 @@ export async function autoFulfillOrionStarsRequest(
         throw new Error(`Orion Stars account verification failed via queryInfo [code ${verifiedInfo.code}]: ${verifiedInfo.msg || "Account not found on provider server"}`);
       }
 
-      console.log(`[OS Strict Flow] Provider account verified successfully! Userbalance: ${verifiedInfo.userbalance}`);
+      console.log(`[OS Strict Flow] Provider account verified successfully! Userbalance: ${parseOrionStarsUserBalance(verifiedInfo)}`);
 
       // 3. Save provider account information locally ONLY AFTER verified on Orion Stars provider
       if (admin && requestId) {
@@ -83,7 +83,7 @@ export async function autoFulfillOrionStarsRequest(
         throw new Error(`Orion Stars queryInfo failed [code ${info.code}]: ${info.msg || "Query failed"}`);
       }
 
-      const userBalance = Number(info.userbalance || 0);
+      const userBalance = parseOrionStarsUserBalance(info);
 
       if (admin && requestId) {
         await admin
@@ -118,7 +118,7 @@ export async function autoFulfillOrionStarsRequest(
         throw new Error(`Orion Stars recharge verification failed [code ${infoAfter.code}]: ${infoAfter.msg || "Recharge verification failed"}`);
       }
 
-      const newBal = Number(infoAfter.userbalance || amount);
+      const newBal = parseOrionStarsUserBalance(infoAfter) || amount;
 
       if (admin && requestId) {
         await admin
@@ -166,7 +166,7 @@ export async function autoFulfillOrionStarsRequest(
         success: true,
         message: `Orion Stars redeemed $${amount}.00 from ${cleanAccount}`,
         accountName: cleanAccount,
-        newBalance: Number(infoAfter.userbalance || 0),
+        newBalance: parseOrionStarsUserBalance(infoAfter),
         rawResponse: res,
       };
     }

@@ -6,8 +6,8 @@ import {
 } from "./gamevault-api";
 
 export function isGameVaultApiConfigured(): boolean {
-  const agentId = process.env.GAMEVAULT_AGENT_ID || "158408";
-  const secretKey = process.env.GAMEVAULT_SECRET_KEY || "352a22adfdc2675cf6b90e621fa687dd";
+  const agentId = process.env.GAMEVAULT_AGENT_ID || "160496";
+  const secretKey = process.env.GAMEVAULT_SECRET_KEY || "6f56ce873171c0a455a8a60c039b3b90";
   return Boolean(agentId?.trim() && secretKey?.trim());
 }
 
@@ -58,7 +58,7 @@ export async function getGameVaultAccountBalance(
 }
 
 /**
- * Resolve numeric Game Vault user_id from DB or input
+ * Resolve numeric Game Vault user_id from DB, or look up by account name via API.
  */
 async function resolveGameVaultUserId(
   admin: any,
@@ -103,7 +103,16 @@ async function resolveGameVaultUserId(
     }
   }
 
-  return clean;
+  // Account name → numeric user_id (required by recharge/withdraw/balance APIs)
+  const api = getGameVaultApiClient();
+  try {
+    return await api.getUserID(clean);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `Could not resolve Game Vault user_id for "${clean}". Recharge/redeem need the numeric ID. (${msg})`
+    );
+  }
 }
 
 export async function autoFulfillGameVaultRequest(

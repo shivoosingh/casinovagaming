@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { MilkyWayApiClient } from "./milkyway-api";
+import { MilkyWayApiClient, parseMilkyWayUserBalance } from "./milkyway-api";
 
 export interface AutoFulfillMilkyWayOptions {
   requestId?: string;
@@ -49,7 +49,7 @@ export async function autoFulfillMilkyWayRequest(
         throw new Error(`Milky Way account verification failed via queryInfo [code ${verifiedInfo.code}]: ${verifiedInfo.msg || "Account not found on provider server"}`);
       }
 
-      console.log(`[MW Strict Flow] Provider account verified successfully! Userbalance: ${verifiedInfo.userbalance}`);
+      console.log(`[MW Strict Flow] Provider account verified successfully! Userbalance: ${parseMilkyWayUserBalance(verifiedInfo)}`);
 
       // 3. Save provider account information locally ONLY AFTER verified on Milky Way provider
       if (admin && requestId) {
@@ -83,7 +83,7 @@ export async function autoFulfillMilkyWayRequest(
         throw new Error(`Milky Way queryInfo failed [code ${info.code}]: ${info.msg || "Query failed"}`);
       }
 
-      const userBalance = Number(info.userbalance || 0);
+      const userBalance = parseMilkyWayUserBalance(info);
 
       if (admin && requestId) {
         await admin
@@ -118,7 +118,7 @@ export async function autoFulfillMilkyWayRequest(
         throw new Error(`Milky Way recharge verification failed [code ${infoAfter.code}]: ${infoAfter.msg || "Recharge verification failed"}`);
       }
 
-      const newBal = Number(infoAfter.userbalance || amount);
+      const newBal = parseMilkyWayUserBalance(infoAfter) || amount;
 
       if (admin && requestId) {
         await admin
@@ -166,7 +166,7 @@ export async function autoFulfillMilkyWayRequest(
         success: true,
         message: `Milky Way redeemed $${amount}.00 from ${cleanAccount}`,
         accountName: cleanAccount,
-        newBalance: Number(infoAfter.userbalance || 0),
+        newBalance: parseMilkyWayUserBalance(infoAfter),
         rawResponse: res,
       };
     }

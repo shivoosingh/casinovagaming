@@ -231,59 +231,44 @@ export class CashMachineApiClient {
    * 1.2 Get player list
    * GET /api/player/playerList?limit=10&page=1
    */
-  async getPlayerList(limit: number = 50, page: number = 1): Promise<CashMachinePlayerListResponse> {
+  async getPlayerList(
+    limit: number = 50,
+    page: number = 1,
+    extra: Record<string, string> = {}
+  ): Promise<CashMachinePlayerListResponse> {
     const params = new URLSearchParams({
       limit: String(limit),
       page: String(page),
+      ...extra,
     });
     return this.request<CashMachinePlayerListResponse>(`/api/player/playerList?${params.toString()}`);
   }
 
-  /**
-   * Find player account object by username / account name or numeric ID
-   */
   async findPlayerByAccount(accountOrId: string | number): Promise<CashMachinePlayer | null> {
-    const target = String(accountOrId).trim().toLowerCase();
-    
-    // Page 1 query with 100 limit to find player fast
-    let listRes = await this.getPlayerList(100, 1);
-    let match = listRes.data?.find(
-      (p) => p.Account.toLowerCase() === target || String(p.id) === target
-    );
-    if (match) return match;
-
-    // Paginate if count > 100
-    const totalCount = listRes.count || 0;
-    const maxPages = Math.ceil(totalCount / 100);
-    for (let p = 2; p <= Math.min(maxPages, 10); p++) {
-      listRes = await this.getPlayerList(100, p);
-      match = listRes.data?.find(
-        (player) => player.Account.toLowerCase() === target || String(player.id) === target
-      );
-      if (match) return match;
+    const strVal = String(accountOrId).trim();
+    if (/^\d+$/.test(strVal)) {
+      return { id: Number(strVal), Account: strVal } as CashMachinePlayer;
     }
-
-    return null;
+    try {
+      const id = await this.resolvePlayerId(strVal);
+      return { id: Number(id), Account: strVal } as CashMachinePlayer;
+    } catch {
+      return null;
+    }
   }
 
-  /**
-   * Resolve numeric player ID from account username or numeric string
-   */
   async resolvePlayerId(accountOrId: string | number): Promise<string> {
-    const strVal = String(accountOrId).trim();
-    
-    // Check if player exists by account lookup
-    const player = await this.findPlayerByAccount(strVal);
-    if (player) {
-      return String(player.id);
-    }
-
-    // If pure digits and player not found by account name, try using as ID directly
-    if (/^\d+$/.test(strVal)) {
-      return strVal;
-    }
-
-    throw new Error(`Player '${strVal}' not found on CashMachine agent account.`);
+    const { resolveLayuiPlayerId } = await import("./layui-player-resolve");
+    return resolveLayuiPlayerId({
+      agentKey: "cashmachine",
+      accountOrId,
+      fetchList: async (params) => {
+        const limit = Number(params.limit || 20);
+        const page = Number(params.page || 1);
+        const { limit: _l, page: _p, ...extra } = params;
+        return this.getPlayerList(limit, page, extra);
+      },
+    });
   }
 
   /**

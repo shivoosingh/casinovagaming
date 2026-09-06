@@ -6,11 +6,13 @@ import { DeferredWalletCardLoader } from "@/components/wallet/deferred-wallet-ca
 import { AppShell } from "@/components/layout/app-shell";
 import { GameLandingClient } from "@/components/games/game-landing-client";
 import type { Game } from "@/lib/games";
+import type { DepositPaymentMethod } from "@/lib/payments/methods";
 
 interface GamePageShellProps {
   game: Game;
   autoCreate?: boolean;
   walletLoadEnabled?: boolean;
+  paymentMethods?: DepositPaymentMethod[];
   initialGameAccount?: {
     game_username: string;
     game_password: string | null;
@@ -21,6 +23,7 @@ export function GamePageShell({
   game,
   autoCreate,
   walletLoadEnabled,
+  paymentMethods,
   initialGameAccount,
 }: GamePageShellProps) {
   const router = useRouter();
@@ -41,6 +44,7 @@ export function GamePageShell({
         game={game}
         autoCreate={autoCreate}
         walletLoadEnabled={walletLoadEnabled}
+        paymentMethods={paymentMethods}
         initialGameAccount={initialGameAccount}
       />
     </AppShell>

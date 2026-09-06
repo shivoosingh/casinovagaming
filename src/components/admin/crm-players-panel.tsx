@@ -173,7 +173,7 @@ export function CrmPlayersPanel({
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button asChild variant="outline" size="sm">
-                        <Link href="/admin/users">Users</Link>
+                        <Link href={`/admin/users?userId=${p.id}`}>Users</Link>
                       </Button>
                     </td>
                   </tr>

@@ -9,8 +9,8 @@ export default async function AdminTransactionsPage() {
     getAdminAllTransactions(),
     supabase
       .from("profiles")
-      .select("id, full_name, email")
-      .order("full_name", { ascending: true, nullsFirst: false })
+      .select("id, full_name, email, wallet_balance, cashout_wallet, created_at, last_seen_at")
+      .order("created_at", { ascending: false })
       .limit(2000),
   ]);
 
@@ -20,10 +20,9 @@ export default async function AdminTransactionsPage() {
     <div>
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Transaction Management</h1>
-        <p className="text-[#6b6d8f] text-sm sm:text-base">
-          Pick one user — see their <strong className="text-foreground font-medium">Total Deposit</strong>{" "}
-          and <strong className="text-foreground font-medium">Deposit Redeem</strong> history.
-          Only money loads & redeems (not account creation). Updates live.
+        <p className="text-sm text-slate-400 sm:text-base">
+          Browse every player, see recent activity at a glance, and open any user&apos;s full
+          transaction history — no typing required.
         </p>
         {"error" in result && (
           <p className="text-sm text-destructive mt-2">{result.error}</p>
