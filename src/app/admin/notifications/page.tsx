@@ -12,8 +12,8 @@ export default async function AdminNotificationsPage() {
   return (
     <div className="mx-auto max-w-4xl">
       <AdminPageHeader
-        title="Broadcasts"
-        description="Send an in-app notice to every non-admin user. Optionally posts in their Support chat."
+        title="Broadcasts & Promos"
+        description="Send in-app promos to every player with one-click templates — deposit bonus, weekend reload, free spin, and more."
       />
 
       <BroadcastComposer />
@@ -23,9 +23,9 @@ export default async function AdminNotificationsPage() {
           How it works
         </h2>
         <ul className="mt-3 space-y-2 text-sm text-slate-400">
-          <li>Uses the <code className="text-violet-200">admin_broadcast_to_all_users</code> RPC.</li>
-          <li>Every player gets a notification; enable Support chat to mirror the message there.</li>
-          <li>Segment targeting is not enabled yet — this reaches all members.</li>
+          <li>Pick a template and click <strong className="text-violet-200">Send now</strong> — or load, edit, then send.</li>
+          <li>Every player gets a notification in their bell icon; enable Support chat to mirror the message.</li>
+          <li>Promo templates use type <code className="text-violet-200">promo</code> so they stand out in the inbox.</li>
         </ul>
       </section>
     </div>

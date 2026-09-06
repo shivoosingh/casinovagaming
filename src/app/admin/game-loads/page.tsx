@@ -16,8 +16,8 @@ export default async function AdminGameLoadsPage() {
       .limit(500),
     supabase
       .from("profiles")
-      .select("id, full_name, email")
-      .order("full_name", { ascending: true, nullsFirst: false })
+      .select("id, full_name, email, wallet_balance, cashout_wallet, created_at, last_seen_at")
+      .order("created_at", { ascending: false })
       .limit(2000),
   ]);
 
@@ -25,9 +25,9 @@ export default async function AdminGameLoadsPage() {
     <div>
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Wallet Loads</h1>
-        <p className="text-[#6b6d8f] text-sm sm:text-base">
-          Loads and redeems from <strong className="text-foreground font-medium">Total Deposit</strong> only.
-          Account creation is not shown here. Updates live when users request loads.
+        <p className="text-sm text-slate-400 sm:text-base">
+          Browse every player&apos;s deposit loads and redeems — pending requests shown first.
+          Click any row to open their full load history. Updates live.
         </p>
       </div>
 

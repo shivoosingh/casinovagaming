@@ -110,9 +110,12 @@ export function AdminUserSidebarPanel({ user, open, onClose }: AdminUserSidebarP
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-violet-300/70">Account actions</p>
             <UserActions userId={user.id} role={user.role} isSuspended={user.is_suspended} />
-            <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
-              <Link href={`/admin/transactions?userId=${user.id}`}>View transactions</Link>
-            </Button>
+          <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
+            <Link href={`/admin/transactions?userId=${user.id}`}>View transactions</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
+            <Link href={`/admin/game-loads?userId=${user.id}`}>View deposit loads</Link>
+          </Button>
             {user.role !== "admin" && (
               <Button variant="outline" size="sm" asChild className="w-full gap-1.5">
                 <Link href={`/admin/chat?userId=${user.id}`}>
