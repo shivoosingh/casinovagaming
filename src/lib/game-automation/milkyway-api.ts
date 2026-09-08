@@ -104,7 +104,7 @@ export class MilkyWayApiClient {
     this.apiUrl = (
       config.apiUrl ||
       process.env.MILKYWAY_API_URL ||
-      "https://milkywayapp.xyz:8033/ws/service.ashx"
+      "https://47.252.40.52:8033/ws/service.ashx"
     ).trim();
 
     this.agentName = (
@@ -130,13 +130,16 @@ export class MilkyWayApiClient {
 
   private async request(url: string): Promise<any> {
     const text = await httpsPost(url, "milkywayapp.xyz", this.proxyUrl);
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.startsWith("<")) {
+      throw new Error(`Milky Way API unreachable: ${trimmed.slice(0, 120) || "empty response"}`);
+    }
     let json: any = {};
     try {
-      json = JSON.parse(text);
-    } catch (e) {
-      throw new Error(`Milky Way invalid JSON response: ${text.slice(0, 200)}`);
+      json = JSON.parse(trimmed);
+    } catch {
+      throw new Error(`Milky Way invalid JSON response: ${trimmed.slice(0, 200)}`);
     }
-
     return json;
   }
 
@@ -198,7 +201,7 @@ export class MilkyWayApiClient {
         if (/session timeout/i.test(msg)) {
           msg = `${msg} (Retry the request — session expired)`;
         } else if (/signature/i.test(msg)) {
-          msg = `${msg} (Check agent store balance and API permissions on Milky Way panel)`;
+          msg = `${msg} (Enable Terminal API on the Milky Way agent panel, or ask your distributor to activate signed API access for agent ${this.agentName})`;
         } else {
           msg = `${msg} (Verify store balance on Milky Way agent panel)`;
         }
@@ -223,7 +226,11 @@ export class MilkyWayApiClient {
     if (String(json.code) !== "200") {
       let msg = json.msg || `Query failed with code ${json.code}`;
       if (String(json.code) === "201") {
-        msg = `${msg} (Session timeout)`;
+        if (/signature/i.test(msg)) {
+          msg = `${msg} (Enable Terminal API on the Milky Way agent panel for agent ${this.agentName})`;
+        } else {
+          msg = `${msg} (Session timeout)`;
+        }
       }
       throw new Error(`Milky Way queryInfo error [code ${json.code}]: ${msg}`);
     }

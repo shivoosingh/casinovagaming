@@ -97,7 +97,6 @@ export const GAMES: Game[] = [
     gradient: "from-red-500 via-orange-600 to-red-900",
     popular: true,
     trending: true,
-    upcoming: true,
   },
   {
     id: "16",

@@ -36,6 +36,8 @@ import { OrionStarsApiClient } from "../src/lib/game-automation/orionstars-api";
 import { isOrionStarsApiConfigured } from "../src/lib/game-automation/orionstars-api";
 import { MilkyWayApiClient } from "../src/lib/game-automation/milkyway-api";
 import { isMilkyWayApiConfigured } from "../src/lib/game-automation/milkyway-api";
+import { FireKirinApiClient } from "../src/lib/game-automation/firekirin-api";
+import { isFireKirinApiConfigured } from "../src/lib/game-automation/firekirin-api";
 import { GAMES } from "../src/lib/games";
 
 type Result = {
@@ -221,6 +223,28 @@ async function probeMilky(account: string): Promise<Result> {
   }
 }
 
+async function probeFireKirin(): Promise<Result> {
+  const slug = "fire-kirin";
+  if (!isFireKirinApiConfigured()) {
+    return { game: "Fire Kirin", slug, configured: false, upcoming: false, status: "NOT_CONFIGURED", detail: "No credentials" };
+  }
+  try {
+    const client = new FireKirinApiClient();
+    const agentBal = await client.getAgentBalance();
+    return {
+      game: "Fire Kirin",
+      slug,
+      configured: true,
+      upcoming: false,
+      status: "OK",
+      detail: `API OK — agent balance $${agentBal.toFixed(2)} (player lookup ready)`,
+    };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { game: "Fire Kirin", slug, configured: true, upcoming: false, status: "API_FAIL", detail: msg };
+  }
+}
+
 async function main() {
   const results: Result[] = [];
 
@@ -238,6 +262,7 @@ async function main() {
   results.push(await probeMafia());
   results.push(await probeOrion(ORION_TEST_ACCOUNT));
   results.push(await probeMilky(MILKY_TEST_ACCOUNT));
+  results.push(await probeFireKirin());
 
   for (const g of GAMES) {
     if (results.some((r) => r.slug === g.slug)) continue;

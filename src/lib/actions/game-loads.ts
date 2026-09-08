@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/actions/notifications";
 import { notifyAdminOfWalletActivity } from "@/lib/telegram/notify-admin-wallet-activity";
-import { getJuwaAdminPanelUrl, getVegasAdminPanelUrl, getGameVaultAdminPanelUrl, getCashFrenzyAdminPanelUrl, isWalletLoadEnabledForGame, WALLET_LOAD_LIMITS } from "@/lib/game-automation/config";
+import { getJuwaAdminPanelUrl, getVegasAdminPanelUrl, getGameVaultAdminPanelUrl, getCashFrenzyAdminPanelUrl, getFireKirinAdminPanelUrl, isWalletLoadEnabledForGame, WALLET_LOAD_LIMITS } from "@/lib/game-automation/config";
 import { validateCustomGameAccountCredentials } from "@/lib/game-automation/account-username";
 import type { GameLoadWalletType } from "@/lib/game-automation/types";
 import {
@@ -23,12 +23,14 @@ import { autoFulfillOrionStarsRequest } from "@/lib/game-automation/orionstars-s
 import { isOrionStarsApiConfigured } from "@/lib/game-automation/orionstars-api";
 import { autoFulfillMilkyWayRequest } from "@/lib/game-automation/milkyway-service";
 import { isMilkyWayApiConfigured } from "@/lib/game-automation/milkyway-api";
+import { autoFulfillFireKirinRequest } from "@/lib/game-automation/firekirin-service";
+import { isFireKirinApiConfigured } from "@/lib/game-automation/firekirin-api";
 import { autoFulfillJuwaRequest } from "@/lib/game-automation/juwa-service";
 import { isJuwaApiConfigured } from "@/lib/game-automation/juwa-api";
 import { autoFulfillVegasRequest } from "@/lib/game-automation/vegas-service";
 import { isVegasApiConfigured } from "@/lib/game-automation/vegas-api";
 
-const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "juwa", "vegas-sweeps", "mr-all-in-one", "orion-stars", "milky-way"];
+const API_CONFIGURED_GAMES = ["cash-machine", "cash-frenzy", "gameroom", "game-vault", "mafia", "juwa", "vegas-sweeps", "mr-all-in-one", "orion-stars", "milky-way", "fire-kirin"];
 
 async function autoFulfillGameRequest(
   gameSlug: string,
@@ -103,6 +105,19 @@ async function autoFulfillGameRequest(
     const targetAccount = input.gameUsername || input.requestedUsername || `mw_${input.userId.slice(0, 8)}`;
     const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
     const res = await autoFulfillMilkyWayRequest({
+      requestId,
+      gameSlug,
+      loadType: mapType as any,
+      accountName: targetAccount,
+      password: input.requestedPassword || undefined,
+      amount: input.amount || 0,
+    });
+    return { success: res.success, error: res.success ? undefined : res.message };
+  }
+  if (gameSlug === "fire-kirin" && isFireKirinApiConfigured()) {
+    const targetAccount = input.gameUsername || input.requestedUsername || `fk_${input.userId.slice(0, 8)}`;
+    const mapType = loadType === "new_account" ? "create_account" : loadType === "reload" ? "load" : loadType;
+    const res = await autoFulfillFireKirinRequest({
       requestId,
       gameSlug,
       loadType: mapType as any,
@@ -810,6 +825,12 @@ export async function getAdminPanelUrlForGame(gameSlug: string) {
   if (gameSlug === "cash-frenzy") {
     const url = getCashFrenzyAdminPanelUrl();
     if (!url) return { error: "CASHFRENZY_ADMIN_URL not configured" };
+    return { url };
+  }
+
+  if (gameSlug === "fire-kirin") {
+    const url = getFireKirinAdminPanelUrl();
+    if (!url) return { error: "FIREKIRIN_ADMIN_URL not configured" };
     return { url };
   }
 

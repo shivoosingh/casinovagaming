@@ -118,7 +118,7 @@ export class OrionStarsApiClient {
     const rawPass =
       config.agentPassword ||
       process.env.ORIONSTARS_AGENT_PASSWORD ||
-      "Re3set@123!";
+      "Re3set@123#";
 
     this.agentPasswdHash = md5(rawPass.trim());
 
@@ -266,6 +266,6 @@ export class OrionStarsApiClient {
 
 export function isOrionStarsApiConfigured(): boolean {
   const username = process.env.ORIONSTARS_AGENT_USERNAME || "Darklord1121";
-  const password = process.env.ORIONSTARS_AGENT_PASSWORD || "Re3set@123!";
+  const password = process.env.ORIONSTARS_AGENT_PASSWORD || "Re3set@123#";
   return Boolean(username?.trim() && password?.trim());
 }
