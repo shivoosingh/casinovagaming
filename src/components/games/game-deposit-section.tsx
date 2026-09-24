@@ -10,10 +10,9 @@ import {
   Download,
   ExternalLink,
   Loader2,
-  Lock,
   Upload,
-  Zap,
 } from "lucide-react";
+import { DollarPayDepositSection } from "@/components/payments/dollarpay-deposit-modal";
 import { createClient } from "@/lib/supabase/client";
 import { submitDepositRequest } from "@/lib/actions/deposits";
 import { uploadDepositProofImage } from "@/lib/deposits/proof-upload";
@@ -164,18 +163,8 @@ export function GameDepositSection({
         </div>
       </div>
 
-      {/* Instant deposit locked until automation is ready */}
-      <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 px-3.5 py-3">
-        <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
-        <div>
-          <p className="flex items-center gap-1.5 text-xs font-bold text-amber-200">
-            <Zap className="h-3.5 w-3.5" />
-            Instant Auto Deposit — coming soon
-          </p>
-          <p className="mt-1 text-[11px] leading-relaxed text-amber-100/70">
-            Use manual deposit below (Cash App, BTC, etc.). Instant payments will unlock after API setup.
-          </p>
-        </div>
+      <div className="mb-5">
+        <DollarPayDepositSection gameSlug={game.slug} gameName={game.name} />
       </div>
 
       <p className="text-xs text-[#6b6d8f] mb-4">
