@@ -11,8 +11,13 @@ export async function GET(req: Request) {
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
 
-    const depositId = new URL(req.url).searchParams.get("id")?.trim();
+    const url = new URL(req.url);
+    const depositId = url.searchParams.get("id")?.trim();
     if (!depositId) return NextResponse.json({ error: "Missing deposit id." }, { status: 400 });
+    const methodValue = url.searchParams.get("method");
+    const methodName = url.searchParams.get("methodName");
+    const gameName = url.searchParams.get("gameName");
+    const gameSlug = url.searchParams.get("gameSlug");
 
     const deposit = await getPaydoraDeposit(depositId);
     if (deposit.userName && deposit.userName !== user.id) {
@@ -27,6 +32,10 @@ export async function GET(req: Request) {
         amount,
         depositId: deposit.id,
         referenceId: deposit.referenceId,
+        methodValue,
+        methodName,
+        gameName,
+        gameSlug,
       });
       credited = Boolean(result.credited);
     }

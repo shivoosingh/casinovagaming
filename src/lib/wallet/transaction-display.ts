@@ -30,6 +30,8 @@ const SOURCE_LABELS: Record<string, string> = {
   game_load_refund: "Load refund",
   game_redeem: "Game redeem",
   deposit: "Deposit",
+  paydora_deposit: "Deposit",
+  paydora_refund: "Deposit refund",
   admin: "Admin adjustment",
   spin: "Spin prize",
   daily_task: "Daily task",
@@ -76,7 +78,14 @@ export function categorizeAdminTransactionPanel(tx: {
     ) {
       return "deposit";
     }
-    if (source === "admin" || source === "deposit") return "deposit";
+    if (
+      source === "admin" ||
+      source === "deposit" ||
+      source === "paydora_deposit" ||
+      source === "paydora_refund"
+    ) {
+      return "deposit";
+    }
   }
 
   return "bonus";

@@ -23,6 +23,7 @@ interface PayMethod {
 
 export function DollarPayDepositSection({
   gameSlug,
+  gameName,
 }: {
   userId?: string;
   gameSlug?: string;
@@ -104,12 +105,21 @@ export function DollarPayDepositSection({
 
       if (data.depositId) {
         const started = Date.now();
+        const methodValue = selected.value;
+        const methodLabel = selected.name;
+        const params = new URLSearchParams({
+          id: data.depositId,
+          method: methodValue,
+          methodName: methodLabel,
+        });
+        if (gameSlug) params.set("gameSlug", gameSlug);
+        if (gameName) params.set("gameName", gameName);
         const timer = window.setInterval(async () => {
           if (Date.now() - started > 3 * 60 * 1000) {
             window.clearInterval(timer);
             return;
           }
-          const statusRes = await fetch(`/api/payments/paydora/status?id=${encodeURIComponent(data.depositId)}`);
+          const statusRes = await fetch(`/api/payments/paydora/status?${params.toString()}`);
           const status = await statusRes.json();
           if (status.credited) {
             window.clearInterval(timer);

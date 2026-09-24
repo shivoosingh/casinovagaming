@@ -99,7 +99,9 @@ export default async function AdminDepositsPage({
                           <span className="text-emerald-400 font-semibold"> · ${Number(dep.amount).toFixed(2)}</span>
                         )}
                       </p>
-                      <DepositProofImage path={dep.proof_url} />
+                      {dep.proof_url && !String(dep.proof_url).startsWith("paydora/") && (
+                        <DepositProofImage path={dep.proof_url} />
+                      )}
                       {dep.admin_notes && (
                         <p className="text-sm text-[#00E5FF]">Admin: {dep.admin_notes}</p>
                       )}
