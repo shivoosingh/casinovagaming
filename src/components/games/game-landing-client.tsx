@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
+  ExternalLink,
   Info,
   MapPin,
   Sparkles,
@@ -259,7 +260,34 @@ export function GameLandingClient({
         </div>
       </section>
 
-      {/* Account panel — first thing after hero when wallet load is enabled */}
+      <section className="space-y-3">
+        <a
+          href={game.playUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold text-[#0a0a0f] bg-gradient-to-r from-emerald-400 to-[#00E5FF] hover:opacity-95 transition-opacity"
+        >
+          <ExternalLink className="h-5 w-5" />
+          Play {game.name}
+        </a>
+
+        {!hasAccount && accountStatus === "none" && (
+          <button
+            type="button"
+            onClick={handleCreateAccount}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold transition-opacity shadow-lg",
+              game.upcoming
+                ? "text-[#6b6d8f] bg-[#13131a] border border-[rgba(255,255,255,0.07)] cursor-not-allowed opacity-80"
+                : "text-[#0a0a0f] bg-gradient-to-b from-[#d4ae52] to-[#a07830] hover:opacity-95 shadow-[rgba(201,168,76,0.2)]"
+            )}
+          >
+            <UserPlus className="h-5 w-5" />
+            {game.upcoming ? "Coming Soon" : "Create Account"}
+          </button>
+        )}
+      </section>
+
       {walletSection}
 
       {/* Recent winners */}
@@ -374,24 +402,7 @@ export function GameLandingClient({
         <p className="text-sm text-[#6b6d8f] leading-relaxed">{game.bio}</p>
       </section>
 
-      {/* Create Account — only when user has no game login yet */}
       <section className="space-y-3">
-        {!hasAccount && accountStatus === "none" && (
-          <button
-            type="button"
-            onClick={handleCreateAccount}
-            className={cn(
-              "w-full flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold transition-opacity shadow-lg",
-              game.upcoming
-                ? "text-[#6b6d8f] bg-[#13131a] border border-[rgba(255,255,255,0.07)] cursor-not-allowed opacity-80"
-                : "text-[#0a0a0f] bg-gradient-to-b from-[#d4ae52] to-[#a07830] hover:opacity-95 shadow-[rgba(201,168,76,0.2)]"
-            )}
-          >
-            <UserPlus className="h-5 w-5" />
-            {game.upcoming ? "Coming Soon" : "Create Account"}
-          </button>
-        )}
-
         <div className="grid grid-cols-2 gap-3">
           <a
             href={game.downloadUrl}
@@ -445,7 +456,7 @@ export function GameLandingClient({
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">4</span>
                 <span>
-                  Need more Casinova Gaming balance? Use the <strong className="text-[#f0f0f5]">Deposit</strong> section below for PayPal, Chime, Cash App, Bitcoin, or Venmo.
+                  Need more Casinova Gaming balance? Use the <strong className="text-[#f0f0f5]">Deposit</strong> section below.
                 </span>
               </li>
             </ol>
@@ -466,7 +477,7 @@ export function GameLandingClient({
               <li className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(201,168,76,0.1)] text-[#c9a84c] text-xs font-bold border border-[rgba(201,168,76,0.2)]">3</span>
                 <span>
-                  Use the <strong className="text-[#f0f0f5]">Deposit</strong> section to load funds — pick PayPal, Chime, Cash App, Bitcoin, or Venmo and upload your payment screenshot.
+                  Use the <strong className="text-[#f0f0f5]">Deposit</strong> section below to add funds to your wallet.
                 </span>
               </li>
               <li className="flex gap-3">

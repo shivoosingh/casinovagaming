@@ -36,7 +36,7 @@ export function DepositPageClient({
     <div>
       <DashboardPageHeader
         title="Deposit"
-        description="Choose a payment method, send your deposit, then upload a screenshot. We credit your game account after verification."
+        description="Choose a payment method and amount. Your wallet is credited when the payment succeeds."
       />
 
       <div className="mb-4 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[#0d0d1f] p-4">
