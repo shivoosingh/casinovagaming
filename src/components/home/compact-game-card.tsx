@@ -92,16 +92,18 @@ export function CompactGameCard({ game, variant = "grid", className, eager = fal
             <Star className="h-3 w-3 fill-current" />
             <span className="text-[10px] font-black">{ratingFor(game)}</span>
           </div>
-          <a
-            href={game.playUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pointer-events-auto relative mb-1 inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-200 backdrop-blur-md hover:bg-emerald-500/35"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ExternalLink className="h-2.5 w-2.5" />
-            Play
-          </a>
+          {!game.upcoming && (
+            <a
+              href={game.playUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pointer-events-auto relative mb-1 inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-200 backdrop-blur-md hover:bg-emerald-500/35"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="h-2.5 w-2.5" />
+              Play
+            </a>
+          )}
           <p
             className="line-clamp-1 font-bold text-white"
             style={{

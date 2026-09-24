@@ -55,6 +55,7 @@ export const GAMES: Game[] = [
     popular: true,
     trending: true,
     topRated: true,
+    upcoming: true,
   },
   {
     id: "7",
@@ -103,6 +104,7 @@ export const GAMES: Game[] = [
     gradient: "from-red-500 via-orange-600 to-red-900",
     popular: true,
     trending: true,
+    upcoming: true,
   },
   {
     id: "16",
@@ -196,6 +198,7 @@ export const GAMES: Game[] = [
     gradient: "from-violet-400 via-purple-600 to-indigo-900",
     popular: true,
     trending: true,
+    upcoming: true,
   },
   {
     id: "6",

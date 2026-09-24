@@ -75,7 +75,7 @@ export function PhoneNumberInput({
         onChange={(e) => onLocalNumberChange(e.target.value.replace(/[^\d\s-]/g, ""))}
         required={required}
         disabled={disabled}
-        placeholder="9862953426"
+        placeholder="555 123 4567"
         className="font-mono flex-1"
       />
     </div>

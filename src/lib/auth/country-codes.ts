@@ -6,7 +6,7 @@ export type CountryDialCode = {
   flag: string;
 };
 
-export const DEFAULT_COUNTRY_ISO = "NP";
+export const DEFAULT_COUNTRY_ISO = "US";
 
 export const COUNTRY_DIAL_CODES: CountryDialCode[] = [
   { code: "AF", name: "Afghanistan", dial: "+93", flag: "🇦🇫" },
@@ -219,7 +219,11 @@ export const COUNTRY_DIAL_CODES: CountryDialCode[] = [
   { code: "YE", name: "Yemen", dial: "+967", flag: "🇾🇪" },
   { code: "ZM", name: "Zambia", dial: "+260", flag: "🇿🇲" },
   { code: "ZW", name: "Zimbabwe", dial: "+263", flag: "🇿🇼" },
-].sort((a, b) => a.name.localeCompare(b.name));
+].sort((a, b) => {
+  if (a.code === "US") return -1;
+  if (b.code === "US") return 1;
+  return a.name.localeCompare(b.name);
+});
 
 const countryByIso = new Map(COUNTRY_DIAL_CODES.map((c) => [c.code, c]));
 

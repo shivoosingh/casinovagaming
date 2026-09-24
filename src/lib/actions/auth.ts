@@ -47,7 +47,7 @@ export async function resolveLoginEmail(
   if (!phone) {
     return {
       email: null,
-      error: "Enter a valid email or phone with country code (e.g. +977 9862953426)",
+      error: "Enter a valid email or phone with country code (e.g. +1 555 123 4567)",
     };
   }
 

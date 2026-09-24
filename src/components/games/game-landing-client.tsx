@@ -261,15 +261,17 @@ export function GameLandingClient({
       </section>
 
       <section className="space-y-3">
-        <a
-          href={game.playUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold text-[#0a0a0f] bg-gradient-to-r from-emerald-400 to-[#00E5FF] hover:opacity-95 transition-opacity"
-        >
-          <ExternalLink className="h-5 w-5" />
-          Play {game.name}
-        </a>
+        {!game.upcoming && (
+          <a
+            href={game.playUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-xl py-4 px-6 text-base font-bold text-[#0a0a0f] bg-gradient-to-r from-emerald-400 to-[#00E5FF] hover:opacity-95 transition-opacity"
+          >
+            <ExternalLink className="h-5 w-5" />
+            Play {game.name}
+          </a>
+        )}
 
         {!hasAccount && accountStatus === "none" && (
           <button
