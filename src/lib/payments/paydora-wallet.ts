@@ -27,14 +27,22 @@ async function alreadyApplied(
   userId: string,
   marker: string
 ) {
-  const { data } = await admin
+  const { data: tx } = await admin
     .from("wallet_transactions")
     .select("id")
     .eq("user_id", userId)
     .ilike("description", `%${marker}%`)
     .limit(1)
     .maybeSingle();
-  return Boolean(data?.id);
+  if (tx?.id) return true;
+
+  const { data: dep } = await admin
+    .from("deposit_requests")
+    .select("id, wallet_credited, status")
+    .eq("proof_url", paydoraProofPath(marker))
+    .maybeSingle();
+
+  return Boolean(dep && (dep.wallet_credited || dep.status === "completed"));
 }
 
 async function ensureDepositRequest(
@@ -87,6 +95,79 @@ async function ensureDepositRequest(
   if (error) throw new Error(error.message);
 }
 
+async function applyWalletCredit(
+  admin: NonNullable<ReturnType<typeof createAdminClient>>,
+  input: {
+    userId: string;
+    amount: number;
+    source: string;
+    description: string;
+  }
+) {
+  const { error: rpcError } = await admin.rpc("credit_system_wallet", {
+    p_user_id: input.userId,
+    p_amount: input.amount,
+    p_source: input.source,
+    p_description: input.description,
+  });
+
+  if (!rpcError) {
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("wallet_balance")
+      .eq("id", input.userId)
+      .maybeSingle();
+    return Number(profile?.wallet_balance || 0);
+  }
+
+  const missingRpc =
+    rpcError.code === "42883" ||
+    rpcError.message.includes("Could not find the function") ||
+    rpcError.message.includes("credit_system_wallet");
+
+  if (!missingRpc) {
+    throw new Error(rpcError.message);
+  }
+
+  // Fallback after protect_wallet_columns allows service_role
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("wallet_balance")
+    .eq("id", input.userId)
+    .maybeSingle();
+
+  const currentBalance = Number(profile?.wallet_balance || 0);
+  const newBalance = Math.round((currentBalance + input.amount) * 100) / 100;
+
+  const { data: updated, error: updateError } = await admin
+    .from("profiles")
+    .update({ wallet_balance: newBalance })
+    .eq("id", input.userId)
+    .select("wallet_balance")
+    .single();
+
+  if (updateError) throw new Error(updateError.message);
+
+  if (Math.abs(Number(updated?.wallet_balance) - newBalance) > 0.009) {
+    throw new Error(
+      "Wallet balance did not update. Run supabase/paydora-system-wallet-credit.sql in Supabase."
+    );
+  }
+
+  const { error: txError } = await admin.from("wallet_transactions").insert({
+    user_id: input.userId,
+    amount: input.amount,
+    wallet_type: "current",
+    transaction_type: "credit",
+    source: input.source,
+    description: input.description,
+    created_by: null,
+  });
+
+  if (txError) throw new Error(txError.message);
+  return Number(updated.wallet_balance);
+}
+
 export async function creditPaydoraDeposit(input: {
   userId: string;
   amount: number;
@@ -112,56 +193,12 @@ export async function creditPaydoraDeposit(input: {
   const methodName = input.methodName?.trim() || "Paydora";
   const description = `Deposit confirmed — $${amount.toFixed(2)} via ${methodName} (${input.referenceId || "order"} ${marker})`;
 
-  const { data: txRow, error: txError } = await admin
-    .from("wallet_transactions")
-    .insert({
-      user_id: input.userId,
-      amount,
-      wallet_type: "current",
-      transaction_type: "credit",
-      source: "deposit",
-      description,
-      created_by: null,
-    })
-    .select("id")
-    .single();
-
-  if (txError || !txRow?.id) {
-    throw new Error(txError?.message || "Could not save the deposit transaction");
-  }
-
-  const { count } = await admin
-    .from("wallet_transactions")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", input.userId)
-    .ilike("description", `%${marker}%`);
-
-  if ((count ?? 0) > 1) {
-    await admin.from("wallet_transactions").delete().eq("id", txRow.id);
-    await ensureDepositRequest(admin, { ...input, amount });
-    return { credited: false, duplicate: true };
-  }
-
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("wallet_balance")
-    .eq("id", input.userId)
-    .maybeSingle();
-
-  const currentBalance = Number(profile?.wallet_balance || 0);
-  const newBalance = Math.round((currentBalance + amount) * 100) / 100;
-
-  const { data: updated, error: updateError } = await admin
-    .from("profiles")
-    .update({ wallet_balance: newBalance })
-    .eq("id", input.userId)
-    .select("wallet_balance")
-    .single();
-
-  if (updateError || Number(updated?.wallet_balance) + 0.009 < newBalance) {
-    await admin.from("wallet_transactions").delete().eq("id", txRow.id);
-    throw new Error(updateError?.message || "Wallet balance did not update");
-  }
+  const newBalance = await applyWalletCredit(admin, {
+    userId: input.userId,
+    amount,
+    source: "deposit",
+    description,
+  });
 
   await ensureDepositRequest(admin, { ...input, amount });
 
@@ -173,7 +210,7 @@ export async function creditPaydoraDeposit(input: {
     is_read: false,
   });
 
-  return { credited: true, newBalance: Number(updated.wallet_balance) };
+  return { credited: true, newBalance };
 }
 
 export async function reversePaydoraDeposit(input: {
@@ -196,12 +233,20 @@ export async function reversePaydoraDeposit(input: {
   const currentBalance = Number(profile?.wallet_balance || 0);
   const newBalance = Math.max(0, Math.round((currentBalance - amount) * 100) / 100);
 
-  const { error: updateError } = await admin
+  const { data: updated, error: updateError } = await admin
     .from("profiles")
     .update({ wallet_balance: newBalance })
-    .eq("id", input.userId);
+    .eq("id", input.userId)
+    .select("wallet_balance")
+    .single();
 
   if (updateError) throw new Error(updateError.message);
+
+  if (Math.abs(Number(updated?.wallet_balance) - newBalance) > 0.009) {
+    throw new Error(
+      "Wallet balance did not update. Run supabase/paydora-system-wallet-credit.sql in Supabase."
+    );
+  }
 
   const { error: txError } = await admin.from("wallet_transactions").insert({
     user_id: input.userId,
@@ -220,5 +265,5 @@ export async function reversePaydoraDeposit(input: {
     .update({ status: "rejected", admin_notes: "Paydora refunded this deposit" })
     .eq("proof_url", paydoraProofPath(input.depositId));
 
-  return { reversed: true, newBalance };
+  return { reversed: true, newBalance: Number(updated.wallet_balance) };
 }
