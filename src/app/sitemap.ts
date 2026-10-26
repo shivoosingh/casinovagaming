@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { SITE_URL, PUBLIC_ROUTES } from "@/lib/constants";
 import { GAMES } from "@/lib/games";
 import { getGameSitemapPriority } from "@/lib/seo/game-seo";
+import { allGeoStateSlugs, allGeoCityParams } from "@/lib/data/marketing";
 import { createStaticClient } from "@/lib/supabase/static";
 
 export const revalidate = 3600;
@@ -66,6 +67,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     undefined
   );
 
+  // Geo landing pages ([state] and [state]/[city]) are statically generated and
+  // indexable, so they belong in the sitemap. Independent queries, so resolve
+  // them together; a failure must not drop the rest of the sitemap.
+  let stateSlugs: string[] = [];
+  let cityParams: { state: string; city: string }[] = [];
+  try {
+    [stateSlugs, cityParams] = await Promise.all([allGeoStateSlugs(), allGeoCityParams()]);
+  } catch (err) {
+    console.error("[sitemap] geo pages query failed:", err instanceof Error ? err.message : err);
+  }
+
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTES.map((route) => ({
     url: `${SITE_URL}${route.path}`,
     ...(route.path === "/blog" && newestBlogDate ? { lastModified: newestBlogDate } : {}),
@@ -86,8 +98,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // No lastModified: geo content has no reliable per-page date, and an always-now
+  // lastmod teaches crawlers to distrust the field across the whole sitemap.
+  const stateRoutes: MetadataRoute.Sitemap = stateSlugs.map((slug) => ({
+    url: `${SITE_URL}/${encodeURIComponent(slug)}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  const cityRoutes: MetadataRoute.Sitemap = cityParams.map(({ state, city }) => ({
+    url: `${SITE_URL}/${encodeURIComponent(state)}/${encodeURIComponent(city)}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   const seen = new Set<string>();
-  return [...staticRoutes, ...gameRoutes, ...blogRoutes].filter((entry) => {
+  return [...staticRoutes, ...gameRoutes, ...blogRoutes, ...stateRoutes, ...cityRoutes].filter((entry) => {
     if (seen.has(entry.url)) return false;
     seen.add(entry.url);
     return true;
