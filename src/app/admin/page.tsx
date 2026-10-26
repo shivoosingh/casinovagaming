@@ -59,7 +59,7 @@ export default async function AdminOverviewPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="min-w-0">
       <AdminPageHeader
         title="Overview"
         description={`Welcome back, ${ctx.email ?? "admin"}. Here's the pulse of Casinova Gaming.`}
@@ -129,15 +129,15 @@ export default async function AdminOverviewPage() {
         <AdminGameBotWorkerCard />
       </div>
 
-      <GlassCard className="mt-6 p-6">
-        <div className="mb-4 flex items-center justify-between border-b border-border/50 pb-3">
-          <div>
+      <GlassCard className="mt-6 p-4 sm:p-6">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-2 border-b border-border/50 pb-3">
+          <div className="min-w-0">
             <h2 className="text-lg font-bold text-foreground">Quick Actions</h2>
             <p className="text-xs text-muted-foreground">
               One-click shortcuts for CMS, AI tools, Telegram, and game ops.
             </p>
           </div>
-          <span className="rounded-full bg-ws-green/15 px-2.5 py-1 text-xs font-semibold text-ws-green-deep dark:text-ws-green">
+          <span className="shrink-0 rounded-full bg-ws-green/15 px-2.5 py-1 text-xs font-semibold text-ws-green-deep dark:text-ws-green">
             Admin Helper
           </span>
         </div>
@@ -152,7 +152,7 @@ export default async function AdminOverviewPage() {
             </div>
             <div>
               <p className="text-sm font-bold text-foreground">KYC Review</p>
-              <p className="text-xs text-muted-foreground">Approve player IDs</p>
+              <p className="text-xs text-muted-foreground">Name, photo, approve or reject</p>
             </div>
           </Link>
 

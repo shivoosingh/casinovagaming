@@ -52,7 +52,7 @@ export function DepositActions({ depositId, currentStatus, amount }: DepositActi
   }
 
   return (
-    <div className="flex flex-col gap-2 min-w-[200px]">
+    <div className="flex w-full max-w-sm flex-col gap-2">
       <Input
         type="number"
         min="0.01"

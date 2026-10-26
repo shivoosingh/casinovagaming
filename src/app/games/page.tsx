@@ -1,35 +1,40 @@
-import { HomeLandingShell } from "@/components/home/home-landing-shell";
-import { HeroStatic } from "@/components/home/hero-static";
-import { HomeIntroGate } from "@/components/home/casinova-intro";
-import { HomeGuides } from "@/components/home/home-guides";
-import { PlayByStateSection } from "@/components/marketing/play-by-state-section";
-import { getLatestBlogPosts } from "@/lib/data/marketing";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { MarketingGameGrid } from "@/components/marketing/game-grid";
+import { GAMES } from "@/lib/games";
 import { createMetadata } from "@/lib/seo/metadata";
+
+const LIVE_GAMES = GAMES.filter((game) => !game.upcoming);
 
 export const metadata = createMetadata({
   title: "All Games",
-  description:
-    "Browse all online sweepstakes casino games, slot machines, fish games, and table games available on Casinova.",
-  keywords: ["all games", "sweepstakes games", "online casino slots", "fish games", "juwa", "game vault", "fire kirin"],
+  description: `Games you can load on Casinova now: ${LIVE_GAMES.map((game) => game.name).join(", ")}. Open a game to create your account and load it from your wallet.`,
+  keywords: ["Casinova games", ...LIVE_GAMES.map((game) => game.name)],
   path: "/games",
 });
 
-export const dynamic = "force-dynamic";
-
-export default async function AllGamesPage() {
-  const posts = await getLatestBlogPosts(6);
-
+export default function AllGamesPage() {
   return (
-    <HomeIntroGate>
-      <HomeLandingShell
-        hero={<HeroStatic />}
-        belowFold={
-          <>
-            <PlayByStateSection />
-            <HomeGuides posts={posts} />
-          </>
-        }
-      />
-    </HomeIntroGate>
+    <>
+      <Navbar />
+      <main className="bg-[#09090F] pb-16 pt-24 text-[#F5F3FF]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs
+            items={[
+              { name: "Home", href: "/" },
+              { name: "Games", href: "/games" },
+            ]}
+          />
+          <h1 className="mb-4 text-4xl font-black tracking-tight">All games</h1>
+          <p className="max-w-2xl text-lg text-slate-400">
+            These are the games you can load from your Casinova wallet today. Open one to create your
+            game account, load credits, or redeem. Games that are still coming soon are not listed.
+          </p>
+        </div>
+        <MarketingGameGrid title="Available games" />
+      </main>
+      <Footer />
+    </>
   );
 }

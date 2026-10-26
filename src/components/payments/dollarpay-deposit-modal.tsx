@@ -11,6 +11,7 @@ import {
   Smartphone,
   Zap,
 } from "lucide-react";
+import { deviceFingerprint } from "@/lib/payments/paydora-client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -79,6 +80,11 @@ export function DollarPayDepositSection({
       return;
     }
 
+    // Open during the click. A popup started after the payment request is blocked,
+    // which left the "Opening Google Pay" message with no checkout.
+    const popup = window.open("about:blank", "_blank");
+    let sentToCheckout = false;
+
     setLoading(true);
     try {
       const res = await fetch("/api/payments/paydora/create", {
@@ -88,20 +94,29 @@ export function DollarPayDepositSection({
           paymentMethodId: selected.id,
           amount: Number(selectedAmount),
           gameSlug,
+          deviceFingerprint: deviceFingerprint(),
         }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
+        popup?.close();
         toast.error(data.error || "Failed to initiate payment");
         return;
       }
       if (!data.payUrl) {
+        popup?.close();
         toast.error("No checkout URL returned from payment server");
         return;
       }
 
-      toast.success(`Opening ${selected.name} checkout...`);
-      window.open(data.payUrl, "_blank", "noopener,noreferrer");
+      if (popup && !popup.closed) {
+        popup.location.href = data.payUrl;
+        sentToCheckout = true;
+        toast.success(`Opening ${selected.name} checkout...`);
+      } else {
+        sentToCheckout = true;
+        window.location.assign(data.payUrl);
+      }
 
       if (data.depositId) {
         const started = Date.now();
@@ -128,6 +143,7 @@ export function DollarPayDepositSection({
         }, 8000);
       }
     } catch (err) {
+      if (!sentToCheckout) popup?.close();
       toast.error(err instanceof Error ? err.message : "Payment error occurred");
     } finally {
       setLoading(false);

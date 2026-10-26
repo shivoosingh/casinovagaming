@@ -3,9 +3,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
+import { AuthHashSession } from "@/components/auth/auth-hash-session";
 import { MessageRealtimeProvider } from "@/components/chat/message-realtime-provider";
 import { createClient } from "@/lib/supabase/client";
 import { MessageRealtimeStubProvider } from "@/lib/chat/message-realtime-stub";
+import { InstallAppBanner } from "@/components/pwa/install-app-banner";
 
 const REALTIME_ROUTE_PREFIXES = ["/dashboard", "/admin", "/spin"];
 
@@ -47,7 +49,9 @@ export function ClientProviders({ children }: { children: ReactNode }) {
 
   return (
     <>
+      <AuthHashSession />
       <Provider>{children}</Provider>
+      <InstallAppBanner />
       <Toaster richColors closeButton position="top-center" />
     </>
   );

@@ -426,6 +426,8 @@ export async function registerWithEmail(input: {
     return { ok: false, error: saved.error ?? "Account created but phone was not saved" };
   }
 
+  await pingNewSignup(data.user.id);
+
   // Do not signOut here — it clears PKCE state and breaks the confirmation email link
   return { ok: true, email: normalizedEmail };
 }
@@ -436,22 +438,34 @@ export async function finalizeRegistrationAfterSignUp(input: {
   fullName: string;
   email: string;
   phone: string;
+  referralCode?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   const e164 = parseValidInternationalPhone(input.phone);
   if (!e164) return { ok: false, error: INVALID_PHONE_MESSAGE };
 
-  return persistContactOnProfile(input.userId, {
+  const saved = await persistContactOnProfile(input.userId, {
     phone: e164,
     fullName: input.fullName.trim(),
     email: normalizeEmail(input.email),
   });
+  if (saved.ok && input.referralCode?.trim()) {
+    try {
+      const { attachSignupReferral } = await import("@/lib/rewards/attach-referral");
+      await attachSignupReferral(input.userId, input.referralCode);
+    } catch (err) {
+      console.error("[referral] signup attach:", err);
+    }
+  }
+  if (saved.ok) await pingNewSignup(input.userId);
+  return saved;
 }
 
 /** Save phone, name, and email on profiles after signup */
 export async function saveUserContactInfo(
   phone: string,
   fullName: string,
-  email: string
+  email: string,
+  options?: { isNewSignup?: boolean }
 ): Promise<{ ok: boolean; error?: string }> {
   const e164 = parseValidInternationalPhone(phone);
   if (!e164) return { ok: false, error: INVALID_PHONE_MESSAGE };
@@ -463,11 +477,13 @@ export async function saveUserContactInfo(
 
   if (!user) return { ok: false, error: "Not signed in" };
 
-  return persistContactOnProfile(user.id, {
+  const saved = await persistContactOnProfile(user.id, {
     phone: e164,
     fullName: fullName.trim(),
     email: normalizeEmail(email),
   });
+  if (saved.ok && options?.isNewSignup) await pingNewSignup(user.id);
+  return saved;
 }
 
 /** After email confirm / OAuth callback — ensure phone + email saved on profile */
@@ -480,32 +496,52 @@ export async function syncProfileFromAuthMetadata(): Promise<void> {
   if (!user) return;
 
   const meta = user.user_metadata ?? {};
+  const referralCode = typeof meta.referral_code === "string" ? meta.referral_code : "";
+  if (referralCode.trim()) {
+    try {
+      const { attachSignupReferral } = await import("@/lib/rewards/attach-referral");
+      await attachSignupReferral(user.id, referralCode);
+    } catch (err) {
+      console.error("[referral] confirm attach:", err);
+    }
+  }
+
   const phoneRaw = meta.phone as string | undefined;
   const phone = phoneRaw ? parseValidInternationalPhone(phoneRaw) : null;
   const fullName = (meta.full_name as string | undefined)?.trim();
   const email = user.email ? normalizeEmail(user.email) : null;
 
-  if (!phone && !fullName && !email) return;
+  if (phone || fullName || email) {
+    if (phone && email) {
+      await persistContactOnProfile(user.id, {
+        phone,
+        fullName: fullName ?? "",
+        email,
+      });
+    } else {
+      const updates: Record<string, string> = {};
+      if (phone) updates.phone = phone;
+      if (fullName) updates.full_name = fullName;
+      if (email) updates.email = email;
 
-  if (phone && email) {
-    await persistContactOnProfile(user.id, {
-      phone,
-      fullName: fullName ?? "",
-      email,
-    });
-    return;
+      const admin = createAdminClient();
+      const db = admin ?? supabase;
+      const { error } = await db.from("profiles").update(updates).eq("id", user.id);
+
+      if (error) {
+        console.error("syncProfileFromAuthMetadata:", error.message);
+      }
+    }
   }
 
-  const updates: Record<string, string> = {};
-  if (phone) updates.phone = phone;
-  if (fullName) updates.full_name = fullName;
-  if (email) updates.email = email;
+  await pingNewSignup(user.id);
+}
 
-  const admin = createAdminClient();
-  const db = admin ?? supabase;
-  const { error } = await db.from("profiles").update(updates).eq("id", user.id);
-
-  if (error) {
-    console.error("syncProfileFromAuthMetadata:", error.message);
+async function pingNewSignup(userId: string): Promise<void> {
+  try {
+    const { notifyAdminOfSignup } = await import("@/lib/telegram/notify-admin-signup");
+    await notifyAdminOfSignup(userId);
+  } catch (err) {
+    console.error("[telegram] signup notify:", err);
   }
 }

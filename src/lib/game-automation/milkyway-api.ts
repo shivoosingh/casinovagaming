@@ -143,6 +143,11 @@ export class MilkyWayApiClient {
     return json;
   }
 
+  public async getAgentBalance(): Promise<number> {
+    await this.getFreshSession();
+    return this.lastAgentBalance;
+  }
+
   public async getFreshSession(): Promise<MilkyWaySession> {
     const time = Date.now().toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatRelativeTime, cn } from "@/lib/utils";
 import type { GameLoadStatus } from "@/lib/game-automation/types";
+import { isRedeemAwaitingAdmin } from "@/lib/wallet/redeem-approval";
 import type {
   AdminGameLoadRow,
   AdminGameLoadUser,
@@ -40,8 +41,8 @@ function LoadEntry({ load, compact }: { load: AdminGameLoadRow; compact?: boolea
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-1.5">
             <span className="text-sm font-semibold text-white">{load.game_name}</span>
-            <Badge variant={statusVariant[load.status]} className="text-[10px]">
-              {load.status}
+            <Badge variant={isRedeemAwaitingAdmin(load) ? "warning" : statusVariant[load.status]} className="text-[10px]">
+              {isRedeemAwaitingAdmin(load) ? "awaiting approval" : load.status}
             </Badge>
             <Badge variant="outline" className="text-[10px]">
               {isRedeem ? "redeem" : "load"}
@@ -103,7 +104,7 @@ export function AdminWalletLoadsSidebarPanel({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-full max-w-lg flex-col border-r border-violet-400/25 bg-[#0b0c1b] shadow-2xl transition-transform duration-300 ease-out",
+          "fixed inset-y-0 left-0 z-50 flex w-full max-w-lg flex-col border-r border-violet-400/25 bg-[#0b0c1b] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         aria-hidden={!open}

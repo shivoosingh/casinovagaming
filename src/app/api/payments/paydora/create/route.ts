@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createPaydoraDeposit } from "@/lib/payments/paydora";
+import { paydoraCustomerIp } from "@/lib/payments/paydora-client";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
@@ -16,6 +17,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const paymentMethodId = String(body.paymentMethodId || "").trim();
     const amount = Number(body.amount);
+    const deviceFingerprint = String(body.deviceFingerprint || "").trim();
+    const customerIp = paydoraCustomerIp(req);
 
     if (!paymentMethodId) {
       return NextResponse.json({ error: "Choose a payment method." }, { status: 400 });
@@ -23,11 +26,23 @@ export async function POST(req: Request) {
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ error: "Choose a deposit amount." }, { status: 400 });
     }
+    if (!/^[A-Za-z0-9_-]{8,128}$/.test(deviceFingerprint)) {
+      return NextResponse.json({ error: "Refresh the page and try the deposit again." }, { status: 400 });
+    }
+    if (!customerIp) {
+      return NextResponse.json(
+        { error: "This connection did not include a public network address, so the payment could not start. Try again on your phone's Wi-Fi or mobile data." },
+        { status: 400 }
+      );
+    }
 
     const deposit = await createPaydoraDeposit({
       paymentMethodId,
       amount,
       userName: user.id,
+      customerIp,
+      deviceFingerprint,
+      customerUserAgent: req.headers.get("user-agent") || undefined,
       idempotencyKey: `dep_${user.id}_${Date.now()}`,
     });
 

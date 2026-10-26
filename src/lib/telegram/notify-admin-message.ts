@@ -56,7 +56,7 @@ export async function notifyAdminOfCustomerMessage(input: {
     `<b>Email:</b> ${escapeTelegramHtml(email)}`,
     `<b>Message:</b> ${escapeTelegramHtml(clippedPreview)}`,
     "",
-    `<a href="${chatUrl}">Open chat in Spinora</a>`,
+    `<a href="${chatUrl}">Open chat in Casinova</a>`,
   ].join("\n");
 
   const result = await sendTelegramMessage(text);

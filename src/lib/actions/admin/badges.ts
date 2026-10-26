@@ -14,7 +14,7 @@ export async function getAdminSidebarBadgesAction(): Promise<
 
   try {
     const db = adminDb();
-    const [pendingReq, cashoutOwed, pendingDeposits, pendingLoads] = await Promise.all([
+    const [pendingReq, cashoutOwed, pendingDeposits, pendingLoads, pendingKyc, awaitingRedeems] = await Promise.all([
       db.from("requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
       db.from("profiles").select("id", { count: "exact", head: true }).gt("cashout_wallet", 0),
       db
@@ -25,13 +25,22 @@ export async function getAdminSidebarBadgesAction(): Promise<
         .from("game_load_requests")
         .select("id", { count: "exact", head: true })
         .in("status", ["pending", "processing"]),
+      db.from("kyc_submissions").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      db
+        .from("game_load_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("load_type", "redeem")
+        .eq("status", "cancelled")
+        .eq("admin_notes", "AWAITING_ADMIN_APPROVAL"),
     ]);
 
     const badges: Record<string, number> = {};
     if (pendingReq.count) badges["/admin/requests"] = pendingReq.count;
     if (cashoutOwed.count) badges["/admin/payouts"] = cashoutOwed.count;
     if (pendingDeposits.count) badges["/admin/deposits"] = pendingDeposits.count;
-    if (pendingLoads.count) badges["/admin/game-loads"] = pendingLoads.count;
+    const loadBadge = (pendingLoads.count ?? 0) + (awaitingRedeems.count ?? 0);
+    if (loadBadge) badges["/admin/game-loads"] = loadBadge;
+    if (pendingKyc.count) badges["/admin/kyc"] = pendingKyc.count;
 
     return { ok: true, badges };
   } catch {

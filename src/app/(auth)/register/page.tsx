@@ -25,7 +25,7 @@ function RegisterForm() {
           </div>
         </div>
 
-        <EmailAuthForm mode="register" redirect="/" referralCodeFromUrl={refFromUrl} />
+        <EmailAuthForm mode="register" redirect="/dashboard" referralCodeFromUrl={refFromUrl} />
 
         <div className="mt-6 pt-5 border-t border-[rgba(0, 229, 255,0.08)] text-center">
           <p className="text-sm text-[#6b6d8f]">

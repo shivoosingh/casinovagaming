@@ -107,9 +107,38 @@ export async function POST(request: Request) {
         const chatSettings = await getChatbotSettings();
         if (!chatSettings.is_enabled || !chatSettings.auto_reply_enabled) return;
 
-        const aiResult = await processAIChatQuery(content, conversationId, user.id);
-        const botSenderId = await getBotSenderProfileId();
         const db = adminClient ?? supabase;
+
+        // Human agent already handling this chat — do not inject bot replies.
+        const { data: liveConv } = await db
+          .from("conversations")
+          .select("admin_id")
+          .eq("id", conversationId)
+          .maybeSingle();
+        if (liveConv?.admin_id) return;
+
+        const botSenderId = await getBotSenderProfileId();
+        const { data: recentMsgs } = await db
+          .from("messages")
+          .select("sender_id")
+          .eq("conversation_id", conversationId)
+          .order("created_at", { ascending: false })
+          .limit(12);
+
+        const recentSenderIds = (recentMsgs ?? [])
+          .map((m) => m.sender_id)
+          .filter((id): id is string => Boolean(id) && id !== user.id && id !== botSenderId);
+
+        if (recentSenderIds.length > 0) {
+          const { data: humanSenders } = await db
+            .from("profiles")
+            .select("id, role")
+            .in("id", [...new Set(recentSenderIds)])
+            .eq("role", "admin");
+          if (humanSenders && humanSenders.length > 0) return;
+        }
+
+        const aiResult = await processAIChatQuery(content, conversationId, user.id);
 
         const isExplicitHumanRequest =
           /human|real agent|live agent|support agent|agent|talk to human/i.test(content);

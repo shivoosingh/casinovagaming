@@ -275,14 +275,14 @@ export function CasinovaIntro({ onComplete }: { onComplete: () => void }) {
         >
           ENTER THE ARENA
         </motion.p>
-        <motion.h1
+        <motion.p
           className="mt-3 bg-gradient-to-b from-white via-violet-100 to-fuchsia-300/90 bg-clip-text text-5xl font-black tracking-[0.14em] text-transparent drop-shadow-[0_0_36px_rgba(168,85,247,0.7)] sm:text-7xl"
           initial={{ opacity: 0, scale: 0.82, filter: "blur(12px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           transition={{ delay: 3.75, duration: 1.25, ease: easeCinematic }}
         >
           CASINOVA
-        </motion.h1>
+        </motion.p>
         <motion.p
           className="mt-2 text-xl font-semibold tracking-[0.4em] text-violet-200/90 sm:text-2xl"
           initial={{ opacity: 0, y: 14 }}
@@ -352,12 +352,16 @@ export function HomeIntroGate({ children }: { children: ReactNode }) {
     setReady(true);
   }, [reduced]);
 
-  if (!ready) {
-    return <div className="min-h-dvh bg-[#030306]" aria-hidden />;
-  }
-
   return (
     <>
+      {!ready ? (
+        <>
+          <div id="casinova-intro-cover" className="fixed inset-0 z-[100] bg-[#030306]" aria-hidden />
+          <noscript>
+            <style>{"#casinova-intro-cover{display:none}"}</style>
+          </noscript>
+        </>
+      ) : null}
       <AnimatePresence mode="wait">
         {showIntro ? (
           <CasinovaIntro key="intro" onComplete={() => setShowIntro(false)} />

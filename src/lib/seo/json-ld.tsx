@@ -139,3 +139,41 @@ export function GamePageSchema({ game }: { game: Game }) {
     />
   );
 }
+
+export function ArticleSchema({
+  title,
+  description,
+  slug,
+  image,
+  publishedAt,
+}: {
+  title: string;
+  description?: string | null;
+  slug: string;
+  image?: string | null;
+  publishedAt?: string | null;
+}) {
+  const url = `${SITE_URL}/blog/${slug}`;
+  const imageUrl = image ? (image.startsWith("http") ? image : `${SITE_URL}${image}`) : `${SITE_URL}/logo.webp`;
+
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: title,
+        ...(description ? { description } : {}),
+        url,
+        mainEntityOfPage: url,
+        image: imageUrl,
+        ...(publishedAt ? { datePublished: publishedAt } : {}),
+        author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        publisher: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.webp` },
+        },
+      }}
+    />
+  );
+}

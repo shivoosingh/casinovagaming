@@ -17,8 +17,8 @@ export const PAYDORA_CARD_AMOUNTS = [
 ];
 
 export const PAYDORA_CHIME_AMOUNTS = [
-  "5", "7", "10", "15", "20", "25", "30", "31", "40", "50", "60", "100",
-  "125", "130", "150", "200", "300", "400", "500",
+  "20", "25", "30", "31", "40", "50", "60", "100", "125", "130", "150",
+  "200", "300", "400", "500",
 ];
 
 export interface PaydoraMethod {
@@ -102,7 +102,13 @@ async function paydoraFetch<T>(path: string, init: RequestInit = {}): Promise<T>
   }
 
   if (!res.ok) {
-    const message = json?.message || text.slice(0, 240) || `Paydora HTTP ${res.status}`;
+    const fieldNotes =
+      json?.errors && typeof json.errors === "object"
+        ? Object.entries(json.errors as Record<string, unknown>)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : String(value)}`)
+            .join(" ")
+        : "";
+    const message = [json?.message, fieldNotes].filter(Boolean).join(" ") || text.slice(0, 240) || `Paydora HTTP ${res.status}`;
     const err = new Error(message) as Error & { status: number; errors?: unknown };
     err.status = res.status;
     err.errors = json?.errors;
@@ -124,14 +130,20 @@ export async function createPaydoraDeposit(input: {
   amount: number;
   userName?: string;
   gameId?: string;
+  customerIp: string;
+  deviceFingerprint: string;
+  customerUserAgent?: string;
   idempotencyKey: string;
 }): Promise<PaydoraDeposit> {
   const body: Record<string, unknown> = {
     paymentMethodId: input.paymentMethodId,
     amount: input.amount,
+    customerIp: input.customerIp,
+    deviceFingerprint: input.deviceFingerprint,
   };
   if (input.userName) body.userName = input.userName.slice(0, 100);
   if (input.gameId) body.gameId = input.gameId;
+  if (input.customerUserAgent) body.customerUserAgent = input.customerUserAgent.slice(0, 300);
 
   return paydoraFetch("/deposits/create", {
     method: "POST",

@@ -9,7 +9,7 @@ import { LogIn } from "lucide-react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams.get("redirect") || "/dashboard";
 
   useEffect(() => {
     if (searchParams.get("verified") === "1") toast.success("Email verified! You are signed in.");

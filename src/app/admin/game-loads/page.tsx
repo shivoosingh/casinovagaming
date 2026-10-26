@@ -26,7 +26,7 @@ export default async function AdminGameLoadsPage() {
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Wallet Loads</h1>
         <p className="text-sm text-slate-400 sm:text-base">
-          Browse every player&apos;s deposit loads and redeems — pending requests shown first.
+          Browse every player&apos;s deposit loads and redeems. A redeem stays here until you approve the cashout.
           Click any row to open their full load history. Updates live.
         </p>
       </div>

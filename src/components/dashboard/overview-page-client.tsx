@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -26,6 +28,14 @@ interface OverviewStats {
 export function OverviewPageClient() {
   const dashboardProfile = useDashboardProfile();
   const { supabase, userId, ready } = useDashboardSession();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      toast.success("Email verified! Your account is ready.");
+    }
+  }, [searchParams]);
+
   const [stats, setStats] = useState<OverviewStats | null>(() => {
     if (!dashboardProfile) return null;
     return {

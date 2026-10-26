@@ -9,6 +9,8 @@ import { BlogCoverImage } from "@/components/marketing/blog-cover-image";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { resolveBlogCoverUrl } from "@/lib/blog-cover";
 import { getBlogPost, getPublishedBlogPosts } from "@/lib/data/marketing";
+import { SITE_NAME } from "@/lib/constants";
+import { ArticleSchema } from "@/lib/seo/json-ld";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +22,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getBlogPost(slug);
   if (!post) return { title: "Post not found" };
+  const title = post.seo_title ?? post.title;
+  const description = post.seo_description ?? post.excerpt ?? undefined;
+  const image = resolveBlogCoverUrl(post.slug, post.cover_image_url) ?? "/logo.webp";
   return {
-    title: post.seo_title ?? post.title,
-    description: post.seo_description ?? post.excerpt ?? undefined,
+    title,
+    description,
     alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      type: "article",
+      url: `/blog/${slug}`,
+      title,
+      description,
+      siteName: SITE_NAME,
+      images: [{ url: image, alt: post.title }],
+      ...(post.published_at ? { publishedTime: post.published_at } : {}),
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
@@ -52,6 +67,13 @@ export default async function BlogPostPage({
       <Navbar />
       <main className="bg-[#09090F] pb-16 pt-24 text-[#F5F3FF]">
         <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <ArticleSchema
+            title={post.title}
+            description={post.seo_description ?? post.excerpt}
+            slug={post.slug}
+            image={cover}
+            publishedAt={post.published_at}
+          />
           <Breadcrumbs
             items={[
               { name: "Home", href: "/" },

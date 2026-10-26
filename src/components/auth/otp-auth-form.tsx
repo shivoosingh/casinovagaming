@@ -179,7 +179,8 @@ export function OtpAuthForm({ mode, redirect = "/", referralCodeFromUrl }: OtpAu
       const saved = await saveUserContactInfo(
         pendingPhone,
         pendingFullName,
-        targetEmail
+        targetEmail,
+        { isNewSignup: true }
       );
       if (!saved.ok) {
         setLoading(false);

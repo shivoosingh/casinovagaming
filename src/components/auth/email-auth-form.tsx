@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { DEFAULT_COUNTRY_ISO, PhoneNumberInput, phoneFromParts } from "@/components/auth/phone-number-input";
+import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
+import { submitSignupIdentity } from "@/lib/actions/kyc-actions";
+import { compressIdPhoto } from "@/lib/kyc/compress-id-photo";
 import { INVALID_PHONE_MESSAGE } from "@/lib/auth/phone";
 import { buildAuthCallbackUrl, getEmailAuthOrigin } from "@/lib/auth/callback-url";
 import { normalizeEmail, formatAuthErrorMessage } from "@/lib/auth/identifier";
@@ -61,8 +64,8 @@ function EmailConfirmationNotice({
         )}
       </p>
       <p className="text-xs text-[#6b6d8f]">
-        Open the link in any browser on your phone or computer. Each link works once —
-        use Sign In to request a new one if it expired.
+        Open the newest confirmation email and tap the link once. If it expired, use
+        Sign In with the same email and password to get a fresh link.
       </p>
       <p className="text-xs text-[#6b6d8f]">Check spam if you don&apos;t see it in 1–2 minutes.</p>
       <Link href="/login" className="inline-block text-sm text-[#00E5FF] hover:underline">
@@ -84,6 +87,9 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
   const [loading, setLoading] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [idFile, setIdFile] = useState<File | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,9 +125,42 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
         return;
       }
 
+      try {
+        await supabase.auth.getSession();
+        const { data: factors, error: factorError } = await supabase.auth.mfa.listFactors();
+        if (!factorError) {
+          const totp = factors?.totp?.find((factor) => factor.status === "verified");
+          if (totp) {
+            const { data: level } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+            if (level?.nextLevel === "aal2" && level.currentLevel !== "aal2") {
+              setMfaFactorId(totp.id);
+              toast.message("Enter the code from your authenticator app.");
+              return;
+            }
+          }
+        }
+      } catch {
+        // Authenticator is optional. A project without MFA still signs in.
+      }
+
       toast.success("Welcome back!");
       router.push(redirect);
       router.refresh();
+      return;
+    }
+
+    if (!idFile) {
+      toast.error("Add a photo of your ID to create an account.");
+      setLoading(false);
+      return;
+    }
+
+    let idPhoto: { name: string; dataUrl: string };
+    try {
+      idPhoto = await compressIdPhoto(idFile);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not read that ID photo.");
+      setLoading(false);
       return;
     }
 
@@ -201,6 +240,16 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
 
     const needsConfirmation = !data.user.email_confirmed_at;
 
+    const identity = await submitSignupIdentity({
+      userId: data.user.id,
+      email: normalizedEmail,
+      documentName: idPhoto.name,
+      documentDataUrl: idPhoto.dataUrl,
+    });
+    if (!identity.ok) {
+      toast.error(identity.error || "Account created, but the ID photo was not saved. Upload it under Verify ID after you sign in.");
+    }
+
     if (needsConfirmation) {
       // Do not signOut — it clears PKCE cookies and breaks the confirmation link
       setLoading(false);
@@ -212,6 +261,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
         fullName: fullName.trim(),
         email: normalizedEmail,
         phone,
+        referralCode: referralCode.trim() || referralCodeFromUrl || undefined,
       });
       return;
     }
@@ -221,6 +271,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
       fullName: fullName.trim(),
       email: normalizedEmail,
       phone,
+      referralCode: referralCode.trim() || referralCodeFromUrl || undefined,
     });
 
     // Browser session fallback if server-side save failed
@@ -259,8 +310,55 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
     return <EmailConfirmationNotice email={pendingEmail} variant={mode} />;
   }
 
+  async function confirmMfa(e: React.FormEvent) {
+    e.preventDefault();
+    const supabase = createClient();
+    if (!supabase || !mfaFactorId) return;
+    setLoading(true);
+    const challenge = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+    if (challenge.error || !challenge.data) {
+      setLoading(false);
+      toast.error(challenge.error?.message || "Could not verify the code.");
+      return;
+    }
+    const verified = await supabase.auth.mfa.verify({
+      factorId: mfaFactorId,
+      challengeId: challenge.data.id,
+      code: mfaCode.trim(),
+    });
+    setLoading(false);
+    if (verified.error) {
+      toast.error(verified.error.message);
+      return;
+    }
+    toast.success("Welcome back!");
+    router.push(redirect);
+    router.refresh();
+  }
+
+  if (mfaFactorId) {
+    return (
+      <form onSubmit={confirmMfa} className="space-y-4">
+        <Label htmlFor="mfa">Authenticator code</Label>
+        <Input
+          id="mfa"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          value={mfaCode}
+          onChange={(event) => setMfaCode(event.target.value)}
+          placeholder="6-digit code"
+          required
+        />
+        <Button type="submit" className="w-full" disabled={loading || mfaCode.trim().length < 6}>
+          {loading ? "Checking..." : "Confirm and sign in"}
+        </Button>
+      </form>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {mode === "login" && <SocialAuthButtons redirect={redirect} referralCode={referralCode} />}
       {mode === "register" && (
         <div className="space-y-2">
           <Label htmlFor="name">Full Name</Label>
@@ -334,6 +432,20 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
             minLength={6}
             placeholder="Re-enter your password"
           />
+        </div>
+      )}
+      {mode === "register" && (
+        <div className="space-y-2">
+          <Label htmlFor="id-photo">Government ID</Label>
+          <input
+            id="id-photo"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            required
+            onChange={(event) => setIdFile(event.target.files?.[0] ?? null)}
+            className="block w-full text-sm text-[#6b6d8f] file:mr-3 file:rounded-lg file:border-0 file:bg-[#00E5FF]/15 file:px-3 file:py-2 file:text-[#00E5FF]"
+          />
+          <p className="text-xs text-[#6b6d8f]">Photo of your ID. Required before the account is created.</p>
         </div>
       )}
       {mode === "register" && (

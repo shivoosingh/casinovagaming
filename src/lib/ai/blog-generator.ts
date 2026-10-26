@@ -605,8 +605,11 @@ ${options.customPrompt || "None"}
     post = await generateViaLLM(prompt, provider, model);
   }
 
+  // Template posts reuse the same paragraphs across articles: never auto-publish them.
+  let usedTemplate = false;
   if (!post) {
     post = generateFallbackArticle(topic, keywords);
+    usedTemplate = true;
   }
 
   // Ensure cover image 100% matches article content and follows auto-blog-image-fix rule
@@ -620,7 +623,7 @@ ${options.customPrompt || "None"}
     return { ok: false, error: "Database client unavailable" };
   }
 
-  const forcePublish = options.forcePublish === true || settings.auto_publish;
+  const forcePublish = !usedTemplate && (options.forcePublish === true || settings.auto_publish);
   const status = forcePublish ? "published" : "draft";
   const publishedAt = forcePublish ? new Date().toISOString() : null;
 

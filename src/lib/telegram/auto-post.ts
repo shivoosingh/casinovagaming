@@ -1,4 +1,9 @@
-import { sendTelegramPhoto, sendTelegramMessage, escapeTelegramHtml } from "@/lib/telegram/client";
+import {
+  sendTelegramPhoto,
+  sendTelegramMessage,
+  escapeTelegramHtml,
+  blogBroadcastChatIds,
+} from "@/lib/telegram/client";
 import { GeneratedBlogPost } from "@/lib/ai/blog-generator";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://Casinovacasinos.com";
@@ -43,24 +48,26 @@ ${keywordsTag} #Casinova #Gaming #OnlineCasino
 `.trim();
 }
 
-/** Sends a blog post broadcast to Telegram channel */
+/** Sends a blog post only to a separate promo chat, never the admin alert chat. */
 export async function broadcastBlogPostToTelegram(
   post: GeneratedBlogPost,
   options?: TelegramBroadcastOptions
 ): Promise<{ ok: boolean; error?: string }> {
+  const chatIds = blogBroadcastChatIds();
+  if (chatIds.length === 0) {
+    return { ok: true };
+  }
+
   const messageText = formatBlogTelegramMessage(post, options);
 
   if (post.cover_image) {
     const isAbsolute = post.cover_image.startsWith("http://") || post.cover_image.startsWith("https://");
     const photoUrl = isAbsolute ? post.cover_image : `${SITE_URL}${post.cover_image}`;
-    const photoResult = await sendTelegramPhoto(photoUrl, messageText, {
-      channel: options?.channel || "promo",
-    });
+    const photoResult = await sendTelegramPhoto(photoUrl, messageText, { chatIds });
     if (photoResult.ok) return { ok: true };
   }
 
-  // Fallback to text message if photo send fails or image unavailable
-  return await sendTelegramMessage(messageText, { channel: options?.channel || "promo" });
+  return await sendTelegramMessage(messageText, { chatIds });
 }
 
 /** Send custom promo alert to Telegram */

@@ -46,7 +46,7 @@ export function RequestActions({ requestId, currentStatus }: RequestActionsProps
   }
 
   return (
-    <div className="flex flex-col gap-2 min-w-[200px]">
+    <div className="flex w-full max-w-sm flex-col gap-2">
       {showComplete && (
         <>
           <Input

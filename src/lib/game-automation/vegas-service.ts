@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isAccountNameTakenError, nextAvailableAccountName } from "./account-username";
 import { VegasApiClient } from "./vegas-api";
 
 export interface AutoFulfillVegasOptions {
@@ -23,6 +24,23 @@ export interface AutoFulfillVegasResult {
   rawResponse?: any;
 }
 
+async function addVegasUserWithRetry(client: VegasApiClient, accountName: string, password: string) {
+  let candidate = nextAvailableAccountName(accountName, 0);
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    if (attempt > 0) candidate = nextAvailableAccountName(accountName, attempt);
+    try {
+      return await client.addUser(candidate, password);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      lastError = err instanceof Error ? err : new Error(message);
+      if (!isAccountNameTakenError(message)) throw lastError;
+      console.log(`[Vegas Service] "${candidate}" already exists — trying another login`);
+    }
+  }
+  throw lastError ?? new Error("Vegas account name already exists");
+}
+
 export async function autoFulfillVegasRequest(
   options: AutoFulfillVegasOptions
 ): Promise<AutoFulfillVegasResult> {
@@ -35,8 +53,7 @@ export async function autoFulfillVegasRequest(
     if (loadType === "create_account") {
       console.log(`[Vegas Service] Processing create_account for account: "${cleanAccount}"`);
       const passToUse = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
-
-      const created = await client.addUser(cleanAccount, passToUse);
+      const created = await addVegasUserWithRetry(client, cleanAccount, passToUse);
       console.log(
         `[Vegas Service] addUser success | userId: ${created.userId} | accountName: ${created.accountName}`
       );

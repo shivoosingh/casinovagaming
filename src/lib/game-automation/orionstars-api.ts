@@ -142,6 +142,11 @@ export class OrionStarsApiClient {
     return json;
   }
 
+  public async getAgentBalance(): Promise<number> {
+    await this.getValidSession();
+    return this.lastAgentBalance;
+  }
+
   public async getValidSession(): Promise<OrionStarsSession> {
     const time = Date.now().toString();
     const loginUrl = `${this.apiUrl}?action=agentLogin&agentName=${encodeURIComponent(

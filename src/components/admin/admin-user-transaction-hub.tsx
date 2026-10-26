@@ -165,8 +165,45 @@ export function AdminUserTransactionHub({ users, transactions, live }: AdminUser
       </p>
 
       <div className={CARD}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+        <div className="divide-y divide-white/[0.04] md:hidden">
+          {visible.length === 0 ? (
+            <p className="px-4 py-10 text-center text-sm text-slate-400">No players match your filter.</p>
+          ) : (
+            visible.map((user) => {
+              const stats = txStatsByUser.get(user.id);
+              return (
+                <button
+                  key={user.id}
+                  type="button"
+                  className={cn(
+                    "flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-violet-500/10",
+                    selectedUserId === user.id && "bg-violet-500/10"
+                  )}
+                  onClick={() => setSelectedUserId(user.id)}
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-white">{user.full_name || "Unnamed"}</p>
+                    <p className="truncate text-xs text-slate-500">{user.email}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {stats?.count ?? 0} tx ·{" "}
+                      {stats?.lastAt
+                        ? relativeTime(stats.lastAt)
+                        : user.last_seen_at
+                          ? relativeTime(user.last_seen_at)
+                          : "No activity"}
+                    </p>
+                  </div>
+                  <p className="shrink-0 font-semibold tabular-nums text-emerald-300">
+                    ${Number(user.wallet_balance ?? 0).toLocaleString()}
+                  </p>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="border-b border-violet-500/20 text-[11px] uppercase tracking-wider text-violet-300/70">
               <tr>
                 <th className="px-4 py-3 font-bold">Player</th>

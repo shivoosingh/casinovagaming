@@ -8,6 +8,7 @@ import { requirePermission } from "@/lib/data/admin";
 
 export const metadata: Metadata = { title: "Newsletters" };
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export default async function AdminNewslettersPage() {
   await requirePermission("newsletters.manage");
@@ -17,17 +18,17 @@ export default async function AdminNewslettersPage() {
     .from("newsletter_campaigns")
     .select("id, name, subject, heading, body, cta_label, cta_href, segment, status, sent_count, total_recipients")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(400);
 
   if (error && !isMissingRelation(error)) {
     throw new Error(error.message);
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-5xl">
       <AdminPageHeader
         title="Newsletters"
-        description="Compose campaigns and send them as in-app notifications — no external email pipeline needed."
+        description="Promos are in folders, with today's suggestions at the top. Open one, use it or make a variation, then Staff sends a test and Players emails everyone. Free Resend sends 100 a day."
       />
 
       {error && isMissingRelation(error) ? (

@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/actions/notifications";
+import { redeemKycBlockReason } from "@/lib/actions/kyc-actions";
+import { REDEEM_AWAITING_ADMIN, isRedeemAwaitingAdmin } from "@/lib/wallet/redeem-approval";
+import { planDepositLoad, type DepositLoadPlan } from "@/lib/wallet/deposit-load-bonus";
 import { notifyAdminOfWalletActivity } from "@/lib/telegram/notify-admin-wallet-activity";
 import { getJuwaAdminPanelUrl, getVegasAdminPanelUrl, getGameVaultAdminPanelUrl, getCashFrenzyAdminPanelUrl, getFireKirinAdminPanelUrl, isWalletLoadEnabledForGame, WALLET_LOAD_LIMITS } from "@/lib/game-automation/config";
 import { validateCustomGameAccountCredentials } from "@/lib/game-automation/account-username";
@@ -309,6 +312,57 @@ export async function requestGameCheckBalance(input: {
   return { success: true, requestId: requestId as string };
 }
 
+async function depositLoadPlanForUser(userId: string, amount: number): Promise<DepositLoadPlan | null> {
+  const admin = createAdminClient();
+  if (!admin) return null;
+
+  const [{ data: deposits }, { data: loads }] = await Promise.all([
+    admin
+      .from("deposit_requests")
+      .select("id, amount")
+      .eq("user_id", userId)
+      .eq("status", "completed")
+      .order("created_at", { ascending: true }),
+    admin
+      .from("game_load_requests")
+      .select("amount, admin_notes, status")
+      .eq("user_id", userId)
+      .eq("wallet_type", "current")
+      .in("load_type", ["load", "reload"])
+      .order("created_at", { ascending: true }),
+  ]);
+
+  return planDepositLoad({
+    requestedAmount: amount,
+    deposits: (deposits ?? []).map((row) => ({
+      id: String(row.id),
+      amount: Number(row.amount ?? 0),
+    })),
+    priorLoads: (loads ?? []).map((row) => ({
+      amount: Number(row.amount ?? 0),
+      adminNotes: row.admin_notes,
+      status: String(row.status ?? ""),
+    })),
+  });
+}
+
+export async function previewDepositLoadBonus(amount: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const plan = await depositLoadPlanForUser(user.id, amount);
+  if (!plan) return null;
+  return {
+    walletDebit: plan.walletDebit,
+    gameAmount: plan.gameAmount,
+    bonusAmount: plan.bonusAmount,
+    playerMessage: plan.playerMessage,
+  };
+}
+
 export async function requestGameLoad(input: {
   gameSlug: string;
   gameName: string;
@@ -326,7 +380,11 @@ export async function requestGameLoad(input: {
     return { error: "Wallet load is not enabled for this game yet." };
   }
 
-  const amount = Math.round(input.amount * 100) / 100;
+  const requested = Math.round(input.amount * 100) / 100;
+  const plan = await depositLoadPlanForUser(user.id, requested);
+  if (!plan) return { error: "Could not calculate the deposit bonus. Try again." };
+
+  const amount = plan.walletDebit;
   if (amount < WALLET_LOAD_LIMITS.min || amount > WALLET_LOAD_LIMITS.max) {
     return {
       error: `Amount must be between $${WALLET_LOAD_LIMITS.min} and $${WALLET_LOAD_LIMITS.max}`,
@@ -353,6 +411,29 @@ export async function requestGameLoad(input: {
     return { error: "You already have a request in progress for this game." };
   }
 
+  const admin = createAdminClient();
+  if (admin) {
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("wallet_balance")
+      .eq("id", user.id)
+      .maybeSingle();
+    const balance = Math.round(Number(profile?.wallet_balance ?? 0) * 100) / 100;
+    const gap = Math.round((amount - balance) * 100) / 100;
+    if (gap > 0.5) {
+      return { error: "Not enough balance in Total Deposit." };
+    }
+    if (gap > 0) {
+      const { error: topUpError } = await admin.rpc("credit_system_wallet", {
+        p_user_id: user.id,
+        p_amount: gap,
+        p_source: "deposit",
+        p_description: `Rounded $${balance.toFixed(2)} deposit to $${amount.toFixed(2)} for game load ${Date.now()}`,
+      });
+      if (topUpError) return { error: topUpError.message };
+    }
+  }
+
   const { data: requestId, error } = await supabase.rpc("request_game_load", {
     p_game_slug: input.gameSlug,
     p_game_name: input.gameName,
@@ -369,10 +450,17 @@ export async function requestGameLoad(input: {
     return { error: error.message };
   }
 
+  if (admin) {
+    await admin
+      .from("game_load_requests")
+      .update({ admin_notes: plan.adminNotes, updated_at: new Date().toISOString() })
+      .eq("id", requestId);
+  }
+
   const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "load", {
     userId: user.id,
     gameUsername: input.gameUsername.trim(),
-    amount,
+    amount: plan.gameAmount,
   });
   if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
     revalidatePath(`/games/${input.gameSlug}`);
@@ -389,12 +477,19 @@ export async function requestGameLoad(input: {
     gameName: input.gameName,
     gameSlug: input.gameSlug,
     kind: "load",
-    amount,
+    amount: plan.gameAmount,
     walletType: input.walletType,
     requestId: requestId as string,
   });
 
-  return { success: true, requestId: requestId as string };
+  void createNotification(
+    user.id,
+    plan.bonusAmount > 0 ? "Deposit bonus added" : "No deposit bonus",
+    plan.playerMessage,
+    plan.bonusAmount > 0 ? "success" : "info"
+  );
+
+  return { success: true, requestId: requestId as string, playerMessage: plan.playerMessage };
 }
 
 export async function requestGameRedeem(input: {
@@ -410,6 +505,9 @@ export async function requestGameRedeem(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
+
+  const kycBlock = await redeemKycBlockReason(supabase, user.id);
+  if (kycBlock) return { error: kycBlock };
 
   if (!isWalletLoadEnabledForGame(input.gameSlug)) {
     return { error: "Wallet load is not enabled for this game yet." };
@@ -470,6 +568,21 @@ export async function requestGameRedeem(input: {
     return { error: "Load credits from Total Deposit into this game before redeeming." };
   }
 
+  const { data: waitingApproval } = await supabase
+    .from("game_load_requests")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("game_slug", input.gameSlug)
+    .eq("load_type", "redeem")
+    .eq("status", "cancelled")
+    .eq("admin_notes", REDEEM_AWAITING_ADMIN)
+    .limit(1)
+    .maybeSingle();
+
+  if (waitingApproval) {
+    return { error: "Your redeem is waiting for admin approval. The cashout is not sent yet." };
+  }
+
   const { data: pending } = await supabase
     .from("game_load_requests")
     .select("id")
@@ -500,15 +613,38 @@ export async function requestGameRedeem(input: {
     return { error: error.message };
   }
 
-  const fulfillResult = await autoFulfillGameRequest(input.gameSlug, requestId as string, "redeem", {
-    userId: user.id,
-    gameUsername: input.gameUsername.trim(),
-    amount: redeemAll ? null : input.amount,
-  });
-  if (fulfillResult && !fulfillResult.success && fulfillResult.error) {
-    revalidatePath(`/games/${input.gameSlug}`);
-    revalidatePath("/admin/game-loads");
-    return { error: fulfillResult.error, requestId: requestId as string };
+  const admin = createAdminClient();
+  if (!admin) {
+    return { error: "Could not hold this redeem for admin approval.", requestId: requestId as string };
+  }
+
+  const { data: held, error: holdError } = await admin
+    .from("game_load_requests")
+    .update({
+      status: "cancelled",
+      admin_notes: REDEEM_AWAITING_ADMIN,
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requestId as string)
+    .eq("status", "pending")
+    .select("id")
+    .maybeSingle();
+
+  if (holdError || !held) {
+    await admin
+      .from("game_load_requests")
+      .update({
+        status: "failed",
+        error_message: "Redeem was not held for admin approval.",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", requestId as string)
+      .eq("status", "pending");
+    return {
+      error: holdError?.message || "Could not hold this redeem for admin approval.",
+      requestId: requestId as string,
+    };
   }
 
   revalidatePath(`/games/${input.gameSlug}`);
@@ -835,6 +971,116 @@ export async function getAdminPanelUrlForGame(gameSlug: string) {
   }
 
   return { error: "No admin panel configured for this game" };
+}
+
+async function requireAdminUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" as const, supabase, user: null };
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") return { error: "Unauthorized" as const, supabase, user: null };
+  return { error: null, supabase, user };
+}
+
+/** Release a held redeem so the game bot can send the cashout. */
+export async function adminApproveRedeem(requestId: string) {
+  const auth = await requireAdminUser();
+  if (auth.error || !auth.user) return { error: auth.error || "Unauthorized" };
+
+  const admin = createAdminClient();
+  if (!admin) return { error: "Server configuration error." };
+
+  const { data: existing } = await admin
+    .from("game_load_requests")
+    .select("id, user_id, game_name, amount, redeem_all, load_type, status, admin_notes")
+    .eq("id", requestId)
+    .maybeSingle();
+
+  if (!existing || !isRedeemAwaitingAdmin(existing)) {
+    return { error: "This redeem is not waiting for approval." };
+  }
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("kyc_status")
+    .eq("id", existing.user_id)
+    .maybeSingle();
+  const kyc = profile?.kyc_status ?? "unverified";
+  if (kyc !== "approved" && kyc !== "verified") {
+    return { error: "Approve their ID on KYC Review before you approve this cashout." };
+  }
+
+  const { data: released, error } = await admin
+    .from("game_load_requests")
+    .update({
+      status: "pending",
+      admin_notes: "Admin approved cashout",
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requestId)
+    .eq("admin_notes", REDEEM_AWAITING_ADMIN)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !released) return { error: error?.message || "Could not approve this cashout." };
+
+  await createNotification(
+    existing.user_id,
+    `${existing.game_name} cashout approved`,
+    existing.redeem_all
+      ? "An admin approved your redeem. The cashout is being sent to your Deposit Redeem wallet."
+      : `An admin approved your $${Number(existing.amount).toFixed(2)} redeem. The cashout is being sent to your Deposit Redeem wallet.`,
+    "success"
+  );
+
+  revalidatePath("/admin/game-loads");
+  revalidatePath("/admin/payouts");
+  return { success: true };
+}
+
+export async function adminRejectRedeem(requestId: string) {
+  const auth = await requireAdminUser();
+  if (auth.error || !auth.user) return { error: auth.error || "Unauthorized" };
+
+  const admin = createAdminClient();
+  if (!admin) return { error: "Server configuration error." };
+
+  const { data: existing } = await admin
+    .from("game_load_requests")
+    .select("id, user_id, game_name, load_type, status, admin_notes")
+    .eq("id", requestId)
+    .maybeSingle();
+
+  if (!existing || !isRedeemAwaitingAdmin(existing)) {
+    return { error: "This redeem is not waiting for approval." };
+  }
+
+  const { error } = await admin
+    .from("game_load_requests")
+    .update({
+      status: "failed",
+      admin_notes: "Admin rejected cashout",
+      error_message: "An admin did not approve this redeem. The cashout was not sent.",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requestId)
+    .eq("admin_notes", REDEEM_AWAITING_ADMIN);
+
+  if (error) return { error: error.message };
+
+  await createNotification(
+    existing.user_id,
+    `${existing.game_name} redeem not approved`,
+    "An admin did not approve this redeem. The cashout was not sent.",
+    "warning"
+  );
+
+  revalidatePath("/admin/game-loads");
+  return { success: true };
 }
 
 export async function adminUpdateGameLoadStatus(

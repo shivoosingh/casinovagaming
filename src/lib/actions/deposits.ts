@@ -6,6 +6,7 @@ import { getActivePaymentMethods } from "@/lib/data/payments";
 import { getDepositMethod, type DepositPaymentMethodId } from "@/lib/payments/methods";
 import { notifyAdminOfDeposit } from "@/lib/telegram/notify-admin-deposit";
 import { createNotification } from "@/lib/actions/notifications";
+import { awardDepositRewards } from "@/lib/rewards/deposit-rewards";
 import type { RequestStatus } from "@/types/database";
 
 export interface DepositRequestRow {
@@ -177,6 +178,16 @@ export async function updateDepositStatus(
       `$${amount.toFixed(2)} has been added to your Total Deposit wallet (${existing.game_name} · ${methodLabel}).`,
       "success"
     );
+
+    try {
+      await awardDepositRewards(supabase, {
+        userId: existing.user_id,
+        amount,
+        depositId,
+      });
+    } catch (rewardError) {
+      console.error("[deposit] rewards:", rewardError);
+    }
   } else {
     const update: Record<string, string | null> = { status };
     if (adminNotes?.trim()) update.admin_notes = adminNotes.trim();

@@ -1,14 +1,16 @@
 /**
  * CashFrenzy777 Direct REST API Client
  *
- * Official API Integration for agentserver.cashfrenzy777.com:
- * 1. Store Login (POST /api/agent/login)
- * 2. Get player list (GET /api/player/playerList)
- * 3. Add player (POST /api/player/insertPlayer)
- * 4. Get player scores (GET /api/player/getScore)
- * 5. Player recharge (POST /api/player/playerRecharge)
- * 6. Player withdrawal (POST /api/player/playerWithdraw)
+ * Official API Integration for agentserver.cashfrenzy777.com.
+ * Must exit via whitelisted proxy on Vercel.
  */
+
+import {
+  buildMultipart,
+  httpsViaProxy,
+  parseApiJson,
+  resolveGameProxyUrl,
+} from "./proxy-http";
 
 export interface CashFrenzyLoginResponse {
   status_code: number;
@@ -90,16 +92,20 @@ export interface CashFrenzyApiConfig {
   baseUrl?: string;
   username?: string;
   password?: string;
+  proxyUrl?: string;
 }
 
-export interface ApiRequestOptions extends RequestInit {
+type ApiRequestOptions = {
+  method?: "GET" | "POST";
+  form?: Record<string, string | number>;
   _isRetry?: boolean;
-}
+};
 
 export class CashFrenzyApiClient {
   private baseUrl: string;
   private agentUsername: string;
   private agentPassword: string;
+  private proxyUrl?: string;
   private token: string | null = null;
   private expiresTime: number | null = null;
 
@@ -122,6 +128,9 @@ export class CashFrenzyApiClient {
       process.env.CASHFRENZY_AGENT_PASSWORD ||
       process.env.CASHFRENZY_PASSWORD ||
       "Fun@123@";
+
+    this.proxyUrl =
+      config.proxyUrl || resolveGameProxyUrl("CASHFRENZY_PROXY_URL", "MRALLINONE_PROXY_URL");
   }
 
   private async ensureAuthenticated(): Promise<string> {
@@ -132,45 +141,43 @@ export class CashFrenzyApiClient {
     return this.login();
   }
 
-  private buildFormData(params: Record<string, string | number>): FormData {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(params)) {
-      formData.append(key, String(value));
-    }
-    return formData;
-  }
-
   private async request<T>(
     endpoint: string,
     options: ApiRequestOptions = {},
     requiresAuth = true
   ): Promise<T> {
+    const method = options.method || (options.form ? "POST" : "GET");
     const url = `${this.baseUrl}${endpoint}`;
-    const headers: Record<string, string> = {
-      ...(options.headers as Record<string, string>),
-    };
+    const headers: Record<string, string> = {};
 
     if (requiresAuth) {
-      const token = await this.ensureAuthenticated();
-      headers["Authorization"] = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${await this.ensureAuthenticated()}`;
     }
 
-    const res = await fetch(url, {
-      ...options,
+    let bodyBuffer: Buffer | null = null;
+    if (options.form) {
+      const fields: Record<string, string> = {};
+      for (const [k, v] of Object.entries(options.form)) fields[k] = String(v);
+      const multipart = buildMultipart(fields);
+      headers["Content-Type"] = `multipart/form-data; boundary=${multipart.boundary}`;
+      bodyBuffer = multipart.body;
+    }
+
+    const { text, statusCode } = await httpsViaProxy(
+      method,
+      url,
       headers,
-    });
+      bodyBuffer,
+      this.proxyUrl,
+      20000,
+      "CashFrenzy API"
+    );
+    const json = parseApiJson(text, statusCode, "CashFrenzy API");
 
-    let json: any;
-    try {
-      json = await res.json();
-    } catch (e) {
-      throw new Error(`Invalid JSON response from CashFrenzy API (${res.status} ${res.statusText})`);
-    }
-
-    const statusCode = json.status_code ?? json.code ?? res.status;
-    if (statusCode !== 200) {
-      const errorMsg = json.message || json.msg || `API call failed with status ${statusCode}`;
-      if (statusCode === 401 && requiresAuth && !options._isRetry) {
+    const code = json.status_code ?? json.code ?? statusCode;
+    if (code !== 200) {
+      const errorMsg = json.message || json.msg || `API call failed with status ${code}`;
+      if (code === 401 && requiresAuth && !options._isRetry) {
         this.token = null;
         this.expiresTime = null;
         return this.request<T>(endpoint, { ...options, _isRetry: true }, true);
@@ -182,6 +189,12 @@ export class CashFrenzyApiClient {
   }
 
   async login(username?: string, password?: string): Promise<string> {
+    await this.getAgentBalance(username, password);
+    if (!this.token) throw new Error("Store login failed: no token returned");
+    return this.token;
+  }
+
+  async getAgentBalance(username?: string, password?: string): Promise<number> {
     const user = username || this.agentUsername;
     const pass = password || this.agentPassword;
 
@@ -189,8 +202,11 @@ export class CashFrenzyApiClient {
       throw new Error("CashFrenzy agent credentials missing.");
     }
 
-    const body = this.buildFormData({ username: user, password: pass });
-    const res = await this.request<CashFrenzyLoginResponse>("/api/agent/login", { method: "POST", body }, false);
+    const res = await this.request<CashFrenzyLoginResponse>(
+      "/api/agent/login",
+      { method: "POST", form: { username: user, password: pass } },
+      false
+    );
 
     if (!res.data?.token) {
       throw new Error(res.message || "Store login failed: no token returned");
@@ -198,7 +214,7 @@ export class CashFrenzyApiClient {
 
     this.token = res.data.token;
     this.expiresTime = res.data.expires_time || Math.floor(Date.now() / 1000) + 3600;
-    return this.token;
+    return parseFloat(String(res.data.money ?? "0")) || 0;
   }
 
   async getPlayerList(limit: number = 50, page: number = 1): Promise<CashFrenzyPlayerListResponse> {
@@ -241,14 +257,15 @@ export class CashFrenzyApiClient {
     let cleanNick = (nickname && nickname !== "-" ? nickname : cleanUser).replace(/[^a-zA-Z0-9]/g, "").slice(0, 20);
     if (!cleanNick) cleanNick = "User" + Math.floor(1000 + Math.random() * 9000);
 
-    const body = this.buildFormData({
-      username: cleanUser,
-      nickname: cleanNick,
-      password: String(password).trim(),
-      money: String(money),
+    return this.request<CashFrenzyAddPlayerResponse>("/api/player/insertPlayer", {
+      method: "POST",
+      form: {
+        username: cleanUser,
+        nickname: cleanNick,
+        password: String(password).trim(),
+        money: String(money),
+      },
     });
-
-    return this.request<CashFrenzyAddPlayerResponse>("/api/player/insertPlayer", { method: "POST", body });
   }
 
   async getPlayerScore(idOrAccount: string | number): Promise<CashFrenzyGetScoreResponse> {
@@ -265,8 +282,10 @@ export class CashFrenzyApiClient {
     const id = await this.resolvePlayerId(idOrAccount);
     const cleanRemark = (remark || "webrecharge").replace(/[^a-zA-Z0-9]/g, "").slice(0, 50) || "webrecharge";
 
-    const body = this.buildFormData({ id, balance: String(balance), remark: cleanRemark });
-    return this.request<CashFrenzyRechargeResponse>("/api/player/playerRecharge", { method: "POST", body });
+    return this.request<CashFrenzyRechargeResponse>("/api/player/playerRecharge", {
+      method: "POST",
+      form: { id, balance: String(balance), remark: cleanRemark },
+    });
   }
 
   async withdrawPlayer(
@@ -277,8 +296,10 @@ export class CashFrenzyApiClient {
     const id = await this.resolvePlayerId(idOrAccount);
     const cleanRemark = (remark || "webwithdraw").replace(/[^a-zA-Z0-9]/g, "").slice(0, 50) || "webwithdraw";
 
-    const body = this.buildFormData({ id, balance: String(balance), remark: cleanRemark });
-    return this.request<CashFrenzyWithdrawResponse>("/api/player/playerWithdraw", { method: "POST", body });
+    return this.request<CashFrenzyWithdrawResponse>("/api/player/playerWithdraw", {
+      method: "POST",
+      form: { id, balance: String(balance), remark: cleanRemark },
+    });
   }
 }
 

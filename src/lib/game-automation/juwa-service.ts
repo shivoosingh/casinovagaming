@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isAccountNameTakenError, nextAvailableAccountName } from "./account-username";
 import { JuwaApiClient } from "./juwa-api";
 
 export interface AutoFulfillJuwaOptions {
@@ -23,6 +24,23 @@ export interface AutoFulfillJuwaResult {
   rawResponse?: any;
 }
 
+async function addJuwaUserWithRetry(client: JuwaApiClient, accountName: string, password: string) {
+  let candidate = nextAvailableAccountName(accountName, 0);
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    if (attempt > 0) candidate = nextAvailableAccountName(accountName, attempt);
+    try {
+      return await client.addUser(candidate, password);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      lastError = err instanceof Error ? err : new Error(message);
+      if (!isAccountNameTakenError(message)) throw lastError;
+      console.log(`[Juwa Service] "${candidate}" already exists — trying another login`);
+    }
+  }
+  throw lastError ?? new Error("Juwa account name already exists");
+}
+
 export async function autoFulfillJuwaRequest(
   options: AutoFulfillJuwaOptions
 ): Promise<AutoFulfillJuwaResult> {
@@ -36,9 +54,7 @@ export async function autoFulfillJuwaRequest(
     if (loadType === "create_account") {
       console.log(`[Juwa Service] Processing create_account for account: "${cleanAccount}"`);
       const passToUse = password?.trim() || `Pass_${Math.floor(1000 + Math.random() * 9000)}`;
-
-      // 1. Call addUser on Juwa External API
-      const created = await client.addUser(cleanAccount, passToUse);
+      const created = await addJuwaUserWithRetry(client, cleanAccount, passToUse);
       console.log(`[Juwa Service] addUser success | userId: ${created.userId} | accountName: ${created.accountName}`);
 
       // 2. Update Database row to completed

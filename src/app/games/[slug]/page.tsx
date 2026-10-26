@@ -10,6 +10,7 @@ import { getMyGameAccount } from "@/lib/actions/game-loads";
 import { getActivePaymentMethods } from "@/lib/data/payments";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 interface GamePageProps {
   params: Promise<{ slug: string }>;

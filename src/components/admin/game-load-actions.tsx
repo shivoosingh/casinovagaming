@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminUpdateGameLoadStatus, getAdminPanelUrlForGame } from "@/lib/actions/game-loads";
+import { adminApproveRedeem, adminRejectRedeem, adminUpdateGameLoadStatus, getAdminPanelUrlForGame } from "@/lib/actions/game-loads";
+import { isRedeemAwaitingAdmin } from "@/lib/wallet/redeem-approval";
 import { toast } from "sonner";
 import type { GameLoadRequest } from "@/lib/game-automation/types";
 
@@ -38,12 +39,46 @@ export function GameLoadActions({ load }: GameLoadActionsProps) {
     setBusy(false);
   }
 
+  async function decide(action: "approve" | "reject") {
+    setBusy(true);
+    const result = action === "approve" ? await adminApproveRedeem(load.id) : await adminRejectRedeem(load.id);
+    if (result.error) toast.error(result.error);
+    else toast.success(action === "approve" ? "Approved. The cashout is now being sent." : "Redeem rejected. No cashout was sent.");
+    router.refresh();
+    setBusy(false);
+  }
+
+  if (isRedeemAwaitingAdmin(load)) {
+    return (
+      <div className="flex w-full max-w-sm flex-col gap-2">
+        <p className="text-xs text-amber-300">KYC is not enough. Approve this to send the cashout.</p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            disabled={busy}
+            onClick={() => void decide("approve")}
+          >
+            Approve cashout
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={busy}
+            onClick={() => void decide("reject")}
+          >
+            Reject
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (load.status === "completed" || load.status === "cancelled") {
     return null;
   }
 
   return (
-    <div className="flex flex-col gap-2 min-w-[180px]">
+    <div className="flex w-full max-w-sm flex-col gap-2">
       <Button size="sm" variant="outline" onClick={openPanel} disabled={busy}>
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
         Open {load.game_name} panel

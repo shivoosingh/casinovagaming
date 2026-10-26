@@ -6,9 +6,9 @@ export function AdminLayoutSkeleton() {
   const groups = ["Insights", "People", "Economy", "Content", "Operations"];
 
   return (
-    <div className="relative flex min-h-dvh bg-[#09090F] text-[#F5F3FF]">
+    <div className="admin-shell relative flex min-h-dvh w-full max-w-[100dvw] overflow-x-clip bg-[#09090F] text-[#F5F3FF]">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-violet-500/20 bg-[rgba(12,10,22,0.92)] lg:flex">
-        <div className="flex items-center gap-2 border-b border-violet-500/20 px-4 py-4">
+        <div className="flex min-w-0 items-center gap-2 border-b border-violet-500/20 px-4 py-4">
           <AnimatedLogo textClassName="text-sm" imageSize={28} />
           <Badge variant="purple">Admin</Badge>
         </div>
@@ -26,18 +26,18 @@ export function AdminLayoutSkeleton() {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 border-b border-violet-500/20 bg-[#09090F]/90">
-          <div className="flex h-14 items-center gap-3 px-4 sm:h-16 sm:px-6">
-            <div className="h-9 w-9 animate-pulse rounded-lg bg-white/[0.06] lg:hidden" />
-            <div className="h-4 w-32 animate-pulse rounded bg-white/[0.06]" />
-            <div className="ml-auto h-9 w-9 animate-pulse rounded-full bg-white/[0.06]" />
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
+        <header className="sticky top-0 z-10 border-b border-violet-500/20 bg-[#09090F]/90 pt-[env(safe-area-inset-top)]">
+          <div className="flex h-14 min-w-0 items-center gap-3 px-3 sm:h-16 sm:px-6">
+            <div className="h-9 w-9 shrink-0 animate-pulse rounded-lg bg-white/[0.06] lg:hidden" />
+            <div className="h-4 w-24 max-w-[40%] animate-pulse rounded bg-white/[0.06] sm:w-32" />
+            <div className="ml-auto h-9 w-9 shrink-0 animate-pulse rounded-full bg-white/[0.06]" />
           </div>
         </header>
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="space-y-6 animate-pulse">
-            <div className="h-10 w-56 rounded-lg bg-white/[0.06]" />
-            <div className="h-4 w-80 max-w-full rounded bg-white/[0.04]" />
+        <main className="min-w-0 flex-1 overflow-x-clip px-3 py-6 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl space-y-6 animate-pulse">
+            <div className="h-10 w-40 max-w-full rounded-lg bg-white/[0.06] sm:w-56" />
+            <div className="h-4 w-full max-w-md rounded bg-white/[0.04]" />
             <div className="h-72 rounded-xl bg-white/[0.04]" />
           </div>
         </main>

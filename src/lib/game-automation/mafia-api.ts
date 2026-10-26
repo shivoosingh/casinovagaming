@@ -1,14 +1,11 @@
 /**
  * Mafia Direct REST API Client
  *
- * Official API Integration for agentserver.mafia77777.com:
- * 1. Agent Login (POST /api/agent/login)
- * 2. Get player list (GET /api/player/playerList)
- * 3. Add player (POST /api/player/insertPlayer)
- * 4. Get player scores (GET /api/player/getScore)
- * 5. Player recharge (POST /api/player/playerRecharge)
- * 6. Player withdrawal (POST /api/player/playerWithdraw)
+ * Official API Integration for agentserver.mafia77777.com.
+ * Must exit via whitelisted proxy on Vercel.
  */
+
+import { httpsViaProxy, parseApiJson, resolveGameProxyUrl } from "./proxy-http";
 
 export interface MafiaLoginResponse {
   status_code: number;
@@ -80,12 +77,14 @@ export interface MafiaConfig {
   baseUrl?: string;
   username?: string;
   password?: string;
+  proxyUrl?: string;
 }
 
 export class MafiaApiClient {
   private baseUrl: string;
   private username: string;
   private password: string;
+  private proxyUrl?: string;
   private token: string | null = null;
   private tokenExpiresAt: number = 0;
 
@@ -105,6 +104,38 @@ export class MafiaApiClient {
       config.password ||
       process.env.MAFIA_AGENT_PASSWORD ||
       "Reset123@";
+
+    this.proxyUrl = config.proxyUrl || resolveGameProxyUrl("MAFIA_PROXY_URL", "MRALLINONE_PROXY_URL");
+  }
+
+  private async requestJson<T>(
+    method: "GET" | "POST",
+    path: string,
+    body?: Record<string, unknown>,
+    requiresAuth = true
+  ): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (requiresAuth) {
+      headers.Authorization = `Bearer ${await this.getValidToken()}`;
+    }
+
+    let bodyBuffer: Buffer | null = null;
+    if (body) {
+      const raw = JSON.stringify(body);
+      headers["Content-Type"] = "application/json";
+      bodyBuffer = Buffer.from(raw, "utf8");
+    }
+
+    const { text, statusCode } = await httpsViaProxy(
+      method,
+      `${this.baseUrl}${path}`,
+      headers,
+      bodyBuffer,
+      this.proxyUrl,
+      20000,
+      "Mafia API"
+    );
+    return parseApiJson(text, statusCode, "Mafia API") as T;
   }
 
   public async getValidToken(): Promise<string> {
@@ -112,47 +143,35 @@ export class MafiaApiClient {
     if (this.token && this.tokenExpiresAt > now + 60) {
       return this.token;
     }
+    await this.getAgentBalance();
+    if (!this.token) throw new Error("Mafia login authentication failed: no token");
+    return this.token;
+  }
 
-    const loginUrl = `${this.baseUrl}/api/agent/login`;
-    const res = await fetch(loginUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: this.username,
-        password: this.password,
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Mafia login request failed (${res.status} ${res.statusText})`);
-    }
-
-    const json: MafiaLoginResponse = await res.json();
+  public async getAgentBalance(): Promise<number> {
+    const now = Math.floor(Date.now() / 1000);
+    const json = await this.requestJson<MafiaLoginResponse>(
+      "POST",
+      "/api/agent/login",
+      { username: this.username, password: this.password },
+      false
+    );
     if (json.status_code !== 200 || !json.data?.token) {
       throw new Error(`Mafia login authentication failed: ${json.message || "Unknown error"}`);
     }
 
     this.token = json.data.token;
     this.tokenExpiresAt = json.data.expires_time || now + 3600;
-    return this.token;
+    return parseFloat(String(json.data.money ?? "0")) || 0;
   }
 
   public async getPlayerList(page = 1, limit = 50, searchAccount?: string): Promise<MafiaPlayer[]> {
-    const token = await this.getValidToken();
-    let url = `${this.baseUrl}/api/player/playerList?page=${page}&limit=${limit}`;
+    let path = `/api/player/playerList?page=${page}&limit=${limit}`;
     if (searchAccount?.trim()) {
-      url += `&account=${encodeURIComponent(searchAccount.trim())}`;
+      path += `&account=${encodeURIComponent(searchAccount.trim())}`;
     }
 
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Mafia getPlayerList HTTP error ${res.status}`);
-    }
-
-    const json: MafiaPlayerListResponse = await res.json();
+    const json = await this.requestJson<MafiaPlayerListResponse>("GET", path);
     if (json.status_code !== 200) {
       throw new Error(`Mafia getPlayerList error: ${json.message}`);
     }
@@ -182,26 +201,10 @@ export class MafiaApiClient {
   }
 
   public async createAccount(account: string, pass: string): Promise<{ id: number; account: string; pass: string }> {
-    const token = await this.getValidToken();
-    const url = `${this.baseUrl}/api/player/insertPlayer`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: account,
-        password: pass,
-      }),
+    const json = await this.requestJson<MafiaAddPlayerResponse>("POST", "/api/player/insertPlayer", {
+      username: account,
+      password: pass,
     });
-
-    if (!res.ok) {
-      throw new Error(`Mafia createAccount HTTP error ${res.status}`);
-    }
-
-    const json: MafiaAddPlayerResponse = await res.json();
     if (json.status_code !== 200) {
       throw new Error(`Mafia createAccount error: ${json.message}`);
     }
@@ -219,31 +222,14 @@ export class MafiaApiClient {
   public async rechargePlayer(account: string, amount: number): Promise<{ game_id: number; balance: number }> {
     let player = await this.findPlayerByAccount(account);
     if (!player) {
-      // If player doesn't exist, create it!
       const created = await this.createAccount(account, "123123");
       player = { id: created.id, Account: created.account } as MafiaPlayer;
     }
 
-    const token = await this.getValidToken();
-    const url = `${this.baseUrl}/api/player/playerRecharge`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: player.id,
-        balance: String(amount),
-      }),
+    const json = await this.requestJson<MafiaRechargeResponse>("POST", "/api/player/playerRecharge", {
+      id: player.id,
+      balance: String(amount),
     });
-
-    if (!res.ok) {
-      throw new Error(`Mafia rechargePlayer HTTP error ${res.status}`);
-    }
-
-    const json: MafiaRechargeResponse = await res.json();
     if (json.status_code !== 200) {
       throw new Error(`Mafia rechargePlayer error: ${json.message}`);
     }
@@ -260,26 +246,10 @@ export class MafiaApiClient {
       throw new Error(`Player ${account} not found on Mafia agent panel`);
     }
 
-    const token = await this.getValidToken();
-    const url = `${this.baseUrl}/api/player/playerWithdraw`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: player.id,
-        balance: String(amount),
-      }),
+    const json = await this.requestJson<MafiaWithdrawResponse>("POST", "/api/player/playerWithdraw", {
+      id: player.id,
+      balance: String(amount),
     });
-
-    if (!res.ok) {
-      throw new Error(`Mafia withdrawPlayer HTTP error ${res.status}`);
-    }
-
-    const json: MafiaWithdrawResponse = await res.json();
     if (json.status_code !== 200) {
       throw new Error(`Mafia withdrawPlayer error: ${json.message}`);
     }

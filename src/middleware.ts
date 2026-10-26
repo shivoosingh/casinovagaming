@@ -14,6 +14,6 @@ export const config = {
     "/register",
     "/reset-password",
     "/reset-password/update",
-    "/auth/callback",
+    // /auth/callback intentionally excluded — it sets cookies / handles hash tokens itself
   ],
 };

@@ -100,8 +100,41 @@ export function CrmPlayersPanel({
       </div>
 
       <div className={cn(CARD, pending && "opacity-60")}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+        <div className="divide-y divide-white/[0.04] md:hidden">
+          {data.rows.length === 0 ? (
+            <p className="px-4 py-10 text-center text-sm text-slate-400">No players in this segment.</p>
+          ) : (
+            data.rows.map(({ profile: p, deposits: stats }) => (
+              <Link
+                key={p.id}
+                href={`/admin/users?userId=${p.id}`}
+                className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-violet-500/10"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-white">
+                    {p.full_name || p.email}
+                    {p.is_suspended && (
+                      <Badge className="ml-2 bg-red-500/20 text-xs text-red-300">Suspended</Badge>
+                    )}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">{p.email}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                    <Badge className="bg-violet-500/15 capitalize text-violet-200">
+                      {tierLabel(p.vip_tier)}
+                    </Badge>
+                    <span>Seen {p.last_seen_at ? relativeTime(p.last_seen_at) : "never"}</span>
+                  </div>
+                </div>
+                <p className="shrink-0 font-semibold tabular-nums text-emerald-300">
+                  ${Number(p.wallet_balance).toLocaleString()}
+                </p>
+              </Link>
+            ))
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-violet-500/20 text-[11px] uppercase tracking-wider text-violet-300/70">
               <tr>
                 <th className="px-4 py-3 font-bold">Player</th>

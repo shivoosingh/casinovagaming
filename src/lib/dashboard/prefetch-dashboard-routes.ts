@@ -13,6 +13,9 @@ const DASHBOARD_ROUTES = [
   "/spin",
   "/dashboard/vip",
   "/dashboard/referrals",
+  "/dashboard/kyc",
+  "/dashboard/daily",
+  "/dashboard/security",
   "/dashboard/reviews",
   "/dashboard/deposits",
 ];

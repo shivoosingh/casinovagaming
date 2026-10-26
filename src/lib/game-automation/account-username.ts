@@ -38,6 +38,18 @@ export function ensureGameAccountUsername(
   return `${u}${randomDigitSuffix(need)}`.slice(0, maxLen);
 }
 
+/** Juwa / Vegas reject a second create with the same login. Try a new 4-digit ending. */
+export function isAccountNameTakenError(message: string): boolean {
+  return /code 20\b|account name already exists|user already exists|already exists/i.test(message);
+}
+
+export function nextAvailableAccountName(base: string, attempt: number, maxLen = 13): string {
+  const clean = base.replace(/[^a-zA-Z0-9_]/g, "").slice(0, maxLen) || "player";
+  if (attempt <= 0) return clean;
+  const suffix = randomDigitSuffix(4);
+  return `${clean.slice(0, Math.max(1, maxLen - suffix.length))}${suffix}`;
+}
+
 export function isLayuiPanelGame(slug: string): boolean {
   return (
     slug === "gameroom" ||

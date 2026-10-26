@@ -323,7 +323,13 @@ export class MrAllInOneApiClient {
     try {
       json = JSON.parse(cleaned);
     } catch {
-      throw new Error(`Invalid JSON from MR All-in-One API (HTTP ${statusCode}): ${text.slice(0, 200)}`);
+      const snippet = text.replace(/\s+/g, " ").trim().slice(0, 160);
+      if (statusCode === 502 || /502\s*Bad Gateway/i.test(text)) {
+        throw new Error(
+          "MR All-in-One provider is temporarily down (502 Bad Gateway). Retry in a minute."
+        );
+      }
+      throw new Error(`MR All-in-One returned non-JSON (HTTP ${statusCode}): ${snippet}`);
     }
 
     const code = json.status_code ?? json.code ?? statusCode;
@@ -341,6 +347,13 @@ export class MrAllInOneApiClient {
   }
 
   async login(username?: string, password?: string): Promise<string> {
+    await this.getAgentBalance(username, password);
+    if (!this.token) throw new Error("Store login failed: no token returned");
+    return this.token;
+  }
+
+  /** Fresh agent store balance from login response (`data.money`). */
+  async getAgentBalance(username?: string, password?: string): Promise<number> {
     const user = username || this.agentUsername;
     const pass = password || this.agentPassword;
     if (!user || !pass) {
@@ -360,7 +373,7 @@ export class MrAllInOneApiClient {
 
     this.token = res.data.token;
     this.expiresTime = res.data.expires_time || Math.floor(Date.now() / 1000) + 3600;
-    return this.token;
+    return parseFloat(String(res.data.money ?? "0")) || 0;
   }
 
   async getPlayerList(

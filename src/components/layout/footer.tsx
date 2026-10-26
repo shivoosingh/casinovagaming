@@ -14,6 +14,8 @@ const footerLinks = {
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact" },
     { href: "/support", label: "Support" },
+    { href: "/help", label: "Help Center" },
+    { href: "/responsible-play", label: "Responsible Play" },
   ],
   Account: [
     { href: "/login", label: "Login" },

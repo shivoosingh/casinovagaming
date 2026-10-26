@@ -242,9 +242,7 @@ export function HomeLandingShell({
         <LazyWhenVisible placeholder={<Placeholder />}>
           <PublicReviewsSection />
         </LazyWhenVisible>
-        <LazyWhenVisible placeholder={<Placeholder />}>
-          <FaqSection />
-        </LazyWhenVisible>
+        <FaqSection />
 
         {belowFold ? <div className="space-y-10 py-4">{belowFold}</div> : null}
       </div>

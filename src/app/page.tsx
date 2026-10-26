@@ -1,3 +1,4 @@
+import { HomeFaqSchema, HomeGamesItemListSchema } from "@/lib/seo/json-ld";
 import { HomeLandingShell } from "@/components/home/home-landing-shell";
 import { HeroStatic } from "@/components/home/hero-static";
 import { HomeIntroGate } from "@/components/home/casinova-intro";
@@ -9,16 +10,20 @@ export default async function HomePage() {
   const posts = await getLatestBlogPosts(6);
 
   return (
-    <HomeIntroGate>
-      <HomeLandingShell
-        hero={<HeroStatic />}
-        belowFold={
-          <>
-            <PlayByStateSection />
-            <HomeGuides posts={posts} />
-          </>
-        }
-      />
-    </HomeIntroGate>
+    <>
+      <HomeGamesItemListSchema />
+      <HomeFaqSchema />
+      <HomeIntroGate>
+        <HomeLandingShell
+          hero={<HeroStatic />}
+          belowFold={
+            <>
+              <PlayByStateSection />
+              <HomeGuides posts={posts} />
+            </>
+          }
+        />
+      </HomeIntroGate>
+    </>
   );
 }

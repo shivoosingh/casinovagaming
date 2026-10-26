@@ -26,8 +26,10 @@ import {
   getDepositRolloverForGame,
   healStaleGameLoads,
   cancelMyGameLoad,
+  previewDepositLoadBonus,
 } from "@/lib/actions/game-loads";
 import type { Game } from "@/lib/games";
+import { isRedeemAwaitingAdmin } from "@/lib/wallet/redeem-approval";
 import { GAME_BONUS_RULES } from "@/lib/games";
 import type { GameLoadRequest } from "@/lib/game-automation/types";
 import { isAutomatedGameSlug } from "@/lib/game-automation/types";
@@ -41,6 +43,7 @@ import { previewJuwaUsername } from "@/lib/game-automation/juwa-credentials";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { toast } from "sonner";
 import type { DepositRolloverBounds } from "@/lib/wallet/deposit-redeem-rollover";
+import { depositBonusPlayerMessage, roundLoadDollars } from "@/lib/wallet/deposit-load-bonus";
 import { WALLET_REFRESH_EVENT } from "@/lib/wallet/use-live-wallet";
 
 interface GameWalletLoadSectionProps {
@@ -88,6 +91,7 @@ export function GameWalletLoadSection({
   const [showPassword, setShowPassword] = useState(false);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [depositRollover, setDepositRollover] = useState<DepositRolloverBounds | null>(null);
+  const [loadBonusMessage, setLoadBonusMessage] = useState<string | null>(null);
   const failedToastRef = useRef<string | null>(null);
   const pendingJobIdsRef = useRef<Set<string>>(new Set());
   const failedToastShownRef = useRef<Set<string>>(new Set());
@@ -246,7 +250,9 @@ export function GameWalletLoadSection({
       (l.status === "pending" || l.status === "processing")
   );
   const pendingRedeem = recentLoads.some(
-    (l) => l.load_type === "redeem" && (l.status === "pending" || l.status === "processing")
+    (l) =>
+      l.load_type === "redeem" &&
+      (l.status === "pending" || l.status === "processing" || isRedeemAwaitingAdmin(l))
   );
   const pendingCheck = recentLoads.some(
     (l) => l.load_type === "check_balance" && (l.status === "pending" || l.status === "processing")
@@ -286,6 +292,21 @@ export function GameWalletLoadSection({
 
   const available = walletBalance;
   const parsedAmount = parseFloat(amount) || 0;
+
+  useEffect(() => {
+    const rounded = roundLoadDollars(parsedAmount);
+    if (rounded < WALLET_LOAD_LIMITS.min) {
+      setLoadBonusMessage(null);
+      return;
+    }
+    let cancelled = false;
+    void previewDepositLoadBonus(parsedAmount).then((plan) => {
+      if (!cancelled) setLoadBonusMessage(plan?.playerMessage ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [parsedAmount, recentLoads]);
   const previewStem = previewJuwaUsername(requesterName, requesterEmail);
   const usesNumberedAccounts =
     game.slug === "game-vault" || game.slug === "cash-frenzy" || game.slug === "vegas-sweeps";
@@ -435,11 +456,12 @@ export function GameWalletLoadSection({
       toast.error("Create your account first");
       return;
     }
-    if (parsedAmount < WALLET_LOAD_LIMITS.min || parsedAmount > WALLET_LOAD_LIMITS.max) {
+    const loadDollars = roundLoadDollars(parsedAmount);
+    if (loadDollars < WALLET_LOAD_LIMITS.min || loadDollars > WALLET_LOAD_LIMITS.max) {
       toast.error(`Enter $${WALLET_LOAD_LIMITS.min}–$${WALLET_LOAD_LIMITS.max}`);
       return;
     }
-    if (parsedAmount > available) {
+    if (loadDollars > available + 0.5) {
       toast.error("Not enough balance in selected wallet");
       return;
     }
@@ -455,7 +477,7 @@ export function GameWalletLoadSection({
 
     if (result.error) toast.error(result.error);
     else {
-      toast.success(`Load queued! $${parsedAmount.toFixed(2)} — bot will credit ${game.name} shortly.`);
+      toast.success(result.playerMessage || `$${loadDollars.toFixed(2)} is going into ${game.name}.`);
       void refreshWallet();
       void refreshLoads();
     }
@@ -515,8 +537,8 @@ export function GameWalletLoadSection({
     else {
       toast.success(
         redeemAll
-          ? `Redeem queued — bot will cash out your full game balance to your ${destLabel} wallet.`
-          : `Redeem queued! $${parsedRedeemAmount.toFixed(2)} will move to your ${destLabel} wallet.`
+          ? `Redeem requested. An admin must approve it before the full balance is sent to your ${destLabel} wallet.`
+          : `Redeem requested. An admin must approve it before $${parsedRedeemAmount.toFixed(2)} is sent to your ${destLabel} wallet.`
       );
       void refreshWallet();
       void refreshLoads();
@@ -540,6 +562,8 @@ export function GameWalletLoadSection({
       if (load.redeem_all) return "Redeem all";
       return `$${Number(load.amount).toFixed(2)} redeem`;
     }
+    const bonusNote = depositBonusPlayerMessage(load.admin_notes);
+    if (bonusNote) return bonusNote;
     return `$${Number(load.amount).toFixed(2)} load`;
   }
 
@@ -908,8 +932,15 @@ export function GameWalletLoadSection({
               Load Credits
             </p>
             <p className="text-sm text-[#6b6d8f]">
-              Load from your Total Deposit balance into {game.name}.
+              Load from your Total Deposit balance into {game.name}. A $4.99 deposit counts as $5.
+              The first deposit adds a 100% bonus in the game, the second adds 50%, and the third
+              deposit onward is the same amount you deposited.
             </p>
+            {loadBonusMessage && (
+              <p className="rounded-lg border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-3 py-2 text-sm text-white">
+                {loadBonusMessage}
+              </p>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
@@ -928,7 +959,7 @@ export function GameWalletLoadSection({
               <button
                 type="button"
                 onClick={handleLoad}
-                disabled={loading || pendingLoad || !savedAccount || available < WALLET_LOAD_LIMITS.min}
+                disabled={loading || pendingLoad || !savedAccount || roundLoadDollars(available) < WALLET_LOAD_LIMITS.min}
                 className="cyber-btn-load flex w-full sm:w-auto sm:min-w-[132px] items-center justify-center gap-2 rounded-xl px-6 py-3.5 sm:py-4 text-sm font-black uppercase tracking-wide disabled:opacity-50 shrink-0"
               >
                 {loading || pendingLoad ? (
@@ -1081,7 +1112,9 @@ export function GameWalletLoadSection({
               <div className="flex items-center justify-between gap-2">
                 <span
                   className={
-                    load.status === "failed"
+                    isRedeemAwaitingAdmin(load)
+                      ? "text-amber-300"
+                      : load.status === "failed"
                       ? "text-red-400"
                       : load.status === "completed"
                         ? "text-emerald-300"
@@ -1090,7 +1123,7 @@ export function GameWalletLoadSection({
                 >
                   {activityLabel(load)}
                   {" · "}
-                  {load.status}
+                  {isRedeemAwaitingAdmin(load) ? "waiting for admin" : load.status}
                 </span>
                 <span className="text-[#6b6d8f] shrink-0">
                   {formatRelativeTime(load.created_at)}

@@ -36,6 +36,20 @@ function getChatIds(channel: TelegramOutboundChannel): string[] {
   return channel === "promo" ? getPromoChatIds() : getAdminChatIds();
 }
 
+/**
+ * Blog posts only. Never falls back to the admin alert chat.
+ * Returns ids only when TELEGRAM_PROMO_CHAT_ID is a different chat.
+ */
+export function blogBroadcastChatIds(): string[] {
+  const raw = process.env.TELEGRAM_PROMO_CHAT_ID?.trim();
+  if (!raw) return [];
+  const admin = new Set(getAdminChatIds());
+  return raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id && !admin.has(id));
+}
+
 export function isTelegramConfigured(): boolean {
   return Boolean(getBotToken() && getAdminChatIds().length > 0);
 }
@@ -91,10 +105,10 @@ async function sendPhotoToChat(
 export async function sendTelegramPhoto(
   photoUrl: string,
   caption: string,
-  options?: { disableNotification?: boolean; channel?: TelegramOutboundChannel }
+  options?: { disableNotification?: boolean; channel?: TelegramOutboundChannel; chatIds?: string[] }
 ): Promise<{ ok: boolean; error?: string }> {
   const token = getBotToken();
-  const chatIds = getChatIds(options?.channel ?? "admin");
+  const chatIds = options?.chatIds ?? getChatIds(options?.channel ?? "admin");
 
   if (!token || chatIds.length === 0) {
     return { ok: false, error: "Telegram is not configured for this channel" };
@@ -149,10 +163,10 @@ async function sendToChat(
 
 export async function sendTelegramMessage(
   text: string,
-  options?: { disableNotification?: boolean; channel?: TelegramOutboundChannel }
+  options?: { disableNotification?: boolean; channel?: TelegramOutboundChannel; chatIds?: string[] }
 ): Promise<{ ok: boolean; error?: string }> {
   const token = getBotToken();
-  const chatIds = getChatIds(options?.channel ?? "admin");
+  const chatIds = options?.chatIds ?? getChatIds(options?.channel ?? "admin");
 
   if (!token || chatIds.length === 0) {
     return { ok: false, error: "Telegram is not configured for this channel" };

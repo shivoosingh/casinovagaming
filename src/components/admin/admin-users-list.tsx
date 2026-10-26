@@ -106,8 +106,54 @@ export function AdminUsersList({ users }: AdminUsersListProps) {
       </p>
 
       <div className={CARD}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+        {/* Mobile cards */}
+        <div className="divide-y divide-white/[0.04] md:hidden">
+          {visible.length === 0 ? (
+            <p className="px-4 py-10 text-center text-sm text-slate-400">No users match your search.</p>
+          ) : (
+            visible.map((user) => (
+              <button
+                key={user.id}
+                type="button"
+                className={cn(
+                  "flex w-full flex-col gap-2 px-4 py-3 text-left transition-colors hover:bg-violet-500/10",
+                  selectedUserId === user.id && "bg-violet-500/10"
+                )}
+                onClick={() => setSelectedUserId(user.id)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-white">
+                      {user.full_name || "Unnamed"}
+                      {user.is_suspended && (
+                        <Badge className="ml-2 bg-red-500/20 text-xs text-red-300">Suspended</Badge>
+                      )}
+                    </p>
+                    <p className="truncate text-xs text-slate-500">{user.email}</p>
+                  </div>
+                  <p className="shrink-0 font-semibold tabular-nums text-emerald-300">
+                    ${Number(user.wallet_balance ?? 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  <Badge className="bg-violet-500/15 capitalize text-violet-200">
+                    {tierLabel(user.vip_tier)}
+                  </Badge>
+                  <span>Seen {user.last_seen_at ? relativeTime(user.last_seen_at) : "never"}</span>
+                  {user.deposits && user.deposits.fulfilledCount > 0 && (
+                    <span className="text-emerald-400">
+                      ${user.deposits.totalDeposited.toLocaleString()} deposited
+                    </span>
+                  )}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-violet-500/20 text-[11px] uppercase tracking-wider text-violet-300/70">
               <tr>
                 <th className="px-4 py-3 font-bold">Player</th>

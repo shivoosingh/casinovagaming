@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import type { GameLoadRequest } from "@/lib/game-automation/types";
+import { isRedeemAwaitingAdmin } from "@/lib/wallet/redeem-approval";
 
 export interface AdminGameLoadRow extends GameLoadRequest {
   user?: { full_name?: string | null; email?: string } | null;
@@ -119,7 +120,7 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
       const userId = load.user_id;
       const existing = map.get(userId) ?? { count: 0, pending: 0, lastAt: null, totalLoaded: 0 };
       existing.count += 1;
-      if (load.status === "pending" || load.status === "processing") {
+      if (load.status === "pending" || load.status === "processing" || isRedeemAwaitingAdmin(load)) {
         existing.pending += 1;
       }
       if (!existing.lastAt || load.created_at > existing.lastAt) {
@@ -138,7 +139,9 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
 
   const pendingLoads = useMemo(
     () =>
-      depositLoads.filter((l) => l.status === "pending" || l.status === "processing").slice(0, 10),
+      depositLoads
+        .filter((l) => l.status === "pending" || l.status === "processing" || isRedeemAwaitingAdmin(l))
+        .slice(0, 10),
     [depositLoads]
   );
 
@@ -180,7 +183,7 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
         <div className={cn(CARD, "border-amber-400/30")}>
           <div className="flex items-center justify-between border-b border-amber-400/20 px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
-              Pending loads — needs action ({pendingLoads.length})
+              Pending loads and cashout approvals ({pendingLoads.length})
             </p>
             {live && (
               <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
@@ -273,8 +276,46 @@ export function AdminWalletLoadsPanels({ loads: initialLoads, users }: AdminWall
       </p>
 
       <div className={CARD}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+        <div className="divide-y divide-white/[0.04] md:hidden">
+          {visible.length === 0 ? (
+            <p className="px-4 py-10 text-center text-sm text-slate-400">No players match your filter.</p>
+          ) : (
+            visible.map((user) => {
+              const stats = loadStatsByUser.get(user.id);
+              return (
+                <button
+                  key={user.id}
+                  type="button"
+                  className={cn(
+                    "flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-violet-500/10",
+                    selectedUserId === user.id && "bg-violet-500/10",
+                    (stats?.pending ?? 0) > 0 && "bg-amber-400/5"
+                  )}
+                  onClick={() => setSelectedUserId(user.id)}
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-white">{user.full_name || "Unnamed"}</p>
+                    <p className="truncate text-xs text-slate-500">{user.email}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                      <span>{stats?.count ?? 0} loads</span>
+                      {(stats?.pending ?? 0) > 0 && (
+                        <Badge variant="warning" className="text-[10px]">
+                          {stats!.pending} pending
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <p className="shrink-0 font-semibold tabular-nums text-emerald-300">
+                    ${Number(user.wallet_balance ?? 0).toLocaleString()}
+                  </p>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="w-full min-w-[680px] text-left text-sm">
             <thead className="border-b border-violet-500/20 text-[11px] uppercase tracking-wider text-violet-300/70">
               <tr>
                 <th className="px-4 py-3 font-bold">Player</th>

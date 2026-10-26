@@ -50,7 +50,7 @@ export function AdminUserSidebarPanel({ user, open, onClose }: AdminUserSidebarP
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-full max-w-md flex-col border-r border-violet-400/25 bg-[#0b0c1b] shadow-2xl transition-transform duration-300 ease-out",
+          "fixed inset-y-0 left-0 z-50 flex w-full max-w-md flex-col border-r border-violet-400/25 bg-[#0b0c1b] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         aria-hidden={!open}

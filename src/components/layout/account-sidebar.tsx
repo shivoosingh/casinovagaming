@@ -12,6 +12,8 @@ import {
   Sparkles,
   Headphones,
   ShieldCheck,
+  CalendarCheck,
+  Lock,
   Gamepad2,
   Banknote,
   History,
@@ -31,6 +33,9 @@ const ACCOUNT_LINKS = [
   { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
   { href: "/dashboard/vip", label: "VIP Status", icon: Crown },
   { href: "/dashboard/referrals", label: "Referrals", icon: Users },
+  { href: "/dashboard/kyc", label: "Verify ID", icon: ShieldCheck },
+  { href: "/dashboard/daily", label: "Daily rewards", icon: CalendarCheck },
+  { href: "/dashboard/security", label: "Security", icon: Lock },
   { href: "/dashboard/reviews", label: "Reviews", icon: StarHalf },
   { href: "/spin", label: "Daily Spin", icon: Sparkles },
 ];

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/shared/glass-card";
 import { toast } from "sonner";
 import { ShieldCheck, CheckCircle2, XCircle, User, FileText, Eye, X, Image as ImageIcon } from "lucide-react";
-import { KYCSubmissionRecord, updateKYCStatus } from "@/lib/actions/kyc-actions";
+import { getKYCDocumentUrl, KYCSubmissionRecord, updateKYCStatus } from "@/lib/actions/kyc-actions";
 
 export function AdminKYCReviewCard({
   initialSubmissions = [],
@@ -15,6 +15,17 @@ export function AdminKYCReviewCard({
 }) {
   const [submissions, setSubmissions] = useState<KYCSubmissionRecord[]>(initialSubmissions);
   const [previewDoc, setPreviewDoc] = useState<KYCSubmissionRecord | null>(null);
+
+  async function openPreview(submission: KYCSubmissionRecord) {
+    setPreviewDoc(submission);
+    if (submission.document_url) return;
+    const result = await getKYCDocumentUrl(submission.id);
+    if ("error" in result) {
+      toast.error(result.error);
+      return;
+    }
+    setPreviewDoc({ ...submission, document_url: result.url });
+  }
 
   async function handleApprove(userId: string, name: string) {
     const res = await updateKYCStatus(userId, "approved");
@@ -83,13 +94,13 @@ export function AdminKYCReviewCard({
                   <p className="text-xs text-muted-foreground font-mono">{s.user_email}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <button
-                      onClick={() => setPreviewDoc(s)}
+                      onClick={() => void openPreview(s)}
                       className="text-[11px] text-amber-300 hover:text-amber-200 underline flex items-center gap-1 font-mono"
                     >
                       <Eye className="h-3.5 w-3.5" /> View Uploaded Photo ({s.document_name})
                     </button>
                     <span className="text-[10px] text-muted-foreground">
-                      • {new Date(s.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      • {new Date(s.created_at).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -99,7 +110,7 @@ export function AdminKYCReviewCard({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => setPreviewDoc(s)}
+                  onClick={() => void openPreview(s)}
                   className="border-amber-500/40 text-amber-300 hover:bg-amber-500/10 font-bold text-xs gap-1"
                 >
                   <Eye className="h-3.5 w-3.5" /> View Photo
