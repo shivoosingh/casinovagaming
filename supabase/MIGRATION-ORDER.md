@@ -93,6 +93,21 @@ See [`workers/README.md`](../workers/README.md).
 -- 6) bot-redeem-fallback-casinova.sql
 ```
 
+## Phase 6 — Telegram command bots (required for /api/telegram/*)
+
+**[`telegram-bots.sql`](./telegram-bots.sql)**
+
+Creates (or aligns) `telegram_link_codes` and `telegram_links`: the one-time `/start`
+codes and the Telegram-identity → user map shared by the admin command bot and the
+customer command bot (`purpose` = `admin` | `player`). Service-role only (RLS on, no
+policies, direct grants revoked). Idempotent; safe where `final-file-features-casinova.sql`
+already created the tables. **Run it before deploying the bot code.** Setup of the three
+bots themselves (tokens, chat ids, webhooks) is in [`docs/telegram-bots.md`](../docs/telegram-bots.md).
+
+```sql
+-- 7) telegram-bots.sql
+```
+
 ## Split files (optional)
 
 Numbered pieces still live in [`fresh-migrations/`](./fresh-migrations/) if you prefer running step-by-step.

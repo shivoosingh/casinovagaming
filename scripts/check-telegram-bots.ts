@@ -21,6 +21,7 @@ import {
   money,
 } from "../src/lib/telegram/bot-policy.ts";
 import { safeEqual } from "../src/lib/telegram/verify.ts";
+import { LINK_CODE_TTL_MINUTES, deepLinkFor, linkCodeStatus, newLinkCode } from "../src/lib/telegram/link-codes.ts";
 
 let checks = 0;
 function check(name: string, fn: () => void) {
@@ -136,6 +137,30 @@ check("safeEqual compares secrets", () => {
   assert.equal(safeEqual("abc", "abd"), false);
   assert.equal(safeEqual("a", "ab"), false);
   assert.equal(safeEqual("", ""), true);
+});
+
+// ── link codes ───────────────────────────────────────────────────────────
+const now = new Date("2026-10-27T12:00:00Z");
+const future = new Date(now.getTime() + 60_000).toISOString();
+const past = new Date(now.getTime() - 60_000).toISOString();
+check("linkCodeStatus: a live, unconsumed code for the right purpose is ok", () => {
+  assert.equal(linkCodeStatus({ purpose: "player", expires_at: future, consumed_at: null }, "player", now), "ok");
+});
+check("linkCodeStatus: missing row is invalid", () => {
+  assert.equal(linkCodeStatus(null, "player", now), "invalid");
+});
+check("linkCodeStatus: an admin code cannot link the player bot", () => {
+  assert.equal(linkCodeStatus({ purpose: "admin", expires_at: future, consumed_at: null }, "player", now), "wrong_purpose");
+});
+check("linkCodeStatus: consumed and expired codes are refused", () => {
+  assert.equal(linkCodeStatus({ purpose: "player", expires_at: future, consumed_at: past }, "player", now), "consumed");
+  assert.equal(linkCodeStatus({ purpose: "player", expires_at: past, consumed_at: null }, "player", now), "expired");
+});
+check("newLinkCode strips dashes from a uuid; deepLinkFor builds the t.me start link", () => {
+  assert.equal(newLinkCode("1b4e28ba-2fa1-11d2-883f-0016d3cca427"), "1b4e28ba2fa111d2883f0016d3cca427");
+  assert.equal(deepLinkFor("CasinovaBot", "abc123"), "https://t.me/CasinovaBot?start=abc123");
+  assert.equal(deepLinkFor("@CasinovaBot", "abc123"), "https://t.me/CasinovaBot?start=abc123");
+  assert.equal(LINK_CODE_TTL_MINUTES, 10);
 });
 
 console.log(`check-telegram-bots: ${checks} checks ok`);
