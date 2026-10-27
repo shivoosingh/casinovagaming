@@ -11,6 +11,14 @@ import { resolveBlogCoverUrl } from "@/lib/blog-cover";
 import { getBlogPost, getPublishedBlogPosts } from "@/lib/data/marketing";
 import { SITE_NAME } from "@/lib/constants";
 import { ArticleSchema } from "@/lib/seo/json-ld";
+import { findGameForPost } from "@/lib/seo/game-match";
+import { BlogCta } from "@/components/marketing/blog-cta";
+import { BlogGameCard } from "@/components/marketing/blog-game-card";
+import { SignupStickyBar } from "@/components/marketing/signup-sticky-bar";
+import { RelatedPosts, rankRelatedPosts } from "@/components/marketing/related-posts";
+import { autolinkGames } from "@/lib/seo/autolink";
+import { QuickAnswer } from "@/components/marketing/quick-answer";
+import { ScrollSignupPrompt } from "@/components/marketing/scroll-signup-prompt";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +69,11 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const cover = resolveBlogCoverUrl(post.slug, post.cover_image_url);
+  const game = findGameForPost(post);
+  const ctaSource = `blog_${post.slug}`;
+  const contentHtml = autolinkGames(post.content ?? post.excerpt ?? "");
+  const allPosts = await getPublishedBlogPosts();
+  const relatedPosts = rankRelatedPosts(allPosts, post);
 
   return (
     <>
@@ -105,12 +118,22 @@ export default async function BlogPostPage({
             {post.excerpt && <p className="mt-4 text-lg text-slate-400">{post.excerpt}</p>}
           </header>
 
+          <QuickAnswer text={post.excerpt} />
+          <BlogCta source={ctaSource} variant="slim" />
+
           <div
             className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-a:text-violet-300 prose-strong:text-white"
-            dangerouslySetInnerHTML={{ __html: post.content ?? post.excerpt ?? "" }}
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
+
+          {game && <BlogGameCard game={game} />}
+          <BlogCta source={ctaSource} variant="feature" />
         </article>
+
+        <RelatedPosts posts={relatedPosts} />
       </main>
+      <SignupStickyBar source={ctaSource} />
+      <ScrollSignupPrompt source={ctaSource} />
       <Footer />
     </>
   );

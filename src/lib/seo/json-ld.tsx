@@ -177,3 +177,20 @@ export function ArticleSchema({
     />
   );
 }
+
+export function FaqSchema({ items }: { items: { q: string; a: string }[] }) {
+  if (items.length === 0) return null;
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: items.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      }}
+    />
+  );
+}

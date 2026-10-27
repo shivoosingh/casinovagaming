@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { OrganizationSchema, WebsiteSchema } from "@/lib/seo/json-ld";
 import { homeMetadata } from "@/lib/seo/metadata";
 import { ClientProviders } from "@/components/providers/client-providers";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={outfit.className} suppressHydrationWarning>
         <ClientProviders>{children}</ClientProviders>
+        <Analytics />
       </body>
     </html>
   );

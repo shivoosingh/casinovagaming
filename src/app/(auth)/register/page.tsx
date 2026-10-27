@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { EmailAuthForm } from "@/components/auth/email-auth-form";
+import { SignupAttribution } from "@/components/marketing/signup-attribution";
 import { UserPlus } from "lucide-react";
 
 function RegisterForm() {
@@ -11,6 +12,8 @@ function RegisterForm() {
   const refFromUrl = searchParams.get("ref");
 
   return (
+    <>
+    <SignupAttribution />
     <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(0, 229, 255,0.2)", boxShadow: "0 0 40px rgba(0, 229, 255,0.08), inset 0 1px 0 rgba(0, 229, 255,0.06)" }}>
       <div className="h-[2px] bg-gradient-to-r from-[#ff2d78] via-[#00E5FF] to-[#ffd700]" />
 
@@ -35,6 +38,7 @@ function RegisterForm() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
