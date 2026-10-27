@@ -15,12 +15,14 @@ import {
   splitChatIds,
 } from "../src/lib/telegram/channels.ts";
 import {
+  ADMIN_COMMANDS,
   ADMIN_COMMAND_PERMISSIONS,
+  CUSTOMER_COMMANDS,
   decideAdminCommand,
   decideCustomerCommand,
   money,
 } from "../src/lib/telegram/bot-policy.ts";
-import { safeEqual } from "../src/lib/telegram/verify.ts";
+import { safeEqual, webhookAccepts } from "../src/lib/telegram/verify.ts";
 import { LINK_CODE_TTL_MINUTES, deepLinkFor, linkCodeStatus, newLinkCode } from "../src/lib/telegram/link-codes.ts";
 
 let checks = 0;
@@ -137,6 +139,26 @@ check("safeEqual compares secrets", () => {
   assert.equal(safeEqual("abc", "abd"), false);
   assert.equal(safeEqual("a", "ab"), false);
   assert.equal(safeEqual("", ""), true);
+});
+check("webhookAccepts fails closed: no secret configured never accepts, even an empty header", () => {
+  assert.equal(webhookAccepts("", undefined), false);
+  assert.equal(webhookAccepts("", ""), false);
+  assert.equal(webhookAccepts("s3cret", "s3cret"), true);
+  assert.equal(webhookAccepts("wrong", "s3cret"), false);
+  assert.equal(webhookAccepts(null, "s3cret"), false);
+});
+check("every permission-mapped admin command is a real admin command", () => {
+  for (const name of Object.keys(ADMIN_COMMAND_PERMISSIONS)) {
+    assert.ok(ADMIN_COMMANDS.includes(name), `${name} is mapped to a permission but not a command`);
+  }
+  for (const name of ["help", "dashboard", "today", "weekly", "monthly", "start"]) {
+    assert.ok(ADMIN_COMMANDS.includes(name), `${name} missing from ADMIN_COMMANDS`);
+  }
+});
+check("customer command catalog has the player basics", () => {
+  for (const name of ["help", "start", "wallet", "games", "loads", "deposits", "promos", "referral", "vip", "ticket", "status", "support", "website"]) {
+    assert.ok(CUSTOMER_COMMANDS.includes(name), `${name} missing from CUSTOMER_COMMANDS`);
+  }
 });
 
 // ── link codes ───────────────────────────────────────────────────────────

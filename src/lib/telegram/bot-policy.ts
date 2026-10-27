@@ -32,6 +32,26 @@ export const ADMIN_COMMAND_PERMISSIONS: Record<string, string> = {
   settings: "settings.manage",
 };
 
+/** Every command the admin bot answers (its /help text is built from this). */
+export const ADMIN_COMMANDS: readonly string[] = [
+  "start", "help",
+  "dashboard", "today", "weekly", "monthly",
+  "users", "newusers", "activeusers", "vip", "banned", "find",
+  "wallet", "deposits", "cashouts", "loads", "transactions", "finance",
+  "campaigns", "tickets", "support", "kyc",
+  "blogs", "seo",
+  "analytics", "traffic", "conversion", "revenue",
+  "settings",
+];
+
+/** Every command the customer bot answers. */
+export const CUSTOMER_COMMANDS: readonly string[] = [
+  "start", "help",
+  "wallet", "games", "loads", "deposits", "promos", "referral", "vip",
+  "ticket", "status", "support",
+  "register", "login", "faq", "terms", "privacy", "contact", "website",
+];
+
 export type CommandDecision = "unlinked" | "not_staff" | "unknown" | "forbidden" | "ok";
 
 /** Order matters: an unlinked chat learns nothing about which commands exist. */
