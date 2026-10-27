@@ -5,11 +5,18 @@ import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
+import { TelegramLinkCard } from "@/components/dashboard/telegram-link-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
-export function SecurityPageClient({ phone }: { phone: string | null }) {
+export function SecurityPageClient({
+  phone,
+  telegramBotUsername = null,
+}: {
+  phone: string | null;
+  telegramBotUsername?: string | null;
+}) {
   const [qr, setQr] = useState<string | null>(null);
   const [factorId, setFactorId] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -88,6 +95,7 @@ export function SecurityPageClient({ phone }: { phone: string | null }) {
             </div>
           )}
         </section>
+        <TelegramLinkCard botUsername={telegramBotUsername} />
       </div>
     </div>
   );

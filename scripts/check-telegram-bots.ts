@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import { parseCommand } from "../src/lib/telegram/types.ts";
 import {
   OPS_CHANNELS,
+  commandBotStatus,
   isOpsConfigured,
   isPromoConfigured,
   resolveBotToken,
@@ -92,6 +93,17 @@ check("isPromoConfigured needs a promo-capable token plus a promo chat (with fal
   assert.equal(isPromoConfigured({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_ADMIN_CHAT_ID: "-1" }), true);
   assert.equal(isPromoConfigured({ TELEGRAM_CUSTOMER_BOT_TOKEN: "cust" }), false);
   assert.equal(isPromoConfigured({ TELEGRAM_CHAT_PROMO: "-9" }), false);
+});
+
+check("commandBotStatus is ready only with token, webhook secret and username", () => {
+  const full = { TELEGRAM_ADMIN_BOT_TOKEN: "t", TELEGRAM_ADMIN_WEBHOOK_SECRET: "s", TELEGRAM_ADMIN_BOT_USERNAME: "@AdminBot" };
+  assert.deepEqual(commandBotStatus(full, "admin"), { token: true, secret: true, username: "AdminBot", ready: true });
+  assert.deepEqual(commandBotStatus({ TELEGRAM_ADMIN_BOT_TOKEN: "t" }, "admin"), { token: true, secret: false, username: null, ready: false });
+  assert.deepEqual(
+    commandBotStatus({ TELEGRAM_CUSTOMER_BOT_TOKEN: "t", TELEGRAM_CUSTOMER_WEBHOOK_SECRET: "s", TELEGRAM_CUSTOMER_BOT_USERNAME: "PlayBot" }, "customer"),
+    { token: true, secret: true, username: "PlayBot", ready: true }
+  );
+  assert.equal(commandBotStatus({}, "customer").ready, false);
 });
 
 // ── bot policy ───────────────────────────────────────────────────────────

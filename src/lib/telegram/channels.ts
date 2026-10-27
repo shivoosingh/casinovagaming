@@ -72,6 +72,17 @@ export function isOpsConfigured(env: Env): boolean {
   return (["admin", "finance", "users", "errors"] as const).some((c) => resolveChatIds(env, c).length > 0);
 }
 
+export type CommandBotStatus = { token: boolean; secret: boolean; username: string | null; ready: boolean };
+
+/** Setup state of a command bot, for the admin Telegram page. A bot is ready when its webhook can be verified and a deep link can be built. */
+export function commandBotStatus(env: Env, bot: "admin" | "customer"): CommandBotStatus {
+  const prefix = bot === "admin" ? "TELEGRAM_ADMIN" : "TELEGRAM_CUSTOMER";
+  const hasToken = Boolean(token(env, `${prefix}_BOT_TOKEN`));
+  const hasSecret = Boolean(token(env, `${prefix}_WEBHOOK_SECRET`));
+  const username = token(env, `${prefix}_BOT_USERNAME`)?.replace(/^@/, "") ?? null;
+  return { token: hasToken, secret: hasSecret, username, ready: hasToken && hasSecret && Boolean(username) };
+}
+
 /** Promo posts can go out (customer bot or, as a fallback, the ops bot). */
 export function isPromoConfigured(env: Env): boolean {
   return Boolean(resolveBotToken(env, "promo")) && resolveChatIds(env, "promo").length > 0;

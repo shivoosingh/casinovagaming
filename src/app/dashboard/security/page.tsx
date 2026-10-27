@@ -11,5 +11,7 @@ export default async function SecurityPage() {
     const { data } = await supabase.from("profiles").select("phone").eq("id", user.id).maybeSingle();
     phone = data?.phone ?? null;
   }
-  return <SecurityPageClient phone={phone} />;
+  // The customer command bot's handle; the card hides itself when unset.
+  const telegramBotUsername = process.env.TELEGRAM_CUSTOMER_BOT_USERNAME?.trim() || null;
+  return <SecurityPageClient phone={phone} telegramBotUsername={telegramBotUsername} />;
 }

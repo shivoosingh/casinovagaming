@@ -85,6 +85,16 @@ Pushed in commit `1bc9aaf` (on `main`): www→apex redirect, blog OG/Twitter +
 **Deferred:** game-hub → related-blog-posts linking (needs editing the large
 `components/games/game-page-shell.tsx` / `GameLandingClient`).
 
+## Telegram (three bots, WinSweeps layout)
+Ops-alert bot (`TELEGRAM_BOT_TOKEN`) posts one-way into five channels (finance, users,
+sweepstakes, errors, reports; each `TELEGRAM_CHAT_<X>`, falling back to the legacy
+`TELEGRAM_ADMIN_CHAT_ID`). Admin command bot (`/api/telegram/admin`) and customer command
+bot (`/api/telegram/customer`) are webhook-driven, permission-gated, and need the link
+tables from `supabase/telegram-bots.sql`. Env, setup and command lists:
+`docs/telegram-bots.md`. Pure rules are checked by
+`node --experimental-strip-types scripts/check-telegram-bots.ts`. ESLint's config is
+currently broken repo-wide (circular-structure error), so `tsc` is the lint gate too.
+
 ## Conventions when changing code here
 - Prefer reusing existing components (`components/home/promo-banner.tsx`,
   `components/marketing/blog-post-card.tsx`, data helpers in `lib/data/marketing.ts`)
