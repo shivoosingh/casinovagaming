@@ -164,7 +164,8 @@ export async function POST(request: Request) {
               `<b>Email:</b> ${escapeTelegramHtml(email)}`,
               `<b>Message:</b> ${escapeTelegramHtml(content.slice(0, 500))}`,
               `👉 <a href="${SITE_URL}/admin/chat">Open Admin Chat Dashboard</a>`,
-            ].join("\n")
+            ].join("\n"),
+            { channel: "users" }
           );
 
           if (botSenderId && isExplicitHumanRequest) {

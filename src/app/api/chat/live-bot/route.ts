@@ -117,7 +117,7 @@ export async function POST(req: Request) {
         .filter(Boolean)
         .join("\n");
 
-      await sendTelegramMessage(alertText);
+      await sendTelegramMessage(alertText, { channel: "users" });
     }
 
     return NextResponse.json({ success: true, reply, alertedTelegram: needsHuman });

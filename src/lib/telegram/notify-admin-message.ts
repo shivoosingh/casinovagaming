@@ -59,7 +59,7 @@ export async function notifyAdminOfCustomerMessage(input: {
     `<a href="${chatUrl}">Open chat in Casinova</a>`,
   ].join("\n");
 
-  const result = await sendTelegramMessage(text);
+  const result = await sendTelegramMessage(text, { channel: "users" });
   if (!result.ok && process.env.NODE_ENV === "development") {
     console.warn("[telegram] notify failed:", result.error);
   }

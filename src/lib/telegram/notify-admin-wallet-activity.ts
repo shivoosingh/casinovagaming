@@ -24,7 +24,7 @@ export async function notifyAdminOfWalletActivity(input: {
   requestId: string;
 }): Promise<void> {
   if (!isTelegramConfigured()) {
-    console.error("[telegram] wallet activity skipped: TELEGRAM_BOT_TOKEN or TELEGRAM_ADMIN_CHAT_ID not set");
+    console.error("[telegram] wallet activity skipped: TELEGRAM_BOT_TOKEN or a finance/admin chat id not set");
     return;
   }
 
@@ -79,7 +79,9 @@ export async function notifyAdminOfWalletActivity(input: {
   // Same as deposit alerts: always send. Silent push when an admin tab is open.
   const disableNotification = await isAnyAdminOnline();
 
-  const result = await sendTelegramMessage(lines.join("\n"), { disableNotification });
+  // Money moves go to finance; a new game account is a people event.
+  const channel = input.kind === "create_account" ? "users" : "finance";
+  const result = await sendTelegramMessage(lines.join("\n"), { disableNotification, channel });
   if (!result.ok) {
     console.error("[telegram] wallet activity notify failed:", result.error);
   }

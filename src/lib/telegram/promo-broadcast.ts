@@ -79,7 +79,7 @@ export async function runTelegramPromoBroadcast(options?: {
     return {
       ok: true,
       status: "skipped",
-      reason: "Telegram promo not configured (set TELEGRAM_BOT_TOKEN + TELEGRAM_ADMIN_CHAT_ID, or TELEGRAM_PROMO_CHAT_ID for a public channel)",
+      reason: "Telegram promo not configured (set TELEGRAM_CUSTOMER_BOT_TOKEN + TELEGRAM_CHAT_PROMO; falls back to TELEGRAM_BOT_TOKEN + TELEGRAM_ADMIN_CHAT_ID)",
     };
   }
 

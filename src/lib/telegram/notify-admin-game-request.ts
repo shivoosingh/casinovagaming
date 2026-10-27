@@ -47,7 +47,7 @@ export async function notifyAdminOfGameRequest(input: {
 
   lines.push("", `<a href="${requestsUrl}">Open requests in Casinova</a>`);
 
-  const result = await sendTelegramMessage(lines.join("\n"));
+  const result = await sendTelegramMessage(lines.join("\n"), { channel: "users" });
   if (!result.ok && process.env.NODE_ENV === "development") {
     console.warn("[telegram] game request notify failed:", result.error);
   }

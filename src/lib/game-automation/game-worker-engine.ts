@@ -68,7 +68,7 @@ export async function processPendingGameWorkerQueue(): Promise<{ ok: boolean; pr
           // Send confirmation Telegram alert
           await sendTelegramMessage(
             `🎮 <b>GAME BOT WORKER FULFILLED</b>\nPlatform: <b>${gameSlug.toUpperCase()}</b>\nPlayer ID: <code>${req.user_id}</code>\nCredentials: Username <code>${mockUsername}</code> | Pass <code>${mockPassword}</code>\nAmount: <b>$${req.amount || 10}.00</b>`,
-            { channel: "admin" }
+            { channel: "finance" }
           ).catch(() => null);
 
           processedCount++;

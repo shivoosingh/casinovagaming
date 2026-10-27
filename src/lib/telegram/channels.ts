@@ -65,3 +65,14 @@ export function resolveBotToken(env: Env, channel: OutboundChannel): string | nu
   }
   return token(env, "TELEGRAM_BOT_TOKEN");
 }
+
+/** The ops-alert bot can deliver staff alerts: a token plus somewhere for them to land. */
+export function isOpsConfigured(env: Env): boolean {
+  if (!resolveBotToken(env, "finance")) return false;
+  return (["admin", "finance", "users", "errors"] as const).some((c) => resolveChatIds(env, c).length > 0);
+}
+
+/** Promo posts can go out (customer bot or, as a fallback, the ops bot). */
+export function isPromoConfigured(env: Env): boolean {
+  return Boolean(resolveBotToken(env, "promo")) && resolveChatIds(env, "promo").length > 0;
+}

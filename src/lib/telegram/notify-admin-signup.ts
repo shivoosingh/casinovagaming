@@ -44,7 +44,7 @@ export async function notifyAdminOfSignup(userId: string): Promise<void> {
   if (phone) lines.push(`<b>Phone:</b> ${escapeTelegramHtml(phone)}`);
   lines.push("", `<a href="${playersUrl}">Open players in Casinova</a>`);
 
-  const result = await sendTelegramMessage(lines.join("\n"));
+  const result = await sendTelegramMessage(lines.join("\n"), { channel: "users" });
   if (!result.ok) {
     console.error("[telegram] signup notify failed:", result.error);
     return;

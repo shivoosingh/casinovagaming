@@ -64,6 +64,7 @@ export async function notifyAdminOfDeposit(input: {
   if (signed?.signedUrl) {
     const photoResult = await sendTelegramPhoto(signed.signedUrl, caption, {
       disableNotification,
+      channel: "finance",
     });
     if (photoResult.ok) return;
     if (process.env.NODE_ENV === "development") {
@@ -77,7 +78,7 @@ export async function notifyAdminOfDeposit(input: {
     "<b>Screenshot:</b> uploaded (open admin panel to view)",
   ];
 
-  const result = await sendTelegramMessage(textLines.join("\n"), { disableNotification });
+  const result = await sendTelegramMessage(textLines.join("\n"), { disableNotification, channel: "finance" });
   if (!result.ok && process.env.NODE_ENV === "development") {
     console.warn("[telegram] deposit notify failed:", result.error);
   }

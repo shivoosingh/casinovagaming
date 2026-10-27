@@ -6,7 +6,14 @@
 import assert from "node:assert/strict";
 
 import { parseCommand } from "../src/lib/telegram/types.ts";
-import { OPS_CHANNELS, resolveBotToken, resolveChatIds, splitChatIds } from "../src/lib/telegram/channels.ts";
+import {
+  OPS_CHANNELS,
+  isOpsConfigured,
+  isPromoConfigured,
+  resolveBotToken,
+  resolveChatIds,
+  splitChatIds,
+} from "../src/lib/telegram/channels.ts";
 import {
   ADMIN_COMMAND_PERMISSIONS,
   decideAdminCommand,
@@ -67,6 +74,20 @@ check("resolveBotToken: promo prefers the customer bot, falls back to the ops bo
   assert.equal(resolveBotToken({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_CUSTOMER_BOT_TOKEN: "cust" }, "finance"), "ops");
   assert.equal(resolveBotToken({ TELEGRAM_BOT_TOKEN: "  ", TELEGRAM_CUSTOMER_BOT_TOKEN: "" }, "promo"), null);
   assert.equal(resolveBotToken({}, "users"), null);
+});
+
+check("isOpsConfigured needs the ops token plus an admin/finance/users/errors chat", () => {
+  assert.equal(isOpsConfigured({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_ADMIN_CHAT_ID: "-1" }), true);
+  assert.equal(isOpsConfigured({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_CHAT_USERS: "-3" }), true);
+  assert.equal(isOpsConfigured({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_CHAT_REPORTS: "-4" }), false);
+  assert.equal(isOpsConfigured({ TELEGRAM_ADMIN_CHAT_ID: "-1" }), false);
+  assert.equal(isOpsConfigured({}), false);
+});
+check("isPromoConfigured needs a promo-capable token plus a promo chat (with fallbacks)", () => {
+  assert.equal(isPromoConfigured({ TELEGRAM_CUSTOMER_BOT_TOKEN: "cust", TELEGRAM_CHAT_PROMO: "-9" }), true);
+  assert.equal(isPromoConfigured({ TELEGRAM_BOT_TOKEN: "ops", TELEGRAM_ADMIN_CHAT_ID: "-1" }), true);
+  assert.equal(isPromoConfigured({ TELEGRAM_CUSTOMER_BOT_TOKEN: "cust" }), false);
+  assert.equal(isPromoConfigured({ TELEGRAM_CHAT_PROMO: "-9" }), false);
 });
 
 // ── bot policy ───────────────────────────────────────────────────────────

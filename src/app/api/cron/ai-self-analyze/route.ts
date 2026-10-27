@@ -30,7 +30,7 @@ async function handleCron(request: Request) {
 ${report.recommendations.map((r) => `• <b>${r.title}:</b> ${r.description}`).join("\n")}
 `.trim();
 
-    void sendTelegramMessage(alertMsg, { channel: "admin" });
+    void sendTelegramMessage(alertMsg, { channel: "reports" });
   }
 
   return NextResponse.json({ success: true, report });
