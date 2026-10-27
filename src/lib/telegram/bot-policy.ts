@@ -76,6 +76,13 @@ export function decideCustomerCommand(input: { known: boolean; linked: boolean }
   return "ok";
 }
 
+/** /ticket text → subject line, or null when the player wrote too little to act on. */
+export function ticketSubjectFrom(text: string): string | null {
+  const trimmed = text.trim();
+  if (trimmed.length < 10) return null;
+  return trimmed.length > 60 ? `${trimmed.slice(0, 57)}...` : trimmed;
+}
+
 /** "$1,234.50" — bot replies always show two decimals. */
 export function money(n: number | string | null | undefined): string {
   const value = Number(n ?? 0);

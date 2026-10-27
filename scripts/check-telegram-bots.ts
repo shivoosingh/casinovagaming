@@ -21,6 +21,7 @@ import {
   decideAdminCommand,
   decideCustomerCommand,
   money,
+  ticketSubjectFrom,
 } from "../src/lib/telegram/bot-policy.ts";
 import { safeEqual, webhookAccepts } from "../src/lib/telegram/verify.ts";
 import { LINK_CODE_TTL_MINUTES, deepLinkFor, linkCodeStatus, newLinkCode } from "../src/lib/telegram/link-codes.ts";
@@ -125,6 +126,15 @@ check("decideCustomerCommand branches", () => {
   assert.equal(decideCustomerCommand({ known: true, linked: false }), "unlinked");
   assert.equal(decideCustomerCommand({ known: false, linked: true }), "unknown");
   assert.equal(decideCustomerCommand({ known: true, linked: true }), "ok");
+});
+check("ticketSubjectFrom refuses short text and clips the subject to 60 chars", () => {
+  assert.equal(ticketSubjectFrom("too short"), null);
+  assert.equal(ticketSubjectFrom("   "), null);
+  assert.equal(ticketSubjectFrom("My deposit has not arrived yet"), "My deposit has not arrived yet");
+  const long = "x".repeat(80);
+  const subject = ticketSubjectFrom(long);
+  assert.equal(subject?.length, 60);
+  assert.ok(subject?.endsWith("..."));
 });
 check("money formats dollars with two decimals and thousands separators", () => {
   assert.equal(money(1234.5), "$1,234.50");
