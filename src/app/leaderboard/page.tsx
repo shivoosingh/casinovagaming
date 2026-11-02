@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createMetadata } from "@/lib/seo/metadata";
 import Link from "next/link";
 import { Crown, Trophy } from "lucide-react";
 
@@ -11,11 +12,12 @@ import { cn } from "@/lib/utils";
 
 export const revalidate = 120;
 
-export const metadata: Metadata = {
-  title: `Leaderboard | ${SITE_NAME}`,
-  description: `Top ${SITE_NAME} players by VIP points.`,
-  alternates: { canonical: "/leaderboard" },
-};
+export const metadata: Metadata = createMetadata({
+  title: "Leaderboard",
+  description: `Top ${SITE_NAME} players ranked by VIP points. See how far the next tier is.`,
+  keywords: ["leaderboard", "VIP points", "Casinova Gaming"],
+  path: "/leaderboard",
+});
 
 type Row = {
   id: string;

@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Gift, Play, Shield, Headphones, Zap, Crown } from "lucide-react";
+import { BONUS_HEADLINE } from "@/lib/offers";
 
 const FEATURES = [
-  { icon: Zap, label: "Instant Withdrawals", tone: "#F97316" },
-  { icon: Shield, label: "100% Secure", tone: "#3B82F6" },
+  { icon: Zap, label: "Card Deposits", tone: "#F97316" },
+  { icon: Shield, label: "ID-Verified Redeems", tone: "#3B82F6" },
   { icon: Headphones, label: "24/7 Support", tone: "#A855F7" },
   { icon: Gift, label: "Daily Rewards", tone: "#E879F9" },
   { icon: Crown, label: "VIP Club", tone: "#FBBF24" },
@@ -61,7 +62,7 @@ export function HeroStatic() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-3 text-[11px] font-bold uppercase tracking-[0.28em] text-violet-300"
           >
-            Live premium lobby
+            Sweepstakes fish table and slot games
           </motion.p>
 
           <motion.h1
@@ -71,9 +72,9 @@ export function HeroStatic() {
             className="mb-3 font-black leading-[0.95] tracking-[-0.04em] text-white"
             style={{ fontSize: "clamp(2.1rem, 5.5vw, 3.6rem)" }}
           >
-            WELCOME TO{" "}
+            PLAY JUWA, GAME VAULT &amp;{" "}
             <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(168,85,247,0.55)]">
-              CASINOVA
+              FISH TABLE GAMES
             </span>
           </motion.h1>
 
@@ -83,7 +84,7 @@ export function HeroStatic() {
             transition={{ delay: 0.1 }}
             className="mb-7 max-w-md text-sm font-medium text-slate-300 sm:text-base"
           >
-            Play. Win. Repeat. — instant accounts, VIP handling, and neon-level polish.
+            {BONUS_HEADLINE}. One wallet, eight live games, 24/7 live chat. 18+.
           </motion.p>
 
           <motion.div

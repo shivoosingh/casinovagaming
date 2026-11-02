@@ -2,7 +2,8 @@ import type { MetadataRoute } from "next";
 import { SITE_URL, PUBLIC_ROUTES } from "@/lib/constants";
 import { GAMES } from "@/lib/games";
 import { getGameSitemapPriority } from "@/lib/seo/game-seo";
-import { allGeoStateSlugs, allGeoCityParams } from "@/lib/data/marketing";
+import { isGeoStateIndexable } from "@/lib/seo/geo-index";
+import { allGeoStateSlugs } from "@/lib/data/marketing";
 import { createStaticClient } from "@/lib/supabase/static";
 
 export const revalidate = 3600;
@@ -32,7 +33,7 @@ async function getSitemapBlogPosts(): Promise<SitemapBlogPost[]> {
     const { data, error } = await supabase
       .from("blog_posts")
       .select("slug, published_at, updated_at")
-      .or("is_published.eq.true,status.eq.published")
+      .eq("status", "published")
       .order("published_at", { ascending: false })
       .order("id", { ascending: true })
       .range(from, from + BLOG_PAGE_SIZE - 1);
@@ -67,13 +68,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     undefined
   );
 
-  // Geo landing pages ([state] and [state]/[city]) are statically generated and
-  // indexable, so they belong in the sitemap. Independent queries, so resolve
-  // them together; a failure must not drop the rest of the sitemap.
+  // Geo landing pages are noindex by default (bulk-generated doorway pattern,
+  // legal review pending). Only allow-listed states are listed; city pages never are.
   let stateSlugs: string[] = [];
-  let cityParams: { state: string; city: string }[] = [];
   try {
-    [stateSlugs, cityParams] = await Promise.all([allGeoStateSlugs(), allGeoCityParams()]);
+    stateSlugs = (await allGeoStateSlugs()).filter(isGeoStateIndexable);
   } catch (err) {
     console.error("[sitemap] geo pages query failed:", err instanceof Error ? err.message : err);
   }
@@ -106,14 +105,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const cityRoutes: MetadataRoute.Sitemap = cityParams.map(({ state, city }) => ({
-    url: `${SITE_URL}/${encodeURIComponent(state)}/${encodeURIComponent(city)}`,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
-
   const seen = new Set<string>();
-  return [...staticRoutes, ...gameRoutes, ...blogRoutes, ...stateRoutes, ...cityRoutes].filter((entry) => {
+  return [...staticRoutes, ...gameRoutes, ...blogRoutes, ...stateRoutes].filter((entry) => {
     if (seen.has(entry.url)) return false;
     seen.add(entry.url);
     return true;

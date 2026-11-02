@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const INTRO_KEY = "casinova-intro-seen";
 /** Total runtime before fade-out (~8.5s feel, skippable). */
-const INTRO_MS = 8500;
+const INTRO_MS = 2200;
 const EXIT_MS = 900;
 
 const easeCinematic = [0.22, 1, 0.36, 1] as const;
@@ -127,7 +127,7 @@ export function CasinovaIntro({ onComplete }: { onComplete: () => void }) {
 
   const finish = useCallback(() => {
     try {
-      sessionStorage.setItem(INTRO_KEY, "1");
+      localStorage.setItem(INTRO_KEY, "1");
     } catch {
       /* ignore */
     }
@@ -339,7 +339,7 @@ export function HomeIntroGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     let seen = false;
     try {
-      seen = sessionStorage.getItem(INTRO_KEY) === "1";
+      seen = localStorage.getItem(INTRO_KEY) === "1";
     } catch {
       seen = false;
     }

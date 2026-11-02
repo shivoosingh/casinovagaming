@@ -57,9 +57,9 @@ export function createMetadata({
 
 export const homeMetadata = createMetadata({
   title: SITE_NAME,
-  documentTitle: "Casinova Gaming | Juwa Casino, Slot Games & Fish Games",
+  documentTitle: "Casinova Gaming | Juwa, Game Vault, Fish Table & Slot Games",
   description:
-    "Play Juwa casino, Game Vault, Fire Kirin, Panda Master, and top slot games on Casinova Gaming. Create your game account in minutes, claim deposit bonuses, earn VIP rewards, and get 24/7 live chat support.",
+    "Play Juwa, Game Vault, Vegas Sweeps and more fish table and slot games through Casinova Gaming. One wallet, card deposits, 100% first-deposit match, VIP rewards, 24/7 live chat. 18+.",
   keywords: [
     "Casinova Gaming",
     "juwa casino",
@@ -68,9 +68,9 @@ export const homeMetadata = createMetadata({
     "slot games",
     "fish games",
     "game vault casino",
-    "sweepstakes casino",
-    "online casino games",
-    "mobile casino",
+    "sweepstakes games",
+    "fish table games online",
+    "sweepstakes slots",
     "fire kirin",
     "panda master",
     "orion stars",
@@ -84,8 +84,8 @@ export const homeMetadata = createMetadata({
 export const promotionsMetadata = createMetadata({
   title: "Promotions & Bonuses",
   description:
-    "Discover exclusive Casinova Gaming promotions, bonuses, and limited-time offers for premium gaming accounts and VIP rewards.",
-  keywords: ["gaming promotions", "casino bonuses", "Casinova Gaming deals", "VIP bonuses", "gaming rewards"],
+    "Current Casinova Gaming promotions: the 100% first-deposit and 50% second-deposit match, daily spin prizes, and VIP referral rewards.",
+  keywords: ["gaming promotions", "deposit bonus", "Casinova Gaming deals", "VIP bonuses", "gaming rewards"],
   path: "/promotions",
 });
 
@@ -99,8 +99,9 @@ export const vipMetadata = createMetadata({
 
 export const aboutMetadata = createMetadata({
   title: "About Casinova Gaming",
+  documentTitle: "About Casinova Gaming",
   description:
-    "Learn about Casinova Gaming — the premium gaming support platform trusted by thousands for game accounts, live support, and VIP rewards.",
+    "Who runs Casinova Gaming, how the one-wallet sweepstakes platform works, and how deposits, ID checks and redeems are handled.",
   keywords: ["about Casinova Gaming", "gaming support platform", "trusted gaming", "game account service"],
   path: "/about",
 });

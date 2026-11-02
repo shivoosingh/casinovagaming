@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { createMetadata } from "@/lib/seo/metadata";
 import Link from "next/link";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Casinova Gaming",
-  description: "How Casinova Gaming collects, uses, and protects your information.",
-  alternates: { canonical: "/privacy" },
-};
+export const metadata: Metadata = createMetadata({
+  title: "Privacy Policy",
+  description: "How Casinova Gaming collects, uses, and protects your information, including ID verification photos.",
+  keywords: ["privacy policy", "Casinova Gaming"],
+  path: "/privacy",
+});
 
 const SECTIONS = [
   {

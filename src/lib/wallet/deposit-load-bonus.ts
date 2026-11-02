@@ -1,4 +1,5 @@
 /** Game-load bonus matched to instant deposits. Wallet is charged the rounded deposit; the game receives the bonus. */
+import { DEPOSIT_BONUS_SCHEDULE } from "@/lib/games";
 
 export interface DepositForBonus {
   id: string;
@@ -42,9 +43,8 @@ export function roundLoadDollars(amount: number): number {
 }
 
 export function bonusRateForDepositIndex(index: number): number {
-  if (index <= 0) return 1;
-  if (index === 1) return 0.5;
-  return 0;
+  if (index < 0) return DEPOSIT_BONUS_SCHEDULE[0] ?? 0;
+  return DEPOSIT_BONUS_SCHEDULE[index] ?? 0;
 }
 
 function money(value: number): string {
@@ -172,7 +172,7 @@ function describeDepositLoad(
       const name = ordinalName(part.depositIndex ?? 0);
       const bonus = Math.round((part.gameAmount - part.paid) * 100) / 100;
       if (bonus > 0) {
-        const percent = part.rate >= 1 ? "100%" : "50%";
+        const percent = `${Math.round(part.rate * 100)}%`;
         sentences.push(
           `${name} bonus ${percent}: ${money(part.paid)} + ${money(bonus)} bonus = ${money(part.gameAmount)} in the game.`
         );

@@ -1,5 +1,5 @@
 import type { Game } from "@/lib/games";
-import { SITE_URL } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
 const GAME_KEYWORDS: Record<string, string[]> = {
   juwa: [
@@ -56,7 +56,7 @@ export function getGameSeoDescription(game: Game): string {
 }
 
 export function getGameSeoKeywords(game: Game): string[] {
-  const base = [game.name, game.provider, game.category, "download", "game account", "Spinora"];
+  const base = [game.name, game.provider, game.category, "download", "game account", SITE_NAME];
   const slugSpecific = GAME_KEYWORDS[game.slug] ?? [];
   const category = CATEGORY_KEYWORDS[game.category] ?? [];
   return [...new Set([...base, ...slugSpecific, ...category])];

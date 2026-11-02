@@ -149,19 +149,17 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
       return;
     }
 
-    if (!idFile) {
-      toast.error("Add a photo of your ID to create an account.");
-      setLoading(false);
-      return;
-    }
-
-    let idPhoto: { name: string; dataUrl: string };
-    try {
-      idPhoto = await compressIdPhoto(idFile);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not read that ID photo.");
-      setLoading(false);
-      return;
+    // ID is optional at signup; redeem stays locked until an approved ID exists
+    // (dashboard > ID verification). Fewer required fields, same enforcement.
+    let idPhoto: { name: string; dataUrl: string } | null = null;
+    if (idFile) {
+      try {
+        idPhoto = await compressIdPhoto(idFile);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Could not read that ID photo.");
+        setLoading(false);
+        return;
+      }
     }
 
     const phone = phoneFromParts(countryIso, phoneLocal);
@@ -240,14 +238,16 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
 
     const needsConfirmation = !data.user.email_confirmed_at;
 
-    const identity = await submitSignupIdentity({
-      userId: data.user.id,
-      email: normalizedEmail,
-      documentName: idPhoto.name,
-      documentDataUrl: idPhoto.dataUrl,
-    });
-    if (!identity.ok) {
-      toast.error(identity.error || "Account created, but the ID photo was not saved. Upload it under Verify ID after you sign in.");
+    if (idPhoto) {
+      const identity = await submitSignupIdentity({
+        userId: data.user.id,
+        email: normalizedEmail,
+        documentName: idPhoto.name,
+        documentDataUrl: idPhoto.dataUrl,
+      });
+      if (!identity.ok) {
+        toast.error(identity.error || "Account created, but the ID photo was not saved. Upload it under Verify ID after you sign in.");
+      }
     }
 
     if (needsConfirmation) {
@@ -358,7 +358,7 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {mode === "login" && <SocialAuthButtons redirect={redirect} referralCode={referralCode} />}
+      <SocialAuthButtons redirect={redirect} referralCode={referralCode} />
       {mode === "register" && (
         <div className="space-y-2">
           <Label htmlFor="name">Full Name</Label>
@@ -436,16 +436,15 @@ export function EmailAuthForm({ mode, redirect = "/", referralCodeFromUrl }: Ema
       )}
       {mode === "register" && (
         <div className="space-y-2">
-          <Label htmlFor="id-photo">Government ID</Label>
+          <Label htmlFor="id-photo">Government ID (optional now, required before your first redeem)</Label>
           <input
             id="id-photo"
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            required
             onChange={(event) => setIdFile(event.target.files?.[0] ?? null)}
             className="block w-full text-sm text-[#6b6d8f] file:mr-3 file:rounded-lg file:border-0 file:bg-[#00E5FF]/15 file:px-3 file:py-2 file:text-[#00E5FF]"
           />
-          <p className="text-xs text-[#6b6d8f]">Photo of your ID. Required before the account is created.</p>
+          <p className="text-xs text-[#6b6d8f]">Add it now to unlock redeems sooner, or upload later under Dashboard, ID verification.</p>
         </div>
       )}
       {mode === "register" && (

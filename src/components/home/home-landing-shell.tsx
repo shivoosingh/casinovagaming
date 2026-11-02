@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { Search, LayoutGrid, Star, Zap, Gift, Trophy, Clock } from "lucide-react";
 import { HomeSidebar } from "@/components/home/home-sidebar";
 import { HomeRightRail } from "@/components/home/home-right-rail";
+import { MIN_DEPOSIT, WELCOME_BONUS_PERCENT } from "@/lib/offers";
+
+const LIVE_GAME_COUNT = GAMES.filter((g) => !g.upcoming).length;
 import { DeferredWalletCardLoader } from "@/components/wallet/deferred-wallet-card-loader";
 import { AppShell } from "@/components/layout/app-shell";
 import { GameCard } from "@/components/home/game-card";
@@ -25,21 +28,6 @@ const VipPreview = dynamic(() => import("@/components/home/vip-preview").then((m
 const ReferralPreview = dynamic(() => import("@/components/home/referral-preview").then((m) => m.ReferralPreview), { loading: () => <Placeholder /> });
 const ActivityFeed = dynamic(() => import("@/components/home/activity-feed").then((m) => m.ActivityFeed), { loading: () => <Placeholder /> });
 const FaqSection = dynamic(() => import("@/components/home/faq-section").then((m) => m.FaqSection), { loading: () => <Placeholder /> });
-const ActivityToast = dynamic(() => import("@/components/ui/ActivityToast").then((m) => m.ActivityToast), { ssr: false, loading: () => null });
-
-function DeferredActivityToast() {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(() => setReady(true), { timeout: 8000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const t = setTimeout(() => setReady(true), 5000);
-    return () => clearTimeout(t);
-  }, []);
-  if (!ready) return null;
-  return <ActivityToast />;
-}
 
 const MAIN_TABS: { id: HomeGameTab; label: string; icon: typeof Zap }[] = [
   { id: "trending", label: "Most Trending Games", icon: Zap },
@@ -213,9 +201,9 @@ export function HomeLandingShell({
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { value: "10K+", label: "Players online" },
-            { value: "14+", label: "Platforms" },
-            { value: "99.9%", label: "Uptime" },
+            { value: `${LIVE_GAME_COUNT}`, label: "Live games" },
+            { value: `$${MIN_DEPOSIT}`, label: "Minimum load" },
+            { value: `${WELCOME_BONUS_PERCENT}%`, label: "First deposit match" },
             { value: "24/7", label: "Live support" },
           ].map((s) => (
             <div key={s.label} className="cx-glass rounded-2xl px-4 py-5 text-center">
@@ -246,7 +234,6 @@ export function HomeLandingShell({
 
         {belowFold ? <div className="space-y-10 py-4">{belowFold}</div> : null}
       </div>
-      <DeferredActivityToast />
     </AppShell>
   );
 }

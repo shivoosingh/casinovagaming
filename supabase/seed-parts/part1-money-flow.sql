@@ -34,7 +34,7 @@ VALUES (
 <ul>
 <li><strong>Smallest card deposit:</strong> $10.99. The smallest game load is $5, so one deposit can be split across two small loads if you like.</li>
 <li><strong>Largest single load:</strong> $500. You can deposit more than once, but each load into a game is capped at $500.</li>
-<li><strong>Cents round up at load time.</strong> $14.99 in the wallet loads as $15. You are never charged more than you deposited; the rounding only applies to the game load.</li>
+<li><strong>Amounts round to the nearest dollar at load time.</strong> $14.99 in the wallet loads as $15. The load preview shows the exact wallet debit before you confirm.</li>
 </ul>
 <p>For the full table, read <a href="/blog/deposit-amounts-and-limits-casinova">deposit amounts and limits</a>.</p>
 
@@ -44,6 +44,15 @@ VALUES (
 <li><strong>Card declined.</strong> Prepaid cards and some bank cards block online gaming merchants. Try another card or ask your bank to allow the charge.</li>
 <li><strong>Paid, but the wallet did not change.</strong> Wait two minutes and refresh. If it still shows the old balance, open live chat (the bubble in the corner, or <a href="/support">Support</a>) with the time of payment and the last four digits of the card. The team can match it to the partner record.</li>
 </ul>
+
+<h2>What you see on the Deposit page</h2>
+<p>The Deposit page has one section that matters, labeled Instant payment, with the card option and its preset amounts. Under it, your Total Deposit and Deposit Redeem balances are shown so you can confirm the credit landed. Below that is your deposit history: each row shows the amount, the time, and a status of pending, completed or failed. A failed row with a completed card charge is rare, but if you see one, that row's time is what support needs.</p>
+<ul>
+<li><strong>Pending</strong> means the partner has not confirmed yet. Give it a minute.</li>
+<li><strong>Completed</strong> means the wallet has the money. Go load a game.</li>
+<li><strong>Failed</strong> means the charge did not go through on the partner side. Your card was not charged, or the charge will reverse; check your bank app.</li>
+</ul>
+<p>Spin wins and referral credits also appear in your history, labeled separately, so the deposit list stays readable. The <a href="/blog/daily-rewards-coins-guide">daily spin guide</a> and the <a href="/blog/referral-program-earn-coins">referral guide</a> explain those credits.</p>
 
 <h2>FAQ</h2>
 <h3>Can I deposit with Cash App, Zelle or crypto?</h3>
@@ -60,7 +69,7 @@ VALUES (
   'published', true, true,
   now() - interval '2 hours',
   'How to Deposit by Card at Casinova Gaming | Casinova Gaming',
-  'Deposit at Casinova Gaming by card in five steps: presets from $10.99 to $199.99, how the Total Deposit wallet works, and what to do if the payment does not show.'
+  'Deposit at Casinova Gaming by card in five steps: presets from $10.99 to $199.99, how the Total Deposit wallet works, and what to do if a payment does not show.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -74,8 +83,8 @@ INSERT INTO public.blog_posts (slug, title, excerpt, content, cover_image_url, t
 VALUES (
   'how-to-load-credits-from-wallet',
   'How to Load Game Credits From Your Casinova Wallet',
-  'To load credits, open the game page for Juwa, Game Vault or any live game, tap Create Account if you have no login yet, then use Load in the game panel. Pick an amount from $5 to $500 and the credits move from your Total Deposit wallet into the game, with your first or second deposit bonus added on top.',
-  $t$<p>To load credits, open the game page for Juwa, Game Vault or any live game, tap Create Account if you have no login yet, then use Load in the game panel. Pick an amount from $5 to $500 and the credits move from your Total Deposit wallet into the game, with your first or second deposit bonus added on top.</p>
+  'To load credits at Casinova Gaming, open the game page for Juwa, Game Vault or any live game, tap Create Account if you have no login yet, then use Load in the game panel. Pick an amount from $5 to $500 and the credits move from your Total Deposit wallet into the game, with your first or second deposit bonus added on top.',
+  $t$<p>To load credits at Casinova Gaming, open the game page for Juwa, Game Vault or any live game, tap Create Account if you have no login yet, then use Load in the game panel. Pick an amount from $5 to $500 and the credits move from your Total Deposit wallet into the game, with your first or second deposit bonus added on top.</p>
 
 <h2>Why loading is a separate step</h2>
 <p>Casinova keeps one wallet for all eight live games. You deposit once by card, then decide which game gets the money and when. That lets you split a deposit between <a href="/games/vegas-sweeps">Vegas Sweeps</a> and <a href="/games/cash-frenzy">Cash Frenzy</a>, or hold part of it for later. It also means the deposit bonus is calculated at load time, against the deposit the money came from.</p>
@@ -93,7 +102,7 @@ VALUES (
 <h2>Reading the load preview</h2>
 <p>Before you confirm, the panel spells out the result in plain sentences. Three things to look for:</p>
 <ul>
-<li><strong>Rounding.</strong> "$14.99 counts as $15.00." Cents round up to the next dollar for the game load. Your wallet is charged the rounded dollar amount.</li>
+<li><strong>Rounding.</strong> "$14.99 counts as $15.00." Amounts round to the nearest dollar for the game load, so every .99 preset rounds up. Your wallet is charged the rounded dollar amount.</li>
 <li><strong>Which deposit the bonus comes from.</strong> "First deposit bonus 100%: $20.00 + $20.00 bonus = $40.00 in the game." If part of a load comes from a later deposit, that part is listed separately with no bonus.</li>
 <li><strong>Money that has already been bonused.</strong> If you redeemed and are loading again from the same deposit, the preview says so, and no bonus is added a second time.</li>
 </ul>
@@ -110,6 +119,14 @@ VALUES (
 <li><strong>I loaded the wrong game.</strong> Loads cannot be reversed from the panel. Open live chat straight away and the team will look at the load record.</li>
 </ul>
 
+<h2>Check balance: the button people skip</h2>
+<p>Next to Load and Redeem, the panel has Check balance. It asks the game for your current in-game balance and shows it on Casinova. Two reasons to use it before every load and every redeem:</p>
+<ul>
+<li><strong>It confirms the login is active.</strong> If Check balance fails, the game account is not ready or the credentials changed, and a load would sit on pending. Message support instead of loading.</li>
+<li><strong>It drives the redeem math.</strong> Redeem opens when the game balance is at least 3x your load. The panel compares against the last balance it saw, so a stale number can block a redeem you are entitled to, or show a threshold you have not actually reached.</li>
+</ul>
+<p>A good habit: Check balance, then Load, then Check balance again once the game shows the credits. The whole loop takes under a minute and leaves a clean record in your dashboard history. The <a href="/blog/deposit-amounts-and-limits-casinova">limits guide</a> has the full table of load amounts and the matching redeem thresholds.</p>
+
 <h2>FAQ</h2>
 <h3>Do I need a separate deposit for each game?</h3>
 <p>No. One card deposit fills the Total Deposit wallet, and you can load any mix of live games from it.</p>
@@ -125,7 +142,7 @@ VALUES (
   'published', true, true,
   now() - interval '4 hours',
   'How to Load Game Credits From Your Wallet | Casinova Gaming',
-  'Load credits into Juwa, Game Vault or any live game from one Casinova wallet. Amounts from $5 to $500, how the load preview reads, and why the bonus is applied at load.'
+  'Load credits into Juwa, Game Vault or any live game from one Casinova wallet: $5 to $500 per load, how the load preview reads, and why the bonus is applied at load.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -173,6 +190,16 @@ VALUES (
 <li><strong>Cap reached.</strong> Earlier redeems already used the 8x allowance on that load. Load again from Total Deposit to open a new allowance.</li>
 <li><strong>Account rule issue.</strong> Multiple accounts or self-referrals are prohibited under the <a href="/terms">terms</a>, and a review can catch that.</li>
 </ul>
+
+<h2>A worked example, load to payout</h2>
+<p>Say you deposit $49.99 by card as your first deposit and load $50 into <a href="/games/juwa">Juwa</a>. The 100% first-deposit match puts $100 into the game. Your redeem threshold is $150 (3x the $50 load) and your cap is $400 (8x). You play, and Juwa shows $180.</p>
+<ol>
+<li><strong>Check balance</strong> in the panel so Casinova sees $180.</li>
+<li><strong>Redeem $120</strong>, leaving $60 in the game to keep playing. The panel shows $280 of cap remaining.</li>
+<li><strong>Admin review.</strong> Your ID is already Approved, the load record matches, the request is approved. $120 lands in your Deposit Redeem wallet with a notification.</li>
+<li><strong>Payout.</strong> Request it from your account to the method the payment partner has enabled.</li>
+</ol>
+<p>Had you loaded <a href="/games/game-vault">Game Vault</a> with a $20 second deposit instead, the 50% match would put $30 in the game, with a $60 threshold and a $160 cap. The size of the load sets every number, which is why the <a href="/blog/maximize-fish-table-bonus">bonus guide</a> and the <a href="/blog/deposit-amounts-and-limits-casinova">limits guide</a> are worth reading before you pick an amount.</p>
 
 <h2>FAQ</h2>
 <h3>Can I redeem bonus money?</h3>
@@ -226,7 +253,7 @@ VALUES (
 
 <h2>Worked examples with real amounts</h2>
 <ul>
-<li><strong>First deposit $10.99.</strong> The wallet shows $10.99. At load, cents round up: $11 is debited and the game receives $22.</li>
+<li><strong>First deposit $10.99.</strong> The wallet shows $10.99. At load, $10.99 rounds to $11: $11 is debited and the game receives $22.</li>
 <li><strong>First deposit $49.99, loaded as two $25 loads.</strong> Each load is still part of the first deposit, so each is matched 100%: $25 becomes $50, twice. The rounding up to $50 total means you are not charged more than you deposited; the second load uses the remaining $24.99 rounded to $25.</li>
 <li><strong>First $20, second $20, third $20, all loaded into Juwa.</strong> Game receives $40, then $30, then $20: $90 in play for $60 deposited.</li>
 <li><strong>Split loads across deposits.</strong> If you load $30 and only $20 of your first deposit remains, the preview lists $20 at 100% and $10 from your second deposit at 50%: $40 + $15 = $55 into the game.</li>
@@ -243,7 +270,17 @@ VALUES (
 </ul>
 
 <h2>What the bonus is not</h2>
-<p>There is no promo code, no no-deposit bonus and no free credits. If you see those promised for Casinova anywhere, it is not us. Reload matches by VIP tier are also not part of the program; tiers change your referral share and your daily spins, which the <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> covers.</p>
+<p>There is no code to enter, no no-deposit bonus and no free credits. If you see those promised for Casinova anywhere, it is not us. Reload matches by VIP tier are also not part of the program; tiers change your referral share and your daily spins, which the <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> covers.</p>
+
+<h2>Knowing which deposit you are on</h2>
+<p>The match depends on deposit order, so it helps to know whether your next card payment counts as a first, second or later deposit. Your dashboard deposit history lists every completed card deposit in order. Count them. If the list is empty, your next deposit is matched 100%. If it has one entry, your next is matched 50%. Two or more, and the next has no match.</p>
+<p>Three details that trip people up:</p>
+<ul>
+<li><strong>Failed deposits do not count.</strong> Only completed card payments take a place in the order.</li>
+<li><strong>Spin wins and referral credits are not deposits.</strong> They sit in your wallet and can be loaded, but they never earn a match and never move you along the deposit order. See the <a href="/blog/daily-rewards-coins-guide">daily spin guide</a>.</li>
+<li><strong>Loading does not advance the order; depositing does.</strong> You can load your first deposit in five pieces and every piece is matched 100%. It is the next card payment that becomes deposit two.</li>
+</ul>
+<p>If the load preview ever shows a smaller match than you expected, the deposit history explains it in one glance.</p>
 
 <h2>FAQ</h2>
 <h3>Does the bonus apply to every game?</h3>
@@ -259,8 +296,8 @@ VALUES (
   ARRAY['deposit bonus','welcome bonus','first deposit','bonus rules']::text[],
   'published', true, true,
   now() - interval '8 hours',
-  'Casinova Deposit Bonus: 100% First, 50% Second | Casinova Gaming',
-  'How the Casinova Gaming deposit bonus works: 100% on your first deposit, 50% on your second, applied when you load a game. Worked examples, rounding, and the redeem rules.'
+  'Casinova Bonus: 100% First, 50% Second | Casinova Gaming',
+  'How the Casinova Gaming deposit bonus works: 100% on your first deposit, 50% on your second, applied when you load a game. Worked examples and the redeem rules.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -274,8 +311,8 @@ INSERT INTO public.blog_posts (slug, title, excerpt, content, cover_image_url, t
 VALUES (
   'deposit-amounts-and-limits-casinova',
   'Minimum Deposit, Load Limits and Card Amounts at Casinova Gaming',
-  'The minimum game load at Casinova Gaming is $5 and the maximum is $500 per load. Card deposits use fixed presets from $10.99 to $199.99, and cents round up to the next dollar when you load a game, so $14.99 loads as $15. There are no deposit fees from Casinova.',
-  $t$<p>The minimum game load at Casinova Gaming is $5 and the maximum is $500 per load. Card deposits use fixed presets from $10.99 to $199.99, and cents round up to the next dollar when you load a game, so $14.99 loads as $15. There are no deposit fees from Casinova.</p>
+  'The minimum game load at Casinova Gaming is $5 and the maximum is $500 per load. Card deposits use fixed presets from $10.99 to $199.99, and amounts round to the nearest dollar when you load a game, so $14.99 loads as $15. There are no deposit fees from Casinova.',
+  $t$<p>The minimum game load at Casinova Gaming is $5 and the maximum is $500 per load. Card deposits use fixed presets from $10.99 to $199.99, and amounts round to the nearest dollar when you load a game, so $14.99 loads as $15. There are no deposit fees from Casinova.</p>
 
 <h2>Every number in one place</h2>
 <table>
@@ -285,7 +322,7 @@ VALUES (
 <tr><td>Largest card deposit preset</td><td>$199.99</td><td>Deposit page, Card</td></tr>
 <tr><td>Smallest game load</td><td>$5</td><td>Game panel, Load</td></tr>
 <tr><td>Largest game load</td><td>$500</td><td>Game panel, Load</td></tr>
-<tr><td>Rounding at load</td><td>cents round up</td><td>$4.99 counts as $5</td></tr>
+<tr><td>Rounding at load</td><td>nearest dollar</td><td>$4.99 counts as $5</td></tr>
 <tr><td>First deposit match</td><td>100%</td><td>applied at load</td></tr>
 <tr><td>Second deposit match</td><td>50%</td><td>applied at load</td></tr>
 <tr><td>Redeem threshold</td><td>3x the load</td><td>game balance before redeem</td></tr>
@@ -294,7 +331,7 @@ VALUES (
 </table>
 
 <h2>The card presets</h2>
-<p>Card deposits are not free-form. You pick one of these: $10.99, $11.99, $12.99, $13.99, $14.99, $17.99, $19.99, $24.99, $29.99, $30.99, $39.99, $49.99, $59.99, $99.99, $124.99, $129.99, $149.99, $199.99. The odd cents are set by the payment partner. They do not cost you anything extra at load, because cents round up for the game credit while your wallet is only ever debited what you actually deposited, rounded to the dollar.</p>
+<p>Card deposits are not free-form. You pick one of these: $10.99, $11.99, $12.99, $13.99, $14.99, $17.99, $19.99, $24.99, $29.99, $30.99, $39.99, $49.99, $59.99, $99.99, $124.99, $129.99, $149.99, $199.99. The odd cents are set by the payment partner. They do not cost you anything extra at load, because the .99 rounds to the next dollar for the game credit while your wallet is debited that same rounded dollar amount.</p>
 <p>Want more than $199.99 in the wallet? Make two deposits. Keep in mind the deposit order rule from the <a href="/blog/maximize-fish-table-bonus">bonus guide</a>: the first deposit is matched 100%, the second 50%, so two $99.99 deposits are matched differently from one $199.99 deposit followed by a $99.99 one.</p>
 
 <h2>Load minimum and maximum</h2>
@@ -304,12 +341,12 @@ VALUES (
 <li><strong>One wallet for all games.</strong> The limits apply per load into a game, so holding $300 in <a href="/games/gameroom">Gameroom</a> does not reduce what you can load into <a href="/games/cash-frenzy">Cash Frenzy</a>.</li>
 </ul>
 
-<blockquote>Loads run from $5 to $500 each. Cents round up at load: a $9.99 wallet balance loads as $10.</blockquote>
+<blockquote>Loads run from $5 to $500 each. Amounts round to the nearest dollar at load: a $9.99 wallet balance loads as $10.</blockquote>
 
 <h2>Rounding, explained with the preview</h2>
 <p>Before you confirm a load, the game panel prints a sentence like "$14.99 counts as $15.00. First deposit bonus 100%: $15.00 + $15.00 bonus = $30.00 in the game. Your wallet is charged $15.00." Two details worth knowing:</p>
 <ul>
-<li><strong>Rounding is per load, up to the dollar.</strong> A $10.99 deposit loads as $11.</li>
+<li><strong>Rounding is per load, to the nearest dollar.</strong> A $10.99 deposit loads as $11; every card preset ends in .99, so in practice loads round up.</li>
 <li><strong>Amounts already on a whole dollar stay there.</strong> $20 loads as $20.</li>
 </ul>
 
@@ -318,6 +355,15 @@ VALUES (
 
 <h2>Picking an amount for a first session</h2>
 <p>Match the load to the redeem rules. A $20 first load becomes $40 in the game and opens redeem once the balance reaches $60 (3x the $20 load), capped at $160 total (8x). A $100 first load becomes $200 in play, with redeem opening at $300 and capping at $800. Bigger loads mean bigger thresholds. Decide what you are comfortable playing to, set it before you deposit, and see <a href="/responsible-play">Responsible Play</a> for limits and help.</p>
+
+<h2>Limits and the rest of the program</h2>
+<p>Three other numbers on the platform sit next to the load limits and are easy to confuse with them:</p>
+<ul>
+<li><strong>Daily spin prizes ($1 to $10).</strong> Wins go to your wallet as credit. They are not deposits, so they do not earn a match, but they count toward the $5 load minimum. Three $2 spin wins make a $6 load. See the <a href="/blog/daily-rewards-coins-guide">daily spin guide</a>.</li>
+<li><strong>Referral share (5% to 25%).</strong> Also wallet credit, also loadable, also not a deposit. The <a href="/blog/referral-program-earn-coins">referral guide</a> has the tiers.</li>
+<li><strong>VIP thresholds (500, 2,000, 5,000 points).</strong> These are points, not dollars, and they do not change load limits. They change your referral share and your spins. See the <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a>.</li>
+</ul>
+<p>So the only dollar limits that constrain play are the ones in the table at the top: $5 to $500 per load, and card presets from $10.99 to $199.99. Everything else is a credit source feeding the same wallet.</p>
 
 <h2>FAQ</h2>
 <h3>Why can I not type my own deposit amount?</h3>
@@ -333,8 +379,8 @@ VALUES (
   ARRAY['minimum deposit','limits','card amounts','wallet']::text[],
   'published', true, true,
   now() - interval '10 hours',
-  'Minimum Deposit and Load Limits at Casinova | Casinova Gaming',
-  'Casinova Gaming limits in one table: $5 minimum and $500 maximum per load, card presets from $10.99 to $199.99, how cents round at load, and what your bank may add.'
+  'Casinova Minimum Deposit and Load Limits | Casinova Gaming',
+  'Casinova Gaming limits in one table: $5 minimum and $500 maximum per load, card presets from $10.99 to $199.99, how amounts round at load, and bank-side limits.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,

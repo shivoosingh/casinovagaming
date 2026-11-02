@@ -64,7 +64,7 @@ export function Testimonials({ reviews }: TestimonialsProps) {
 
                 {review.admin_comment && (
                   <p className="text-xs text-orange-200/70 mb-4 leading-relaxed border-l-2 border-[rgba(0, 229, 255,0.25)] pl-3">
-                    <span className="font-semibold text-[#7af5ff]">Spinora Team: </span>
+                    <span className="font-semibold text-[#7af5ff]">Casinova Gaming Team: </span>
                     {review.admin_comment}
                   </p>
                 )}
@@ -86,7 +86,7 @@ export function Testimonials({ reviews }: TestimonialsProps) {
       ) : (
         <div className="text-center review-card-surface rounded-2xl py-12 px-6">
           <p className="text-[#6b6d8f] mb-4">
-            No player reviews yet. Be the first to share your Spinora experience!
+            No player reviews yet. Be the first to share your Casinova Gaming experience!
           </p>
           <Button asChild>
             <Link href="/register">Join & leave a review</Link>

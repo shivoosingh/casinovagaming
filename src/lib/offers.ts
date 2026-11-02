@@ -12,6 +12,8 @@ import { VIP_TIERS } from "@/lib/constants";
 
 /** First-deposit bonus, as a percentage. */
 export const WELCOME_BONUS_PERCENT = GAME_BONUS_RULES.firstTimeBonus;
+/** Second-deposit bonus, as a percentage. */
+export const SECOND_DEPOSIT_BONUS_PERCENT = GAME_BONUS_RULES.secondDepositBonus;
 /** Minimum deposit in USD to qualify for a load. */
 export const MIN_DEPOSIT = GAME_BONUS_RULES.minDeposit;
 /** Highest referral share across VIP tiers, as a percentage. */
@@ -20,10 +22,10 @@ export const MAX_REFERRAL_PERCENT = Math.round(
 );
 
 /** Short hook used in inline banners. */
-export const BONUS_HEADLINE = `Get a ${WELCOME_BONUS_PERCENT}% bonus on your first deposit`;
+export const BONUS_HEADLINE = `${WELCOME_BONUS_PERCENT}% bonus on your first deposit, ${SECOND_DEPOSIT_BONUS_PERCENT}% on your second`;
 /** Even shorter hook for the sticky mobile bar. */
 export const BONUS_HEADLINE_SHORT = `${WELCOME_BONUS_PERCENT}% first deposit bonus`;
-export const BONUS_SUBTEXT = `Deposit from $${MIN_DEPOSIT}. Create a free account in under 2 minutes.`;
+export const BONUS_SUBTEXT = `Applied when you load a game. Loads from $${MIN_DEPOSIT}. Free account, card deposits, 18+.`;
 
 /**
  * Build a /register link that carries blog attribution.

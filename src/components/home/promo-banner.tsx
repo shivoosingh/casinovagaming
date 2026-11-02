@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Gift } from "lucide-react";
+import { BONUS_HEADLINE } from "@/lib/offers";
 
+/** Site-wide offer strip. Copy comes from offers.ts, so it always states the real deposit match. */
 export function PromoBanner() {
   return (
     <motion.div
@@ -29,15 +31,14 @@ export function PromoBanner() {
             <Gift className="h-3.5 w-3.5" />
           </span>
           <p className="text-xs font-medium text-violet-100 sm:text-sm">
-            Weekend Boost live —{" "}
-            <span className="font-bold text-orange-300">up to 50% extra VIP points</span>
+            <span className="font-bold text-orange-300">{BONUS_HEADLINE}</span>, applied when you load a game.
           </p>
         </div>
         <Link
-          href="/promotions"
+          href="/register?src=promo_banner"
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 via-fuchsia-500 to-violet-600 px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-white shadow-[0_0_18px_rgba(232,121,249,0.4)] transition-transform hover:scale-[1.03]"
         >
-          Avail Now
+          Create free account
         </Link>
       </div>
     </motion.div>

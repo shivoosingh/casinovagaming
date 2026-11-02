@@ -9,10 +9,10 @@ export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("spinora-cookies")) return;
+    if (localStorage.getItem("casinova-cookies")) return;
 
     function show() {
-      if (!localStorage.getItem("spinora-cookies")) setVisible(true);
+      if (!localStorage.getItem("casinova-cookies")) setVisible(true);
     }
 
     // Delay so cookie bar is not the LCP element on mobile.
@@ -21,7 +21,7 @@ export function CookieConsent() {
   }, []);
 
   function accept() {
-    localStorage.setItem("spinora-cookies", "1");
+    localStorage.setItem("casinova-cookies", "1");
     setVisible(false);
   }
 

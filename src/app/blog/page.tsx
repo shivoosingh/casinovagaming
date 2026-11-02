@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createMetadata } from "@/lib/seo/metadata";
 import { BookOpen } from "lucide-react";
 
 import { Navbar } from "@/components/layout/navbar";
@@ -8,13 +9,16 @@ import { BlogPostCard } from "@/components/marketing/blog-post-card";
 import { getPublishedBlogPosts } from "@/lib/data/marketing";
 import { SITE_NAME } from "@/lib/constants";
 
-export const dynamic = "force-dynamic";
+// ISR; new posts arrive via revalidatePath (admin) or /api/revalidate (SQL batches).
+export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: `Game Guides, Bonuses & Tips | ${SITE_NAME} Blog`,
-  description: `How-to guides on games, deposits, bonuses and VIP rewards at ${SITE_NAME}.`,
-  alternates: { canonical: "/blog" },
-};
+export const metadata: Metadata = createMetadata({
+  title: "Game Guides, Bonuses & Tips",
+  documentTitle: `Game Guides, Bonuses & Tips | ${SITE_NAME} Blog`,
+  description: `How-to guides on Juwa, Game Vault and other live games, card deposits, the deposit bonus, redeem rules and VIP rewards at ${SITE_NAME}.`,
+  keywords: ["fish table guides", "Juwa guide", "Game Vault guide", "sweepstakes tips", SITE_NAME],
+  path: "/blog",
+});
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();

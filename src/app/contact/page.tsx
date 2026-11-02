@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createMetadata } from "@/lib/seo/metadata";
 import Link from "next/link";
 import { Mail, MessageCircle, Clock } from "lucide-react";
 
@@ -8,11 +9,12 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { SITE_NAME } from "@/lib/constants";
 
-export const metadata: Metadata = {
-  title: `Contact | ${SITE_NAME}`,
-  description: `Reach ${SITE_NAME} support for deposits, game accounts, and VIP questions.`,
-  alternates: { canonical: "/contact" },
-};
+export const metadata: Metadata = createMetadata({
+  title: "Contact",
+  description: `Reach ${SITE_NAME} support for deposits, game accounts, and VIP questions. Live chat is open 24/7.`,
+  keywords: ["contact Casinova Gaming", "support", "live chat"],
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
