@@ -198,7 +198,7 @@ export default function UpdatePasswordPage() {
     <Card>
       <CardHeader>
         <CardTitle>Set new password</CardTitle>
-        <CardDescription>Choose a new password for your Spinora account</CardDescription>
+        <CardDescription>Choose a new password for your Casinova Gaming account</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

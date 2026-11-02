@@ -7,7 +7,7 @@ export const DAILY_SPIN_ENABLED = true;
 export const REFERRAL_REWARD_POINTS = 10;
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://casinovasgaming.com";
 export const SITE_DESCRIPTION =
-  "Casinova Gaming is your premium hub for Juwa casino, Game Vault, slot games, and fish games. Create game accounts fast, claim bonuses, earn VIP rewards, and get 24/7 live support.";
+  "Casinova Gaming is a sweepstakes gaming platform for Juwa, Game Vault, Vegas Sweeps and more fish table and slot games. One wallet, card deposits, a 100% first-deposit match, VIP rewards and 24/7 live chat. 18+.";
 
 export const VIP_TIERS = [
   {
@@ -94,5 +94,6 @@ export const SOCIAL_LINKS = {
     "https://www.instagram.com/casinovagaming/",
   // Old @spinora09 brand link removed; set NEXT_PUBLIC_TIKTOK_URL when the real profile is ready.
   tiktok: process.env.NEXT_PUBLIC_TIKTOK_URL || "",
-  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/1234567890",
+  // Unset until a real business number exists; empty strings are filtered out of the footer and schema.
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_URL || "",
 } as const;

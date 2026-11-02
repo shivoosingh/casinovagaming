@@ -26,13 +26,15 @@ export async function generateMetadata({ params }: GamePageProps) {
   const game = getGameBySlug(slug);
   if (!game) return {};
 
-  return createMetadata({
+  const base = createMetadata({
     title: getGameSeoTitle(game),
     description: getGameSeoDescription(game),
     keywords: getGameSeoKeywords(game),
     path: `/games/${game.slug}`,
     ogImage: game.image,
   });
+  // A game that cannot be loaded yet must not compete in search as if it were live.
+  return game.upcoming ? { ...base, robots: { index: false, follow: true } } : base;
 }
 
 export default async function GamePage({ params, searchParams }: GamePageProps) {

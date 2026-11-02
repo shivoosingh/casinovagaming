@@ -69,3 +69,20 @@ Weekly in GSC:
 - Real `SOCIAL_LINKS` URLs (TikTok currently points to the old `@spinora09`; WhatsApp is a `1234567890` placeholder) — `src/lib/constants.ts`.
 - Legal review of state-targeted pages.
 - Confirm the Vercel domain redirect is set (belt-and-suspenders with the code redirect).
+
+## 9. 2026-10-27 cleanup (what changed and why)
+
+Live DB on 2026-10-27: 281 posts, 278 published. 176 were templated AI posts (7 titles x 12 games, random suffix, fabricated "RTP / secret payout / 5-minute cashout" claims); 102 were July seed posts stored as markdown but rendered as raw HTML; 49 state pages + cities were bulk-generated doorway pages. Search Console: ~339 indexed, ~0 impressions after 3+ months, no manual action. That pattern is algorithmic quality suppression, so the fix is prune + honest content, not more pages.
+
+- **SQL** `supabase/blog-seed-2026-10-quality-30.sql` (paste into Supabase SQL editor, idempotent): sets `telegram_sent = true` on legacy rows, archives the templated posts and 43 thin/false/doorway posts by slug, prepends a coming-soon notice to 15 kept posts about unloadable games, and upserts 30 HTML posts (19 into already-indexed thin slugs, 11 new). Facts in those posts come from code: 100% first-deposit / 50% second-deposit match, $5-$500 loads, 3x redeem threshold / 8x cap, card-only deposits, 18+.
+- **Geo pages** noindex,follow and out of the sitemap until a state is allow-listed in `src/lib/seo/geo-index.ts` after legal review. Copy reworded to informational framing with the compliance line.
+- **Archived slugs with a replacement** 301 via `src/lib/seo/retired-posts.ts` -> `next.config.ts`. The rest 404.
+- **Blog rendering**: markdown bodies converted at render time (`src/lib/blog/markdown.ts`), FAQ parsed into FAQPage JSON-LD (`src/lib/blog/faq.ts`), one bonus strip before the 2nd H2 (`src/lib/blog/promo-strip.ts`), `dateModified` on BlogPosting, brand suffix on titles, ISR (5 min) with `POST /api/revalidate` for SQL batches (`REVALIDATE_SECRET`).
+- **Single source for the bonus**: `DEPOSIT_BONUS_SCHEDULE` in `src/lib/games.ts` feeds both the real payout (`deposit-load-bonus.ts`) and every marketing string (`offers.ts`). Old "50% first deposit" and "100% deposit bonus / weekend boost / regular bonus 10%" copy removed.
+- **Fabricated proof removed**: live winners, activity toast, "10K+ players / 99.9% uptime" stats, random "recent winners" on game pages, cashback tiers that did not exist, placeholder WhatsApp in Organization schema. "Spinora" leaks fixed.
+- **Metadata**: auth pages noindex with real titles; coming-soon game pages noindex and no `Offer`; FAQPage on /support; OG/Twitter on contact, leaderboard, terms, privacy, blog; homepage H1 names the games; footer has Terms/Privacy/Responsible Play and the 18+ line; intro gate cut from 8.5s to 2.2s and remembered in localStorage.
+- **AI layer**: robots.ts allows AI search crawlers explicitly; `/llms.txt` is built from constants and published guides.
+- **Signup**: Google sign-in on register, ID upload optional at signup (redeem still requires approval), bonus and trust line shown above the form.
+- **Quality gate**: `npm run check:blog` (`scripts/check-blog-content.mjs`) fails on invented numbers, coming-soon games as playable, payment methods not offered, markdown in HTML, missing FAQ, retired links, thin bodies.
+
+Brand facts for writers live in `S:\casinovas\.claude\skills\_brand\casinovas-facts.md`; Search Console notes in `S:\casinovas\.claude\skills\blog-post\search-console-data.md`.

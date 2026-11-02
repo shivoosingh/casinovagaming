@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { createMetadata } from "@/lib/seo/metadata";
 import Link from "next/link";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | Casinova Gaming",
-  description: "Terms that govern your use of the Casinova Gaming platform.",
-  alternates: { canonical: "/terms" },
-};
+export const metadata: Metadata = createMetadata({
+  title: "Terms of Service",
+  description: "Terms that govern your use of the Casinova Gaming platform: 18+, one account per person, virtual rewards, prohibited conduct.",
+  keywords: ["terms of service", "Casinova Gaming"],
+  path: "/terms",
+});
 
 const SECTIONS = [
   {

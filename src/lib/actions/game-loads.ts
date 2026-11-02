@@ -1128,7 +1128,7 @@ export async function adminUpdateGameLoadStatus(
       existing.user_id,
       isRedeem ? `${existing.game_name} redeem complete` : `${existing.game_name} load complete`,
       isRedeem
-        ? `$${Number(existing.amount).toFixed(2)} was redeemed to your Spinora wallet.`
+        ? `$${Number(existing.amount).toFixed(2)} was redeemed to your Casinova Gaming wallet.`
         : `$${Number(existing.amount).toFixed(2)} was loaded to your ${existing.game_name} account.`,
       "success"
     );

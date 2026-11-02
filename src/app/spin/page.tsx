@@ -11,8 +11,8 @@ import { DAILY_SPIN_ENABLED } from "@/lib/constants";
 export const metadata = createMetadata({
   title: "Spin the Wheel",
   description:
-    "Spin the Spinora prize wheel and win cash bonuses, VIP points, and exclusive rewards. Free daily spins for all members.",
-  keywords: ["spin wheel", "casino rewards", "free spins", "Spinora prizes", "VIP bonuses"],
+    "Spin the Casinova Gaming daily wheel for prizes from $1 to $10. One free spin a day at Bronze, up to three at Gold and Platinum. 18+.",
+  keywords: ["spin wheel", "casino rewards", "free spins", "Casinova Gaming prizes", "VIP bonuses"],
   path: "/spin",
 });
 

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { EmailAuthForm } from "@/components/auth/email-auth-form";
 import { SignupAttribution } from "@/components/marketing/signup-attribution";
 import { UserPlus } from "lucide-react";
+import { BONUS_HEADLINE, MIN_DEPOSIT } from "@/lib/offers";
 
 function RegisterForm() {
   const searchParams = useSearchParams();
@@ -26,6 +27,13 @@ function RegisterForm() {
             <h1 className="text-xl font-black text-white">Create Account</h1>
             <p className="text-sm text-[#6b6d8f]">Join Casinova Gaming free</p>
           </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-[rgba(0, 229, 255,0.2)] bg-[rgba(0, 229, 255,0.05)] px-4 py-3">
+          <p className="text-sm font-bold text-[#f0f0f5]">{BONUS_HEADLINE}</p>
+          <p className="mt-1 text-xs text-[#6b6d8f]">
+            Applied when you load a game. Loads from ${MIN_DEPOSIT}. 18+ · email verification · ID checked before your first redeem.
+          </p>
         </div>
 
         <EmailAuthForm mode="register" redirect="/dashboard" referralCodeFromUrl={refFromUrl} />

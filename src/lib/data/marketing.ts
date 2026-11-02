@@ -1,6 +1,7 @@
 import { createStaticClient } from "@/lib/supabase/static";
 import { resolveBlogCoverUrl } from "@/lib/blog-cover";
 import { GEO_STATES, type CityData, type StateData } from "@/lib/geo-data";
+import { SITE_NAME } from "@/lib/constants";
 
 export type { CityData, StateData };
 
@@ -18,17 +19,17 @@ export type MarketingPost = {
 
 export type MarketingPostFull = MarketingPost & {
   content: string | null;
+  updated_at?: string | null;
 };
 
-/** Rewrite legacy Spinora / WinSweeps copy to casinovasgaming. */
+/** Rewrite legacy Spinora / WinSweeps copy to the current brand name. */
 function brandText(value: string | null | undefined): string | null {
   if (value == null || value === "") return value ?? null;
   return value
-    .replace(/Win\s*Sweeps/gi, "casinovasgaming")
-    .replace(/WinSweeps/gi, "casinovasgaming")
-    .replace(/Spinora/g, "casinovasgaming")
-    .replace(/spinora/gi, "casinovasgaming")
-    .replace(/spinoracasinos\.com/gi, "casinovasgaming.com");
+    .replace(/spinoracasinos\.com/gi, "casinovasgaming.com")
+    .replace(/Win\s*Sweeps/gi, SITE_NAME)
+    .replace(/Spinora/gi, SITE_NAME)
+    .replace(/casinovasgaming(?!\.com)/g, SITE_NAME);
 }
 
 function brandPost<T extends MarketingPost>(post: T): T {
@@ -105,9 +106,9 @@ export async function getPublishedBlogPosts(): Promise<MarketingPost[]> {
       .select(
         "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description, is_published, status"
       )
-      .or("is_published.eq.true,status.eq.published")
+      .eq("status", "published")
       .order("published_at", { ascending: false })
-      .limit(100);
+      .limit(500);
     if (error || !data?.length) return FALLBACK_POSTS.map(brandPost);
     return (data as MarketingPost[]).map(brandPost);
   } catch {
@@ -115,27 +116,46 @@ export async function getPublishedBlogPosts(): Promise<MarketingPost[]> {
   }
 }
 
+/**
+ * One published post by slug. Archived, draft and unknown slugs return null
+ * (404 or, for retired slugs, the 301 in next.config.ts). The fallback posts are
+ * used only when the database itself is unreachable, never to resurrect an
+ * archived slug.
+ */
 export async function getBlogPost(slug: string): Promise<MarketingPostFull | null> {
   try {
     const supabase = createStaticClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("blog_posts")
       .select(
-        "id, slug, title, excerpt, cover_image_url, tags, published_at, seo_title, seo_description, content, is_published, status"
+        "id, slug, title, excerpt, cover_image_url, tags, published_at, updated_at, seo_title, seo_description, content, is_published, status"
       )
       .eq("slug", slug)
+      .eq("status", "published")
       .maybeSingle();
-
-    if (data) {
-      const row = data as MarketingPostFull & { is_published?: boolean; status?: string };
-      const live = row.is_published === true || row.status === "published";
-      if (live) return brandPostFull(row);
-    }
+    if (error) throw error;
+    return data ? brandPostFull(data as MarketingPostFull) : null;
   } catch {
-    // fall through
+    const fb = FALLBACK_POSTS.find((p) => p.slug === slug);
+    return fb ? brandPostFull(fb) : null;
   }
-  const fb = FALLBACK_POSTS.find((p) => p.slug === slug);
-  return fb ? brandPostFull(fb) : null;
+}
+
+/** Slugs for generateStaticParams. Empty on error so the build still succeeds (ISR fills in on demand). */
+export async function getPublishedBlogSlugs(): Promise<string[]> {
+  try {
+    const supabase = createStaticClient();
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("slug")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(500);
+    if (error || !data) return [];
+    return (data as { slug: string | null }[]).map((r) => r.slug?.trim()).filter((v): v is string => Boolean(v));
+  } catch {
+    return [];
+  }
 }
 
 export async function getLatestBlogPosts(limit = 6): Promise<MarketingPost[]> {

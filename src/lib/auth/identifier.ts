@@ -72,7 +72,7 @@ export function formatAuthErrorMessage(error: unknown): string {
   const codeLower = code.toLowerCase();
 
   if (codeLower.includes("redirect") || lower.includes("redirect")) {
-    return "Add https://spinoracasinos.com/auth/callback to Supabase → Authentication → URL Configuration → Redirect URLs.";
+    return "Add https://casinovasgaming.com/auth/callback to Supabase → Authentication → URL Configuration → Redirect URLs.";
   }
   if (
     codeLower === "unexpected_failure" ||
@@ -110,7 +110,7 @@ export function formatAuthErrorMessage(error: unknown): string {
     lower.includes("magic link email") ||
     lower.includes("error sending")
   ) {
-    return "Could not send email. Check Supabase Custom SMTP (Resend): sender noreply@spinoracasinos.com, API key, and domain verification.";
+    return "Could not send email. Check Supabase Custom SMTP (Resend): sender noreply@casinovasgaming.com, API key, and domain verification.";
   }
   if (lower.includes("syntax") || lower.includes("template") || lower.includes("parse")) {
     return 'Email template error in Supabase. Use double braces: {{ .ConfirmationURL }} and {{ .Email }} — not single { }.';

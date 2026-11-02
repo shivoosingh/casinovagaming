@@ -53,7 +53,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           <p className="text-[#6b6d8f] text-sm leading-relaxed mb-8">
-            Premium casino platform with VIP rewards, instant account setup, and 24/7 live support.
+            Sweepstakes gaming platform: one wallet for eight live games, a 100% first-deposit match, VIP rewards and 24/7 live chat. 18+.
           </p>
 
           <div className="space-y-2.5">

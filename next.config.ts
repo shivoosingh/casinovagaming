@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { retiredPostRedirectRules } from "./src/lib/seo/retired-posts";
 
 const nextConfig: NextConfig = {
   eslint: {
@@ -7,14 +8,16 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   async redirects() {
-    // One canonical host: www duplicates every page and splits ranking signals.
     return [
+      // One canonical host: www duplicates every page and splits ranking signals.
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.casinovasgaming.com" }],
         destination: "https://casinovasgaming.com/:path*",
         permanent: true,
       },
+      // Archived blog slugs that have a rewritten replacement (see src/lib/seo/retired-posts.ts).
+      ...retiredPostRedirectRules(),
     ];
   },
   compiler: {

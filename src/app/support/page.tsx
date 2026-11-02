@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/footer";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { supportMetadata } from "@/lib/seo/metadata";
+import { FaqSchema } from "@/lib/seo/json-ld";
 import Link from "next/link";
 import { MessageCircle, Mail, HelpCircle, Clock, ChevronRight } from "lucide-react";
 
@@ -106,6 +107,7 @@ export default function SupportPage() {
               <HelpCircle className="h-6 w-6 text-[#c9a84c]" />
               Frequently Asked Questions
             </h2>
+            <FaqSchema items={faqs} />
             <div className="space-y-3">
               {faqs.map((faq) => (
                 <div

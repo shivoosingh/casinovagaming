@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { GeoPageTemplate } from "@/components/marketing/geo-page-template";
-import { allGeoCityParams, getGeoCity } from "@/lib/data/marketing";
+import { allGeoCityParams, getGeoCity, getGeoState } from "@/lib/data/marketing";
+import { SITE_NAME } from "@/lib/constants";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -20,11 +21,14 @@ export async function generateMetadata({
   const city = await getGeoCity(stateSlug, citySlug);
   if (!city) return {};
 
-  const title = `Fish Table Games in ${city.name} | Casinova Gaming`;
+  // City pages are templated with no unique content: kept for visitors who land
+  // on them, never indexed. The state page is the canonical geo entry point.
+  const title = `Fish Table Games for ${city.name} Players: How ${SITE_NAME} Works | ${SITE_NAME}`;
   return {
     title,
-    description: city.descriptionSnippet,
+    description: `How ${SITE_NAME} works for players in ${city.name}: one wallet, card deposits, eight live games. 18+. Availability varies by jurisdiction.`,
     alternates: { canonical: `/${stateSlug}/${citySlug}` },
+    robots: { index: false, follow: true },
   };
 }
 
@@ -37,9 +41,8 @@ export default async function CityPage({
   const city = await getGeoCity(stateSlug, citySlug);
   if (!city) notFound();
 
-  const { getGeoState } = await import("@/lib/data/marketing");
   const state = await getGeoState(stateSlug);
   if (!state) notFound();
 
-  return <GeoPageTemplate state={state} city={city} />;
+  return <GeoPageTemplate state={state} city={city} indexable={false} />;
 }
