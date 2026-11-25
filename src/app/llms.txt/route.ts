@@ -59,7 +59,7 @@ export async function GET() {
     `- Payments: card only, through an instant payment partner. Cash App, Zelle, Venmo, PayPal, Chime and crypto are not offered.`,
     `- Daily spin: prizes $1, $2, $3, $4, $7, $10 or none; spins per 24h: Bronze 1, Silver 2, Gold 3, Platinum 3.`,
     `- VIP tiers (points): ${VIP_TIERS.map((t) => `${t.name} ${t.minPoints} (${Math.round(t.referralRate * 100)}% referral share)`).join(", ")}. Referral share is a percentage of a referred friend's first deposit; each referral also adds 10 VIP points.`,
-    `- Not offered: promo codes, free credits, no-deposit bonuses, published odds or RTP.`,
+    `- Not offered: promo codes, published odds or RTP.`,
     `- Support: 24/7 live chat at ${SITE_URL}/support. Telegram: ${SOCIAL_LINKS.telegram}.`,
     "",
     "## Live games (loadable now)",

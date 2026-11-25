@@ -3,7 +3,7 @@
 // hand (Supabase SQL editor or `supabase db query --linked -f`) after approval.
 //
 //   batch-*.json      full rewrites: [{ slug, title, excerpt, content, seo_title, seo_description, tags, needs_review }]
-//   meta-fixes.json   metadata-only edits: [{ slug, seo_title?, seo_description? }]
+//   meta-fixes.json   small edits: [{ slug, seo_title?, seo_description?, replace?: [[from, to]] }]
 //
 // Rows are UPDATEs keyed on slug and limited to published posts, so the script
 // can never publish a draft, resurrect an archived post or create a new URL.
@@ -71,6 +71,8 @@ for (const fix of metaFixes) {
   const sets = [];
   if (fix.seo_title) sets.push(`  seo_title = ${quote(fix.seo_title)}`);
   if (fix.seo_description) sets.push(`  seo_description = ${quote(fix.seo_description)}`);
+  // Exact-text swaps inside the body, for a one-phrase fix that does not justify a rewrite.
+  for (const [from, to] of fix.replace ?? []) sets.push(`  content = replace(content, ${quote(from)}, ${quote(to)})`);
   if (!sets.length) continue;
   lines.push(`-- ${fix.slug} (metadata only)`, "UPDATE public.blog_posts SET", sets.join(",\n"), `WHERE slug = ${sqlSlug(fix.slug)} AND status = 'published';`, "");
 }

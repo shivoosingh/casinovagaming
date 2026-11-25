@@ -1,0 +1,319 @@
+{
+  "beginner-guide-fish-table-games": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"no free credits / no no-deposit bonus / the match is the whole offer\": the daily spin can credit the wallet without a deposit.",
+      "\"Can I practice for free?\" now says there is no demo mode and mentions the daily spin, which can also land on nothing.",
+      "Payment line no longer says card is the only method and no longer lists Chime.",
+      "Responsible Play is described as advice and a helpline number, not limit tools.",
+      "Removed \"the fish specialist\" and similar descriptions of Juwa."
+    ],
+    "unverifiable": [
+      "Which payment methods the live checkout shows.",
+      "The generic description of fish table screens and controls is about the genre, not checked against a specific app."
+    ]
+  },
+  "best-fish-table-games-online": {
+    "verdict": "corrected",
+    "corrections": [
+      "No longer a ranking: it lists the five live games whose stated mix includes fish games, unranked, and says why.",
+      "Title and search title changed so they do not promise a \"best\" list.",
+      "No longer claims Cash Machine, Cash Frenzy and Mafia have no fish tables; they are described as listed.",
+      "Coming-soon games are described as marked Soon in the home page lobby, not on the games page.",
+      "Removed unsupported descriptions of each lobby and the free-credits wording."
+    ],
+    "unverifiable": [
+      "What each third-party lobby actually contains beyond the game types listed in the code.",
+      "The slug still contains \"best\" although the post no longer ranks."
+    ]
+  },
+  "boss-fish-jackpot-timing-guide": {
+    "verdict": "corrected",
+    "corrections": [
+      "Replaced \"a redeem does not close your session\" with what the code does: a redeem starts a staff review and credits leave the game after approval.",
+      "Added: several partial redeems are allowed up to the 8x total, $5 to $500 each, one open at a time.",
+      "Added: the 3x threshold and 8x cap come from your most recent completed load.",
+      "\"Balance above the cap cannot be redeemed\" replaced with \"a redeem cannot exceed what is left under the 8x cap\".",
+      "Responsible Play wording corrected; unsupported lobby descriptions removed."
+    ],
+    "unverifiable": [
+      "What happens to in-game balance above the 8x cap.",
+      "Boss fish and jackpot behaviour is described generically; providers publish nothing Casinova can cite."
+    ]
+  },
+  "fish-em-up-online-alternatives": {
+    "verdict": "corrected",
+    "corrections": [
+      "No longer calls any game \"the closest\"; names the five live games that list fish games.",
+      "Comparison table shows category and listed game types only.",
+      "Removed the statement that Fish Em Up is a third-party title; says only that Casinova does not offer or operate it.",
+      "Payment, free-credits and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "Anything about Fish Em Up itself: Casinova has no data on it.",
+      "Whether a post about a game the site does not offer is worth keeping."
+    ]
+  },
+  "game-vault-online-guide": {
+    "verdict": "corrected",
+    "corrections": [
+      "Redeem troubleshooting now lists all six reasons the code refuses a redeem.",
+      "Removed \"slots as the largest part\" and \"the provider rotates titles\".",
+      "Payment and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "That the web player and the app lead to the same lobby and balance (provider side).",
+      "Whether the web player works on every phone browser."
+    ]
+  },
+  "how-to-create-game-vault-account": {
+    "verdict": "corrected",
+    "corrections": [
+      "Security: removed every description of how default usernames and passwords are generated.",
+      "\"Own login\" is described as the pencil button, which is how it appears on phones.",
+      "Google and Facebook sign-in are no longer named as available.",
+      "Payment and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "Whether social sign-in is enabled in production.",
+      "What happens to credits on the old login after Replace Account."
+    ]
+  },
+  "how-to-create-juwa-account-online": {
+    "verdict": "corrected",
+    "corrections": [
+      "Security: removed the generated-login comparison table and every description of generated credentials.",
+      "\"Live chat is open around the clock if you would rather have someone look\" became \"live chat is available 24/7\", without implying a person answers.",
+      "Google and Facebook sign-in are no longer named as available.",
+      "Free-credits, payment and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "Whether Juwa has a separate web player (its Play and Download links are the same address in the code).",
+      "Whether a Juwa login obtained elsewhere can be attached to a Casinova account."
+    ]
+  },
+  "juwa-fish-table-game": {
+    "verdict": "corrected",
+    "corrections": [
+      "Juwa is described by its listed mix only; \"best known for its fish tables\" and similar removed.",
+      "Removed the claim that slots and fish rooms share one balance in a session.",
+      "Free-credits, payment and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "Named Juwa features and in-game controls: described generically, not checked against the current app."
+    ]
+  },
+  "luckytap-slots-guide-casinovasgaming-alternative": {
+    "verdict": "owner",
+    "corrections": [
+      "Removed \"they belong to other companies\" and \"often searched together with LuckyTap\".",
+      "Slots table shows category and listed game types only; opinion wording removed.",
+      "Removed links that implied Cash Machine and Mafia have no fish games.",
+      "Payment and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "Anything about LuckyTap or the four named titles.",
+      "The title and tags use third-party brand names (Family Feud, Survivor). Confirm you are comfortable with that, or retire the post."
+    ]
+  },
+  "win-at-fish-table-games-strategies": {
+    "verdict": "corrected",
+    "corrections": [
+      "\"The only move that removes balance from play\" replaced: a redeem starts a staff review and credits leave the game after approval.",
+      "Added the partial-redeem limits and that thresholds come from the most recent load.",
+      "\"Balance above the cap cannot be redeemed\" replaced with \"a redeem cannot exceed what is left under the 8x cap\".",
+      "Free-credits and Responsible Play wording corrected."
+    ],
+    "unverifiable": [
+      "What happens to in-game balance above the 8x cap.",
+      "Example bet sizes are illustrations; real ranges are set by each provider."
+    ]
+  },
+  "fire-kirin-online": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"no download or app link\" and \"no request form\": the coming-soon page still shows a Download App button.",
+      "Status now matches the page: no load panel, Play link hidden, Create Account replaced by a disabled Coming Soon button.",
+      "\"The games page shows the status\" corrected: the games page lists live games only.",
+      "Juwa is no longer called fish-focused; its category in the code is Casino.",
+      "\"When Fire Kirin opens\" became \"if and when\"; the rules are described as those every live game uses today."
+    ],
+    "unverifiable": [
+      "Whether and when Fire Kirin will open.",
+      "What the Fire Kirin app contains beyond \"a fish shooting game app\"."
+    ]
+  },
+  "orion-stars-online": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"cannot be requested\" and \"cannot be downloaded\".",
+      "Description corrected to the code's wording: an arcade-style app with fish games and slots.",
+      "\"Three of which are mixed lobbies\" became \"several\" (five live games mix slots and fish).",
+      "Comparison table reduced to category and game types; opinion wording removed.",
+      "\"When it goes live\" became \"if and when\"."
+    ],
+    "unverifiable": [
+      "Whether and when Orion Stars will open."
+    ]
+  },
+  "panda-master-online-guide": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"no login can be requested and no download is provided\".",
+      "Description corrected to \"a fish game app\".",
+      "Juwa is no longer \"the fish specialist\"; Gameroom is no longer \"a small lobby\".",
+      "The $50 worked example was recomputed against the code and is correct."
+    ],
+    "unverifiable": [
+      "Whether Panda Master and Ultrapanda are related products.",
+      "Whether and when Panda Master will open."
+    ]
+  },
+  "milky-way-fish-table-guide": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"requested or downloaded through Casinova\" for Milky Way and Vblink.",
+      "Vblink description corrected to the code's wording.",
+      "\"Most categories\" became \"some categories\".",
+      "Removed unsupported descriptions of Game Vault, Vegas Sweeps and Juwa."
+    ],
+    "unverifiable": [
+      "Whether and when either game will open.",
+      "The slug and tags say \"fish table\" although the code lists Milky Way as a space-themed app with slots and fish games."
+    ]
+  },
+  "ultrapanda-game-guide": {
+    "verdict": "corrected",
+    "corrections": [
+      "Removed \"cannot be requested\" and the no-app-link statement.",
+      "Removed the claim that the games page shows a coming-soon label.",
+      "Description corrected to \"a fish and slots app\".",
+      "Step 3 corrected: you press Create Account on a live game's page and the login appears in that page's panel; no time is quoted."
+    ],
+    "unverifiable": [
+      "Whether and when Ultrapanda will open."
+    ]
+  },
+  "casinovasgaming-leaderboard-guide": {
+    "verdict": "owner",
+    "corrections": [
+      "Removed deposits and game-account requests as sources of VIP points: the card deposit flow awards none in the current code.",
+      "Removed the referral share; tiers are described as changing the number of daily spins.",
+      "Referral points no longer carry a number (the app awards 10, a database trigger in the repo awards 100).",
+      "Your own points are said to be on the dashboard VIP Status page, not the public VIP page.",
+      "Name masking reduced to \"names are partly hidden\"."
+    ],
+    "unverifiable": [
+      "Whether deposit points and the referral share are meant to exist. If the reward fix ships, this post should be updated to say so.",
+      "Which referral point value is live."
+    ]
+  },
+  "casinovasgaming-next-generation-gaming-platform": {
+    "verdict": "corrected",
+    "corrections": [
+      "Payments read \"by card\"; \"card only\" and Chime removed. $5 is described as the minimum load, not a deposit amount.",
+      "Wallet described as two dollar balances: Total Deposit and Deposit Redeem.",
+      "Redeem rules now include the load base, Check Balance first and $5 to $500 per request.",
+      "Referral share removed; coming-soon games described as absent from the games page.",
+      "Chat described as an AI Assistant tab and a Real Agent tab, available after login."
+    ],
+    "unverifiable": [
+      "Which payment methods the live checkout shows, and the deposit amounts it offers.",
+      "Whether staff cover the chat 24/7."
+    ]
+  },
+  "casinovasgaming-telegram-support-guide": {
+    "verdict": "owner",
+    "corrections": [
+      "No longer says Telegram is where promotions are announced; only that the footer links to a Telegram channel.",
+      "Removed the claim that visitors who are not logged in can chat.",
+      "Readers are sent to Real Agent or Messages for money questions, not the AI Assistant.",
+      "Removed the response-time sentence, the 24/7 staffing claim and the support email address.",
+      "Safety advice rephrased: deposits go through the site checkout; do not send money to a personal handle."
+    ],
+    "unverifiable": [
+      "What the public Telegram channel is used for and whether staff answer there.",
+      "The AI assistant's built-in answers and the Telegram promo text contradict this post until they are fixed."
+    ]
+  },
+  "casinovasgaming-vs-online-casinos": {
+    "verdict": "owner",
+    "corrections": [
+      "Table row \"Legal basis\" renamed \"Model\".",
+      "Payment wording corrected; two dollar balances added.",
+      "\"It did not come from the provider\" softened to \"we have not seen one published by the provider\".",
+      "Removed the unverified claim that credits do not move between games."
+    ],
+    "unverifiable": [
+      "The section describing the sweepstakes model as a different category from a licensed casino needs a legal read.",
+      "Which payment methods the live checkout shows, and the deposit amounts it offers."
+    ]
+  },
+  "casinovasgaming-xp-leveling-explained": {
+    "verdict": "owner",
+    "corrections": [
+      "Removed deposit points and the 50-point game-request row.",
+      "Tier table shows points needed and daily spins only; referral share column removed.",
+      "Button labels corrected to \"Check in\" and \"Claim spin reward\".",
+      "\"16 points a day\" qualified: only if you check in and spin each UTC day.",
+      "Removed \"the fastest way to add points is to deposit\"."
+    ],
+    "unverifiable": [
+      "Whether deposit points are meant to exist (see the reward fix).",
+      "The VIP page still lists a +50 game request and a +200 monthly bonus that nothing awards."
+    ]
+  },
+  "welcome-to-casinova": {
+    "verdict": "corrected",
+    "corrections": [
+      "Payment wording corrected; money is credited \"after the payment is confirmed\".",
+      "Bonus table restated in load terms ($20 loaded, $20 bonus).",
+      "Dashboard described accurately: wallet and VIP tier there, a panel on each game's page.",
+      "Removed \"usually finished long before you need it\" and the referral share.",
+      "Game Vault no longer called \"slots-heavy\"."
+    ],
+    "unverifiable": [
+      "Which payment methods the live checkout shows, and the deposit amounts it offers.",
+      "Whether any manual approval step remains on deposits."
+    ]
+  },
+  "win-sweeps-vs-other-fish-table-platforms": {
+    "verdict": "corrected",
+    "corrections": [
+      "\"Card-only\" replaced with \"deposits by card, through a checkout\".",
+      "Rules table adds the redeem base, request size and Check Balance.",
+      "Removed \"printed on each game page\" and the claim that staff can see your account history.",
+      "\"No free credits\" replaced with \"no promo codes and no signup credit\"."
+    ],
+    "unverifiable": [
+      "Which payment methods the live checkout shows, and the deposit amounts it offers.",
+      "The slug still contains the old brand name."
+    ]
+  },
+  "sweepstakes-no-deposit-bonus-explained": {
+    "verdict": "corrected",
+    "corrections": [
+      "Reframed: no signup credit and no promo code; the daily spin can add $1 to $10 or nothing without a deposit.",
+      "Removed every \"$5 deposit\" example; examples are now \"$5 loaded from a first deposit\".",
+      "\"One wallet and no second currency\" replaced with the two dollar balances.",
+      "Referral share row removed."
+    ],
+    "unverifiable": [
+      "Which payment methods the live checkout shows, and the deposit amounts it offers.",
+      "How the match is applied when a first deposit is loaded in parts."
+    ]
+  },
+  "fish-table-sweepstakes-explained": {
+    "verdict": "corrected",
+    "corrections": [
+      "Mafia is described as a slots and arcade app, not a slots app.",
+      "\"The redeem button stays locked\" corrected to \"a redeem is refused; run Check Balance first\".",
+      "Statements about how provider software decides each shot softened: Casinova does not control or see it.",
+      "Payment wording corrected."
+    ],
+    "unverifiable": [
+      "Fish table mechanics are described from general knowledge of the genre.",
+      "Whether Mafia includes fish games."
+    ]
+  }
+}

@@ -35,6 +35,19 @@ export const RETIRED_POST_REDIRECTS: Record<string, string> = {
   "orion-stars-vs-fire-kirin": "fire-kirin-orion-stars-alternatives",
   "fire-kirin-vs-game-vault": "fire-kirin-orion-stars-alternatives",
   "game-vault-vs-orion-stars": "fire-kirin-orion-stars-alternatives",
+  // 2026-11 phase 2: how-to, strategy and comparison posts for coming-soon games.
+  // Each game keeps one honest status page; these point at it. Archive SQL:
+  // supabase/blog-seed-2026-11-phase2-archive-coming-soon.sql (run with the deploy).
+  "how-to-win-at-fire-kirin": "fire-kirin-online",
+  "how-to-create-fire-kirin-account-online": "fire-kirin-online",
+  "fire-kirin-advanced-tips": "fire-kirin-online",
+  "how-to-win-at-orion-stars": "orion-stars-online",
+  "how-to-create-orion-stars-account": "orion-stars-online",
+  "orion-stars-advanced-guide": "orion-stars-online",
+  "gameroom-vs-orion-stars": "orion-stars-online",
+  "panda-master-vs-ultrapanda": "panda-master-online-guide",
+  "vblink-vs-milky-way": "milky-way-fish-table-guide",
+  "fire-kirin-vs-juwa-vs-orion-stars": "fire-kirin-orion-stars-alternatives",
 };
 
 export const RETIRED_POST_SLUGS: ReadonlySet<string> = new Set(Object.keys(RETIRED_POST_REDIRECTS));
