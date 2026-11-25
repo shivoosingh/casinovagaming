@@ -10,7 +10,7 @@ import { SITE_NAME } from "@/lib/constants";
 
 /** Platform guides every game page can fall back on. All are published, hand-written posts. */
 const CORE_GUIDES = [
-  { slug: "wallet-deposit-guide-casinovasgaming", label: "How to deposit by card" },
+  { slug: "wallet-deposit-guide-casinovasgaming", label: "How to deposit" },
   { slug: "how-to-load-credits-from-wallet", label: "How to load game credits from your wallet" },
   { slug: "how-to-redeem-winnings-fast", label: "How redeem works: 3x threshold, 8x cap, ID review" },
   { slug: "maximize-fish-table-bonus", label: "How the deposit match works" },
@@ -36,7 +36,7 @@ export function gameFaqs(game: Game): { q: string; a: string }[] {
     },
     {
       q: `How much can I load into ${game.name}?`,
-      a: `Between $${r.minDeposit} and $${r.maxDeposit} per load, taken from your ${SITE_NAME} wallet. Wallet deposits are by card.`,
+      a: `Between $${r.minDeposit} and $${r.maxDeposit} per load, taken from your ${SITE_NAME} wallet. Wallet deposits go through the checkout on the site.`,
     },
     {
       q: `Is there a bonus on ${game.name}?`,

@@ -18,9 +18,24 @@ function needsRealtimeImmediately(pathname: string | null): boolean {
   );
 }
 
+/**
+ * First guess at "is there a session", read from the Supabase auth cookie
+ * before the async session check answers. Null on the server.
+ *
+ * Why it matters: the provider below is chosen from this value. Starting from
+ * "unknown" meant every logged-out visitor first got the realtime provider and
+ * was then switched to the stub, and swapping the provider component makes
+ * React throw away and rebuild the whole page a second time. With the right
+ * first guess the provider never changes, so the page renders once.
+ */
+function hasSessionCookie(): boolean | null {
+  if (typeof document === "undefined") return null;
+  return /(?:^|;\s*)sb-[^=;]+-auth-token/.test(document.cookie);
+}
+
 export function ClientProviders({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(hasSessionCookie);
 
   useEffect(() => {
     const supabase = createClient();

@@ -72,7 +72,11 @@ for (const fix of metaFixes) {
   if (fix.seo_title) sets.push(`  seo_title = ${quote(fix.seo_title)}`);
   if (fix.seo_description) sets.push(`  seo_description = ${quote(fix.seo_description)}`);
   // Exact-text swaps inside the body, for a one-phrase fix that does not justify a rewrite.
-  for (const [from, to] of fix.replace ?? []) sets.push(`  content = replace(content, ${quote(from)}, ${quote(to)})`);
+  // A column can be assigned once per UPDATE, so several swaps are nested.
+  if (fix.replace?.length) {
+    const expr = fix.replace.reduce((inner, [from, to]) => `replace(${inner}, ${quote(from)}, ${quote(to)})`, "content");
+    sets.push(`  content = ${expr}`, "  updated_at = now()");
+  }
   if (!sets.length) continue;
   lines.push(`-- ${fix.slug} (metadata only)`, "UPDATE public.blog_posts SET", sets.join(",\n"), `WHERE slug = ${sqlSlug(fix.slug)} AND status = 'published';`, "");
 }

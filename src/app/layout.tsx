@@ -29,12 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <OrganizationSchema />
         <WebsiteSchema />
-        <link rel="icon" href="/logo.webp" />
+        {/* 58 KB icon; the 201 KB logo.webp is no longer fetched or preloaded on every page. */}
+        <link rel="icon" href="/icons/icon-192.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link rel="preload" href="/logo.webp" as="image" type="image/webp" />
       </head>
       <body className={outfit.className} suppressHydrationWarning>
         <ClientProviders>{children}</ClientProviders>

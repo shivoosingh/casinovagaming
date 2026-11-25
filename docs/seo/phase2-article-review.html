@@ -52,15 +52,15 @@
       <tr><th>Title</th><td>casinovasgaming Leaderboard Guide — How Rankings Are Calculated</td><td>Casinova Leaderboard Guide: How Rankings Are Calculated</td></tr>
       <tr><th>Search title</th><td>casinovasgaming Leaderboard Guide — How Rankings Work | casinovasgaming</td><td>Casinova Leaderboard: How Rankings Are Calculated | Casinova Gaming</td></tr>
       <tr><th>Search description</th><td>How casinovasgaming leaderboard rankings are calculated, the reset schedule for daily/weekly/monthly/all-time boards, and how to climb fast.</td><td>The Casinova leaderboard ranks the top 50 members by total VIP points. One all-time board, no resets, no prizes. See how points are earned.</td></tr>
-      <tr><th>Summary</th><td>How casinovasgaming leaderboards rank players, the daily/weekly/monthly/all-time reset schedule, and how to climb fast.</td><td>The Casinova Gaming leaderboard ranks the top 50 members by total VIP points, highest first. It is one all-time board: there are no daily, weekly or monthly resets and no prize attached to a position. Points come from daily check-ins, the daily spin and referrals.</td></tr>
+      <tr><th>Summary</th><td>How casinovasgaming leaderboards rank players, the daily/weekly/monthly/all-time reset schedule, and how to climb fast.</td><td>The Casinova Gaming leaderboard ranks the top 50 members by total VIP points, highest first. It is one all-time board: there are no daily, weekly or monthly resets and no prize attached to a position. Points come from deposits, daily check-ins, the daily spin and referrals.</td></tr>
       <tr><th>Tags</th><td>casinovasgaming leaderboard, leaderboard rewards</td><td>casinovasgaming leaderboard, leaderboard rewards, vip points</td></tr>
-      <tr><th>Length</th><td>320 words</td><td>947 words</td></tr>
+      <tr><th>Length</th><td>320 words</td><td>1106 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
     <div><h3>Corrections made after fact-check</h3><ul><li>Removed deposits and game-account requests as sources of VIP points: the card deposit flow awards none in the current code.</li><li>Removed the referral share; tiers are described as changing the number of daily spins.</li><li>Referral points no longer carry a number (the app awards 10, a database trigger in the repo awards 100).</li><li>Your own points are said to be on the dashboard VIP Status page, not the public VIP page.</li><li>Name masking reduced to &quot;names are partly hidden&quot;.</li></ul></div>
     <div><h3>Statements the code cannot confirm</h3><ul><li>Whether deposit points and the referral share are meant to exist. If the reward fix ships, this post should be updated to say so.</li><li>Which referral point value is live.</li></ul></div>
-    <div><h3>Questions for you</h3><ul><li>The old post described daily/weekly/monthly/all-time boards ranked by XP, with a top-10 achievement bonus. None of that exists on the site: there is one all-time top-50 table by VIP points. Confirm no period boards or prizes are planned before this goes live.</li><li>The leaderboard page says 'Sign in to track your rank' but there is no personal rank display, only the points total on the dashboard VIP Status page. The post sends members outside the top 50 there. Should the page wording change?</li><li>The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The post publishes exact VIP point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. The published VIP tiers post keeps these vague. OK to publish the exact numbers?</li><li>Points from a spin prize are added to the total but the tier label is not recalculated at that moment, so a member can pass a threshold and still show the old tier until their next check-in. The post does not mention this; flagging for a fix.</li><li>Tag 'leaderboard rewards' kept from the old post even though rank pays no reward. Remove it if you prefer.</li></ul></div>
+    <div><h3>Questions for you</h3><ul><li>The old post described daily/weekly/monthly/all-time boards ranked by XP, with a top-10 achievement bonus. None of that exists on the site: there is one all-time top-50 table by VIP points. Confirm no period boards or prizes are planned before this goes live.</li><li>The leaderboard page says 'Sign in to track your rank' but there is no personal rank display, only the points total on the dashboard VIP Status page. The post sends members outside the top 50 there. Should the page wording change?</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The post publishes exact VIP point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. The published VIP tiers post keeps these vague. OK to publish the exact numbers?</li><li>Tag 'leaderboard rewards' kept from the old post even though rank pays no reward. Remove it if you prefer.</li></ul></div>
   </div>
   <div class="cols">
     <div><h3>Before (live now, as stored)</h3><pre>casinovasgaming leaderboards rank players by XP earned within a time period, not total lifetime XP — so a new player can climb a daily or weekly board fast without competing against someone's all-time total. There are four boards: daily, weekly, monthly and all-time.
@@ -91,7 +91,7 @@ The fastest way to move up a period board is the same as [earning XP generally](
 **Does VIP tier affect leaderboard rank?** No — ranking is based purely on XP earned in the period, though [VIP multipliers](/blog/casinovasgaming-vip-tiers-explained) can help you earn that XP faster.
 
 [Create your free account](/register) and check today's leaderboard on your dashboard.</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>The Casinova Gaming leaderboard ranks the top 50 members by total VIP points, highest first. It is one all-time board: there are no daily, weekly or monthly resets and no prize attached to a position. Points come from daily check-ins, the daily spin and referrals.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>The Casinova Gaming leaderboard ranks the top 50 members by total VIP points, highest first. It is one all-time board: there are no daily, weekly or monthly resets and no prize attached to a position. Points come from deposits, daily check-ins, the daily spin and referrals.</p>
 
 <h2>What the leaderboard shows</h2>
 <p>The <a href="/leaderboard">leaderboard page</a> is public, so you can read it without logging in. It is a single table with four columns:</p>
@@ -108,13 +108,14 @@ The fastest way to move up a period board is the same as [earning XP generally](
 <table>
 <thead><tr><th>Action</th><th>VIP points</th></tr></thead>
 <tbody>
+<tr><td>Confirmed deposit</td><td>The deposit amount rounded to the nearest whole number, minimum 1, once per deposit</td></tr>
 <tr><td>Daily check-in on the Daily rewards page ("Check in")</td><td>5 on the first day, 1 more for each consecutive day, up to 11 from day seven</td></tr>
 <tr><td>Daily mission: spin the wheel, then "Claim spin reward"</td><td>5</td></tr>
 <tr><td>Cash prize on the daily spin</td><td>10 points per dollar won, so 10 to 100</td></tr>
 <tr><td>Friend signs up with your referral code</td><td>Points per referral, shown in your dashboard</td></tr>
 </tbody>
 </table>
-<p>The check-in streak follows the calendar day in UTC. Miss a day and the streak starts again at 5 points. The board never resets, and nothing in the program removes points for inactivity.</p>
+<p>Every confirmed deposit counts, whichever checkout method you use: a $19.99 deposit adds 20 points. The check-in streak follows the calendar day in UTC. Miss a day and the streak starts again at 5 points. The board never resets, and nothing in the program removes points for inactivity.</p>
 
 <h2>How your name appears</h2>
 <p>Names are partly hidden on the board, so a full name or an email address is not displayed. There is no opt-in step: any active account with enough points to reach the top 50 is listed automatically.</p>
@@ -129,16 +130,17 @@ The fastest way to move up a period board is the same as [earning XP generally](
 </ul>
 
 <h2>How rank relates to VIP tiers</h2>
-<p>Because the board and the tiers use the same number, the tier column tells you roughly where the thresholds sit on the table: Bronze from 0 points, Silver from 500, Gold from 2,000 and Platinum from 5,000. What a tier changes is the number of daily spins you get: 1 at Bronze, 2 at Silver, 3 at Gold and Platinum. The <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> covers the tiers, and the public <a href="/vip">VIP page</a> lists the thresholds. Your own points and the gap to the next tier are on the VIP Status page in your dashboard.</p>
+<p>Because the board and the tiers use the same number, the tier column tells you roughly where the thresholds sit on the table: Bronze from 0 points, Silver from 500, Gold from 2,000 and Platinum from 5,000. A tier changes two things. One is the number of daily spins you get: 1 at Bronze, 2 at Silver, 3 at Gold and Platinum. The other is your referral share: when a player you referred makes their first completed deposit, you receive 5% of it at Bronze, 10% at Silver, 15% at Gold or 25% at Platinum, credited to your Total Deposit wallet, once per referred player. Your tier is recalculated automatically whenever your points change. The <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> covers the tiers, and the public <a href="/vip">VIP page</a> lists the thresholds. Your own points and the gap to the next tier are on the VIP Status page in your dashboard.</p>
 
 <h2>Sensible ways to move up</h2>
 <ol>
 <li><strong>Check in every day.</strong> Open Daily rewards in your dashboard and tap Check in. A full week of consecutive check-ins is 5, 6, 7, 8, 9, 10 and 11 points, 56 in total, and every day after that is 11 as long as the streak holds.</li>
 <li><strong>Spin, then claim the mission.</strong> Take your <a href="/spin">daily spin</a>, then go back to Daily rewards and tap Claim spin reward for 5 points. A cash prize on the wheel adds 10 points per dollar on top. The <a href="/blog/daily-rewards-coins-guide">daily spin guide</a> lists the prizes.</li>
-<li><strong>Refer people who will actually use the site.</strong> Each friend who signs up with your code adds VIP points. The <a href="/blog/referral-program-earn-coins">referral guide</a> covers where to find the code.</li>
+<li><strong>Refer people who will actually use the site.</strong> Each friend who signs up with your code adds VIP points, and their first completed deposit pays you a share set by your tier. The <a href="/blog/referral-program-earn-coins">referral guide</a> covers where to find the code.</li>
+<li><strong>Let deposits count, but do not deposit for rank.</strong> Each confirmed deposit adds its amount in points, rounded to the nearest whole number. That is a side effect of money you already planned to play with, not a reason to add more.</li>
 </ol>
-<p>A member who checks in and spins every UTC day earns 91 points in the first week and 16 a day after that, before any spin prizes. At that pace the Silver threshold of 500 points is about 33 days away. Gold and Platinum are long-term totals.</p>
-<p>A leaderboard position has no cash value, and none of the point sources involves spending. Keep it that way: rank is a by-product of showing up, not a reason to load a game. If the board, or play in general, starts to feel like pressure, the <a href="/responsible-play">responsible play page</a> has tools and contacts.</p>
+<p>On the no-deposit path, a member who checks in and spins every UTC day earns 91 points in the first week and 16 a day after that, before any spin prizes. At that pace the Silver threshold of 500 points is about 33 days away, and any deposit shortens it by the points it adds. Gold and Platinum are long-term totals.</p>
+<p>A leaderboard position has no cash value, and points earned by depositing more than you intended are expensive points. Set your budget first and treat rank as a by-product, not a reason to deposit. If the board, or play in general, starts to feel like pressure, the <a href="/responsible-play">responsible play page</a> has tools and contacts.</p>
 
 <h2>FAQ</h2>
 <h3>Do I need to opt in to appear on the leaderboard?</h3>
@@ -146,7 +148,7 @@ The fastest way to move up a period board is the same as [earning XP generally](
 <h3>Does the leaderboard reset?</h3>
 <p>No. It is a single all-time ranking by total VIP points. There are no daily, weekly or monthly boards.</p>
 <h3>Is there a prize for finishing first?</h3>
-<p>No. Rank itself pays nothing. The practical benefit of points is your VIP tier, which sets how many daily spins you get.</p>
+<p>No. Rank itself pays nothing. The practical benefit of points is your VIP tier, which sets your number of daily spins and your referral share.</p>
 <h3>Why am I not on the board?</h3>
 <p>Only the top 50 accounts by points are shown. Your own points total and the gap to the next tier are on the VIP Status page in your dashboard.</p>
 <h3>How quickly does the board update?</h3>
@@ -165,16 +167,16 @@ The fastest way to move up a period board is the same as [earning XP generally](
     <tbody>
       <tr><th>Title</th><td>casinovasgaming: The Next Platform for Online Sweepstakes Gaming</td><td>Casinova Gaming: How the Platform Works, End to End</td></tr>
       <tr><th>Search title</th><td>casinovasgaming: The Next Platform for Online Sweepstakes Gaming</td><td>How the Casinova Gaming Platform Works | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>How casinovasgaming works as a full gaming platform, and the exact steps to deposit, play, and cash out.</td><td>One account and one wallet for eight live sweepstakes games. Deposits by card, loads from $5 to $500, 100% then 50% match, redeem at 3x with ID review.</td></tr>
-      <tr><th>Summary</th><td>What makes casinovasgaming different from the last generation of sweepstakes sites, and exactly how deposits, play and cash-outs work end to end.</td><td>Casinova Gaming is a sweepstakes gaming platform that puts one account and one wallet in front of eight third-party game apps, including Juwa, Game Vault and Vegas Sweeps. You deposit by card, load $5 to $500 into a game, and redeem from the game panel once the balance reaches 3x the load. It is not a licensed casino, and availability varies by jurisdiction.</td></tr>
+      <tr><th>Search description</th><td>How casinovasgaming works as a full gaming platform, and the exact steps to deposit, play, and cash out.</td><td>One account and one wallet for eight live sweepstakes games. Deposit at the site checkout, load $5 to $500, 100% then 50% match, redeem at 3x.</td></tr>
+      <tr><th>Summary</th><td>What makes casinovasgaming different from the last generation of sweepstakes sites, and exactly how deposits, play and cash-outs work end to end.</td><td>Casinova Gaming is a sweepstakes gaming platform that puts one account and one wallet in front of eight third-party game apps, including Juwa, Game Vault and Vegas Sweeps. You deposit through the site checkout, load $5 to $500 into a game, and redeem from the game panel once the balance reaches 3x the load. It is not a licensed casino, and availability varies by jurisdiction.</td></tr>
       <tr><th>Tags</th><td>casinovasgaming, gaming platform, how to deposit, sweepstakes, getting started</td><td>casinovasgaming, gaming platform, how to deposit, sweepstakes, getting started</td></tr>
-      <tr><th>Length</th><td>417 words</td><td>1049 words</td></tr>
+      <tr><th>Length</th><td>417 words</td><td>1138 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
     <div><h3>Corrections made after fact-check</h3><ul><li>Payments read &quot;by card&quot;; &quot;card only&quot; and Chime removed. $5 is described as the minimum load, not a deposit amount.</li><li>Wallet described as two dollar balances: Total Deposit and Deposit Redeem.</li><li>Redeem rules now include the load base, Check Balance first and $5 to $500 per request.</li><li>Referral share removed; coming-soon games described as absent from the games page.</li><li>Chat described as an AI Assistant tab and a Real Agent tab, available after login.</li></ul></div>
     <div><h3>Statements the code cannot confirm</h3><ul><li>Which payment methods the live checkout shows, and the deposit amounts it offers.</li><li>Whether staff cover the chat 24/7.</li></ul></div>
-    <div><h3>Questions for you</h3><ul><li>Old post claimed: XP/level tracking, VIP multipliers up to 2x, a 40% uncapped referral reward, a weekly leaderboard prize pool, CashApp/Zelle/crypto deposits, a 20% deposit bonus, $2 to $3 Free Play and Happy Hour. None are supported by the site; all removed.</li><li>The slug says 'next-generation gaming platform'. I dropped that claim from the title because it cannot be verified. OK?</li><li>The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.</li><li>The repo also defines a separate redeem rule (7x to 15x) for loads from the bonus balance. The post states only the 3x/8x rule. Should posts mention the bonus-balance rule?</li></ul></div>
+    <div><h3>Questions for you</h3><ul><li>Old post claimed: XP/level tracking, VIP multipliers up to 2x, a 40% uncapped referral reward, a weekly leaderboard prize pool, CashApp/Zelle/crypto deposits, a 20% deposit bonus, $2 to $3 Free Play and Happy Hour. None are supported by the site; all removed.</li><li>The slug says 'next-generation gaming platform'. I dropped that claim from the title because it cannot be verified. OK?</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.</li><li>The repo also defines a separate redeem rule (7x to 15x) for loads from the bonus balance. The post states only the 3x/8x rule. Should posts mention the bonus-balance rule?</li></ul></div>
   </div>
   <div class="cols">
     <div><h3>Before (live now, as stored)</h3><pre>## A Next-Generation Take on Sweepstakes Gaming
@@ -207,7 +209,7 @@ New players get $2 or $3 Free Play to start (eligible players only), and returni
 ## Getting Started
 
 Message the casinovasgaming team to claim your Free Play, make your first deposit, and pick a game — the whole account-to-playing flow usually takes minutes, not days.</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming is a sweepstakes gaming platform that puts one account and one wallet in front of eight third-party game apps, including Juwa, Game Vault and Vegas Sweeps. You deposit by card, load $5 to $500 into a game, and redeem from the game panel once the balance reaches 3x the load. It is not a licensed casino, and availability varies by jurisdiction.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming is a sweepstakes gaming platform that puts one account and one wallet in front of eight third-party game apps, including Juwa, Game Vault and Vegas Sweeps. You deposit through the site checkout, load $5 to $500 into a game, and redeem from the game panel once the balance reaches 3x the load. It is not a licensed casino, and availability varies by jurisdiction.</p>
 
 <h2>What "platform" means here</h2>
 <p>The games themselves are made by outside providers. Each one normally needs its own login and its own way of adding credits. Casinova sits in front of them: you hold one Casinova account, one wallet, and a panel on each game's page where you create a login, load credits, check the balance and submit a redeem. Your deposit history, VIP points and support messages stay in the same account no matter which game you open.</p>
@@ -218,8 +220,8 @@ Message the casinovasgaming team to claim your Free Play, make your first deposi
 <li><strong>A panel per game.</strong> Create the game login, load, check balance and redeem from one screen.</li>
 <li><strong>A daily spin.</strong> A wheel with prizes of $1, $2, $3, $4, $7 or $10, or nothing. Bronze members get 1 spin per 24 hours, Silver 2, Gold and Platinum 3. See the <a href="/blog/daily-rewards-coins-guide">daily spin guide</a>.</li>
 <li><strong>Daily rewards.</strong> A check-in that adds VIP points, with a streak that raises the daily amount.</li>
-<li><strong>VIP tiers.</strong> Bronze, Silver, Gold and Platinum at 0, 500, 2,000 and 5,000 points. Explained in the <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a>.</li>
-<li><strong>Referrals.</strong> A personal code. Each friend who signs up with it adds VIP points to your account.</li>
+<li><strong>VIP tiers.</strong> Bronze, Silver, Gold and Platinum at 0, 500, 2,000 and 5,000 points. Points come from confirmed deposits (the amount rounded to the nearest whole number), daily check-ins, the daily spin and referrals. Explained in the <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a>.</li>
+<li><strong>Referrals.</strong> A personal code. Each friend who signs up with it adds VIP points to your account. When a player you referred makes their first completed deposit, you also receive a share of it in your Total Deposit wallet: 5% at Bronze, 10% at Silver, 15% at Gold and 25% at Platinum, set by your tier at that moment and paid once per referred player.</li>
 <li><strong>A leaderboard.</strong> The top 50 members by VIP points, on the public <a href="/leaderboard">leaderboard page</a>.</li>
 <li><strong>Chat and Messages.</strong> Once you are logged in, the chat is available 24/7 and has an AI Assistant tab and a Real Agent tab. The dashboard also has a Messages inbox.</li>
 <li><strong>ID verification.</strong> An upload page for a government ID, required before any redeem.</li>
@@ -228,7 +230,7 @@ Message the casinovasgaming team to claim your Free Play, make your first deposi
 <h2>How it works, end to end</h2>
 <ol>
 <li><strong>Create a free account</strong> and verify your email.</li>
-<li><strong>Deposit by card.</strong> Choose one of the amounts shown at checkout and pay. Cash App, Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> walks through it.</li>
+<li><strong>Deposit through the checkout on the site.</strong> Choose one of the amounts shown at checkout and pay. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> walks through it.</li>
 <li><strong>Open a live game and create your game login</strong> from the panel on its page. The login appears in the panel when it is ready.</li>
 <li><strong>Load credits.</strong> Any whole-dollar amount from $5 to $500 per load. The deposit match is applied at this step, to the amount you load. Details in <a href="/blog/how-to-load-credits-from-wallet">how to load credits</a>.</li>
 <li><strong>Play</strong> in the provider's app or web player with the login from your panel.</li>
@@ -239,7 +241,7 @@ Message the casinovasgaming team to claim your Free Play, make your first deposi
 <table>
 <thead><tr><th>Rule</th><th>What applies</th></tr></thead>
 <tbody>
-<tr><td>Deposits</td><td>By card, in the amounts shown at checkout</td></tr>
+<tr><td>Deposits</td><td>Through the checkout, in the amounts shown there</td></tr>
 <tr><td>Deposit match</td><td>100% on the first deposit, 50% on the second, none after</td></tr>
 <tr><td>When the match is applied</td><td>When you load a game, on the amount loaded</td></tr>
 <tr><td>Load size</td><td>$5 minimum, $500 maximum, rounded to the nearest dollar</td></tr>
@@ -268,7 +270,7 @@ Message the casinovasgaming team to claim your Free Play, make your first deposi
 <h3>Is Casinova Gaming a casino?</h3>
 <p>No. It is a sweepstakes gaming platform, not a licensed casino. Availability varies by jurisdiction.</p>
 <h3>How do I deposit?</h3>
-<p>By card, through the checkout in your dashboard. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</p>
+<p>Through the checkout in your dashboard. The checkout lists the methods available to you.</p>
 <h3>Which games are available right now?</h3>
 <p>Game Vault, Juwa, MR All In One, Cash Machine, Cash Frenzy, Vegas Sweeps, Gameroom and Mafia. Coming-soon games cannot be loaded yet.</p>
 <h3>What do I need before I can redeem?</h3>
@@ -292,7 +294,7 @@ Message the casinovasgaming team to claim your Free Play, make your first deposi
       <tr><th>Search description</th><td>How to contact casinovasgaming support via Telegram for deposits, account setup and general questions, plus VIP priority response times.</td><td>The Casinova footer links to a Telegram channel, but account support runs through the site chat and dashboard Messages. Here is how to reach a person.</td></tr>
       <tr><th>Summary</th><td>How to reach casinovasgaming support through Telegram, what it's best for, and how VIP tiers affect response time.</td><td>The Casinova Gaming site footer links to a Telegram channel at t.me/casinovagaming, but account support does not run through Telegram. Support happens in the chat on the site and the Messages inbox in your dashboard, both of which need a Casinova login. For anything about a deposit, a game login or a redeem, use the Real Agent tab in the chat or the Messages inbox.</td></tr>
       <tr><th>Tags</th><td>casinovasgaming telegram support, casinovasgaming contact</td><td>casinovasgaming telegram support, casinovasgaming contact</td></tr>
-      <tr><th>Length</th><td>257 words</td><td>990 words</td></tr>
+      <tr><th>Length</th><td>257 words</td><td>989 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -360,7 +362,7 @@ Diamond and Elite members get priority handling with sub-minute live response ti
 <li><strong>What the panel shows now.</strong> Run Check Balance and send a screenshot of the game panel or your deposit history.</li>
 <li><strong>What you expected.</strong> One sentence is enough.</li>
 </ol>
-<p>Many questions are answered faster by a guide than by a queue. For a deposit that has not appeared, read the <a href="/blog/wallet-deposit-guide-casinovasgaming">card deposit guide</a>. For a redeem that will not go through, check <a href="/blog/casinova-id-verification-guide">ID verification</a> and <a href="/blog/how-to-redeem-winnings-fast">how to redeem</a> first, because the usual causes are an ID still in review, a balance below 3x the amount loaded, or a Check Balance that has not been run.</p>
+<p>Many questions are answered faster by a guide than by a queue. For a deposit that has not appeared, read the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>. For a redeem that will not go through, check <a href="/blog/casinova-id-verification-guide">ID verification</a> and <a href="/blog/how-to-redeem-winnings-fast">how to redeem</a> first, because the usual causes are an ID still in review, a balance below 3x the amount loaded, or a Check Balance that has not been run.</p>
 
 <h2>Staying safe on Telegram</h2>
 <p>Telegram makes it easy for anyone to create an account with a familiar name and logo. Treat a direct message that claims to be Casinova with suspicion, and keep these rules:</p>
@@ -402,10 +404,10 @@ Diamond and Elite members get priority handling with sub-minute live response ti
     <tbody>
       <tr><th>Title</th><td>casinovasgaming vs Online Casinos — What's the Difference?</td><td>Casinova Gaming vs Online Casinos: What Is the Difference?</td></tr>
       <tr><th>Search title</th><td>casinovasgaming vs Online Casinos Explained</td><td>Casinova Gaming vs Online Casinos: The Difference | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>casinovasgaming vs online casinos: how the sweepstakes model differs from licensed real-money gambling, and what it means for player access.</td><td>Casinova is a sweepstakes platform, not a licensed casino. Compare the model, deposits by card, 3x to 8x redeem rules and what is published.</td></tr>
+      <tr><th>Search description</th><td>casinovasgaming vs online casinos: how the sweepstakes model differs from licensed real-money gambling, and what it means for player access.</td><td>Casinova is a sweepstakes platform, not a licensed casino. Compare the model, deposits through the site checkout, 3x to 8x redeem rules and what is published.</td></tr>
       <tr><th>Summary</th><td>How casinovasgaming' sweepstakes model differs from a licensed online casino, and what that means for where you can play.</td><td>Casinova Gaming is a sweepstakes gaming platform, not a licensed online casino. A licensed casino holds a gambling license from a regulator and operates only where that license applies; Casinova holds no casino license, makes no claim about where it is legal, and its availability varies by jurisdiction. In practice the differences you will notice are how you pay, how you redeem and what information is published about the games.</td></tr>
       <tr><th>Tags</th><td>sweepstakes vs online casino, casinovasgaming vs casino</td><td>sweepstakes vs online casino, casinovasgaming vs casino</td></tr>
-      <tr><th>Length</th><td>254 words</td><td>1039 words</td></tr>
+      <tr><th>Length</th><td>254 words</td><td>1059 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -443,7 +445,7 @@ casinovasgaming funds a single [wallet](/blog/wallet-deposit-guide-casinovasgami
 <tr><td>Model</td><td>Sweepstakes model, no casino license</td><td>Gambling license issued by a regulator</td></tr>
 <tr><td>Where it operates</td><td>Varies by jurisdiction; you must check your own</td><td>Only in places covered by its license</td></tr>
 <tr><td>Games</td><td>Third-party apps such as Juwa and Game Vault, each with its own login</td><td>Games offered inside the casino's own site or app</td></tr>
-<tr><td>Paying in</td><td>By card</td><td>Depends on the operator</td></tr>
+<tr><td>Paying in</td><td>Through the site checkout</td><td>Depends on the operator</td></tr>
 <tr><td>Bonus</td><td>100% match on the first deposit, 50% on the second, none after</td><td>Depends on the operator</td></tr>
 <tr><td>Getting money out</td><td>Redeem from the game panel at 3x the load, capped at 8x, with ID and staff review</td><td>Withdrawal under the operator's terms and its regulator's rules</td></tr>
 <tr><td>Published odds or RTP</td><td>None</td><td>Depends on the regulator and the operator</td></tr>
@@ -462,7 +464,7 @@ casinovasgaming funds a single [wallet](/blog/wallet-deposit-guide-casinovasgami
 
 <h2>How the money side differs</h2>
 <ul>
-<li><strong>Deposits are by card.</strong> You choose one of the amounts shown at checkout. Cash App, Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">card deposit guide</a> shows each step.</li>
+<li><strong>Deposits go through the checkout on the site.</strong> You choose one of the amounts shown at checkout. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> shows each step.</li>
 <li><strong>Balances are in dollars, not coins.</strong> There is a Total Deposit balance you load from and a Deposit Redeem balance that approved redeems return to.</li>
 <li><strong>Loads have fixed limits.</strong> $5 minimum and $500 maximum per load, rounded to the nearest dollar.</li>
 <li><strong>The bonus is tied to deposit order.</strong> Your first deposit is matched 100% and your second 50%, on the amount you load into a game. There is nothing after the second, and there are no promo codes.</li>
@@ -487,7 +489,7 @@ casinovasgaming funds a single [wallet](/blog/wallet-deposit-guide-casinovasgami
 <h3>Is redeeming the same as a casino withdrawal?</h3>
 <p>Not quite. You redeem from the game panel once the in-game balance is at least 3x the amount you loaded, up to an 8x cap, with an approved ID and a staff review. There is no promised payout time.</p>
 <h3>How do I pay at Casinova?</h3>
-<p>By card, through the checkout in your dashboard. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</p>
+<p>Through the checkout in your dashboard. The checkout lists the methods available to you.</p>
 
 <p><a href="/register?src=blog_casinovasgaming-vs-online-casinos&amp;utm_source=blog&amp;utm_medium=cta&amp;utm_campaign=casinovasgaming-vs-online-casinos">Create your free account</a> and read the deposit and redeem screens yourself before you spend anything.</p>
 <p>Casinova Gaming is for players 18+. Sweepstakes availability varies by jurisdiction; void where prohibited.</p></div></div>
@@ -503,15 +505,15 @@ casinovasgaming funds a single [wallet](/blog/wallet-deposit-guide-casinovasgami
       <tr><th>Title</th><td>casinovasgaming XP &amp; Leveling Explained — How to Climb Levels Fast</td><td>Casinova XP and Levels Explained: VIP Points and Tiers</td></tr>
       <tr><th>Search title</th><td>casinovasgaming XP &amp; Leveling Explained | casinovasgaming</td><td>Casinova XP and Levels: How VIP Points Work | Casinova Gaming</td></tr>
       <tr><th>Search description</th><td>How casinovasgaming XP and leveling actually work: the exact XP curve, every XP source, and how leveling connects to VIP tier multipliers.</td><td>Casinova has no XP or levels. Progress is VIP points across four tiers: Bronze 0, Silver 500, Gold 2,000, Platinum 5,000. Here is how points are earned.</td></tr>
-      <tr><th>Summary</th><td>The exact XP curve behind casinovasgaming levels, where XP comes from, and how leveling connects to VIP tiers.</td><td>Casinova Gaming does not have XP or numbered levels. Progress is measured in VIP points, and those points place you in one of four tiers: Bronze at 0, Silver at 500, Gold at 2,000 and Platinum at 5,000. Points come from daily check-ins, the daily spin and referrals.</td></tr>
+      <tr><th>Summary</th><td>The exact XP curve behind casinovasgaming levels, where XP comes from, and how leveling connects to VIP tiers.</td><td>Casinova Gaming does not have XP or numbered levels. Progress is measured in VIP points, and those points place you in one of four tiers: Bronze at 0, Silver at 500, Gold at 2,000 and Platinum at 5,000. Points come from deposits, daily check-ins, the daily spin and referrals.</td></tr>
       <tr><th>Tags</th><td>casinovasgaming xp, casinovasgaming leveling, how to level up fast</td><td>casinovasgaming xp, casinovasgaming leveling, how to level up fast, vip points</td></tr>
-      <tr><th>Length</th><td>311 words</td><td>927 words</td></tr>
+      <tr><th>Length</th><td>311 words</td><td>1110 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
     <div><h3>Corrections made after fact-check</h3><ul><li>Removed deposit points and the 50-point game-request row.</li><li>Tier table shows points needed and daily spins only; referral share column removed.</li><li>Button labels corrected to &quot;Check in&quot; and &quot;Claim spin reward&quot;.</li><li>&quot;16 points a day&quot; qualified: only if you check in and spin each UTC day.</li><li>Removed &quot;the fastest way to add points is to deposit&quot;.</li></ul></div>
     <div><h3>Statements the code cannot confirm</h3><ul><li>Whether deposit points are meant to exist (see the reward fix).</li><li>The VIP page still lists a +50 game request and a +200 monthly bonus that nothing awards.</li></ul></div>
-    <div><h3>Questions for you</h3><ul><li>There is no XP or level system on the site; only VIP points and tiers exist. The old post's XP curve, streak milestones, Weekly Chest, Monthly Vault and coin bonuses were all invented. The rewrite says so and covers VIP points. Consider whether this slug should eventually redirect to the VIP tiers post.</li><li>The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The post publishes exact point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. OK to publish? If the values change, the post goes stale.</li><li>The public VIP page shows '+50 game request' and 'Monthly Activity Bonus +200' lines that are not implemented. The post does not repeat them. Remove them from the VIP page?</li><li>Points from a spin prize are added to the total but the tier label is not recalculated at that moment, so a member can pass a threshold and keep the old tier label until the next check-in.</li><li>I wrote that nothing removes points for inactivity (no decay found). Confirm there is no manual or database-side points reset.</li><li>The post says the check-in and mission use the UTC calendar day, while the published daily spin post describes the spin window as a rolling 24 hours. Confirm both descriptions.</li></ul></div>
+    <div><h3>Questions for you</h3><ul><li>There is no XP or level system on the site; only VIP points and tiers exist. The old post's XP curve, streak milestones, Weekly Chest, Monthly Vault and coin bonuses were all invented. The rewrite says so and covers VIP points. Consider whether this slug should eventually redirect to the VIP tiers post.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The post publishes exact point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. OK to publish? If the values change, the post goes stale.</li><li>The public VIP page shows '+50 game request' and 'Monthly Activity Bonus +200' lines that are not implemented. The post does not repeat them. Remove them from the VIP page?</li><li>I wrote that nothing removes points for inactivity (no decay found). Confirm there is no manual or database-side points reset.</li><li>The post says the check-in and mission use the UTC calendar day, while the published daily spin post describes the spin window as a rolling 24 hours. Confirm both descriptions.</li></ul></div>
   </div>
   <div class="cols">
     <div><h3>Before (live now, as stored)</h3><pre>Your casinovasgaming level is calculated directly from total XP earned: level L requires 100 × (L−1)² XP to reach. That means leveling up costs more each time — level 2 needs 100 XP, level 5 needs 1,600 XP, level 10 needs 8,100 XP — and every XP source (daily claims, streaks, referrals) counts toward it automatically.
@@ -544,27 +546,28 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 **Does level affect my VIP tier directly?** VIP tiers are based on total XP thresholds, not level number directly, but since both are driven by the same XP total, they move together.
 
 [Create your free account](/register) and start earning XP with your first daily claim.</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming does not have XP or numbered levels. Progress is measured in VIP points, and those points place you in one of four tiers: Bronze at 0, Silver at 500, Gold at 2,000 and Platinum at 5,000. Points come from daily check-ins, the daily spin and referrals.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming does not have XP or numbered levels. Progress is measured in VIP points, and those points place you in one of four tiers: Bronze at 0, Silver at 500, Gold at 2,000 and Platinum at 5,000. Points come from deposits, daily check-ins, the daily spin and referrals.</p>
 
 <h2>XP versus VIP points</h2>
 <p>If you searched for a Casinova XP curve or a level chart, there is not one. An earlier version of this page described an XP formula, level milestones and coin bonuses that the site does not have. The only progress number on your account is your VIP points total, and the only "levels" are the four VIP tiers. Everything below describes that system.</p>
 
 <h2>The four tiers</h2>
 <table>
-<thead><tr><th>Tier</th><th>Points needed</th><th>Daily spins</th></tr></thead>
+<thead><tr><th>Tier</th><th>Points needed</th><th>Referral share</th><th>Daily spins</th></tr></thead>
 <tbody>
-<tr><td>Bronze</td><td>0</td><td>1</td></tr>
-<tr><td>Silver</td><td>500</td><td>2</td></tr>
-<tr><td>Gold</td><td>2,000</td><td>3</td></tr>
-<tr><td>Platinum</td><td>5,000</td><td>3</td></tr>
+<tr><td>Bronze</td><td>0</td><td>5%</td><td>1</td></tr>
+<tr><td>Silver</td><td>500</td><td>10%</td><td>2</td></tr>
+<tr><td>Gold</td><td>2,000</td><td>15%</td><td>3</td></tr>
+<tr><td>Platinum</td><td>5,000</td><td>25%</td><td>3</td></tr>
 </tbody>
 </table>
-<p>Daily spins are per 24 hours. The public <a href="/vip">VIP page</a> lists the tiers and thresholds. Your own points and the gap to the next tier are on the VIP Status page in your dashboard. The <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> goes through the tiers one by one.</p>
+<p>Daily spins are per 24 hours. The referral share is the part of a referred player's first completed deposit that is credited to your Total Deposit wallet; it is set by your tier at that moment and paid once per referred player. Your tier is recalculated automatically whenever your points change. The public <a href="/vip">VIP page</a> lists the tiers and thresholds. Your own points and the gap to the next tier are on the VIP Status page in your dashboard. The <a href="/blog/casinovasgaming-vip-tiers-explained">VIP tiers guide</a> goes through the tiers one by one.</p>
 
 <h2>Where points come from</h2>
 <table>
 <thead><tr><th>Action</th><th>VIP points</th></tr></thead>
 <tbody>
+<tr><td>Confirmed deposit</td><td>The deposit amount rounded to the nearest whole number, minimum 1, once per deposit</td></tr>
 <tr><td>Daily check-in on the Daily rewards page ("Check in")</td><td>5 on the first day, 1 more for each consecutive day, up to 11 from day seven</td></tr>
 <tr><td>Daily mission: spin the wheel, then "Claim spin reward"</td><td>5</td></tr>
 <tr><td>Cash prize on the daily spin</td><td>10 points per dollar won, so 10 to 100</td></tr>
@@ -573,20 +576,21 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 </table>
 <p>A few details behind the table:</p>
 <ul>
+<li><strong>Deposits.</strong> Every confirmed deposit adds VIP points equal to the deposit amount rounded to the nearest whole number, with a minimum of 1. A $19.99 deposit is 20 points. Points are awarded once per deposit, whichever checkout method you use.</li>
 <li><strong>Check-in streak.</strong> The Daily rewards page in your dashboard has a Check in button. Day one pays 5 points, day two 6, and so on up to 11 on day seven and every day after. The day is counted in UTC. Miss one and the streak goes back to 5.</li>
 <li><strong>Daily mission.</strong> After you take your <a href="/spin">daily spin</a>, return to Daily rewards and tap Claim spin reward for 5 more points. One claim per day.</li>
 <li><strong>Spin prizes.</strong> The wheel pays $1, $2, $3, $4, $7 or $10, or nothing. A cash prize also adds 10 points per dollar, so a $3 result is 30 points. The <a href="/blog/daily-rewards-coins-guide">daily spin guide</a> explains the wheel.</li>
-<li><strong>Referrals.</strong> Each friend who signs up with your code adds VIP points. See the <a href="/blog/referral-program-earn-coins">referral guide</a>.</li>
+<li><strong>Referrals.</strong> Each friend who signs up with your code adds VIP points, and their first completed deposit pays you the referral share for your tier. See the <a href="/blog/referral-program-earn-coins">referral guide</a>.</li>
 </ul>
 
 <h2>How long does Silver take?</h2>
-<p>Silver is 500 points. Here is the arithmetic for a member who refers nobody and uses the check-in and the mission only:</p>
+<p>Silver is 500 points. Here is the arithmetic for the no-deposit path, a member who makes no deposits, refers nobody and uses the check-in and the mission only:</p>
 <ul>
 <li>First seven days of check-ins: 5 + 6 + 7 + 8 + 9 + 10 + 11 = 56 points.</li>
 <li>Seven daily missions: 35 points. First week total: 91.</li>
 <li>Each day after that: 11 for the check-in plus 5 for the mission, 16 points.</li>
 </ul>
-<p>At that pace 500 points takes about 33 days, provided you check in and spin every UTC day. Spin prizes and referrals shorten it. Gold at 2,000 and Platinum at 5,000 are long-term totals: at 16 points a day, Gold is roughly four months of unbroken days.</p>
+<p>At that pace 500 points takes about 33 days, provided you check in and spin every UTC day. Spin prizes, referrals and deposits shorten it; a single $19.99 deposit takes 20 points off the total. Gold at 2,000 and Platinum at 5,000 are long-term totals: at 16 points a day, Gold is roughly four months of unbroken days.</p>
 
 <h2>What points and tiers do not change</h2>
 <ul>
@@ -597,20 +601,20 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 </ul>
 <p>Points cannot be spent, traded or redeemed. They only set your tier and your place on the <a href="/leaderboard">leaderboard</a>, which the <a href="/blog/casinovasgaming-leaderboard-guide">leaderboard guide</a> describes.</p>
 
-<h2>Climbing without spending</h2>
-<p>None of the point sources involves spending: a check-in, a spin and a referral code are all free to use. That is worth keeping in mind, because a tier adds a daily spin or two and nothing more. It is not a reason to load a game, and no amount of play inside a game moves the counter. Set your deposit budget from what you can afford to lose and treat the points as a separate daily habit. If the two start to blur, take a break and read the <a href="/responsible-play">responsible play page</a>.</p>
+<h2>Climbing without overspending</h2>
+<p>The check-in, the spin and a referral code cost nothing to use, and on their own they reach Silver in about a month. Deposits add points too, which makes depositing the quickest way up and the worst reason to deposit. A tier adds a daily spin or two and a higher referral share; it does not pay back money spent to reach it. Play inside a game does not move the counter. Set your deposit budget from what you can afford to lose and let the points fall where they fall. If you notice yourself depositing to hit a threshold, take a break and read the <a href="/responsible-play">responsible play page</a>.</p>
 
 <h2>FAQ</h2>
 <h3>Does Casinova Gaming have XP or levels?</h3>
 <p>No. There is no XP and no level number. Accounts have a VIP points total and one of four tiers: Bronze, Silver, Gold or Platinum.</p>
 <h3>What is the fastest way to earn VIP points?</h3>
-<p>Check in and claim the daily mission after your spin. With a full streak that is 16 points a day if you check in and spin each UTC day, plus 10 points per dollar of any spin prize.</p>
+<p>Every confirmed deposit adds points equal to its amount, rounded to the nearest whole number, but points are not a reason to deposit. Without depositing, check in and claim the daily mission after your spin. With a full streak that is 16 points a day if you check in and spin each UTC day, plus 10 points per dollar of any spin prize.</p>
 <h3>Do VIP points expire?</h3>
 <p>Tiers follow your total points, and nothing in the program removes points for inactivity. Only the check-in streak resets if you miss a day.</p>
 <h3>Can I exchange VIP points for credits or cash?</h3>
 <p>No. Points only determine your tier and leaderboard rank.</p>
 <h3>Does a higher tier improve the deposit bonus or redeem limits?</h3>
-<p>No. The 100% and 50% deposit matches, the $5 to $500 load range and the 3x to 8x redeem rules are the same at every tier. A tier changes the number of daily spins.</p>
+<p>No. The 100% and 50% deposit matches, the $5 to $500 load range and the 3x to 8x redeem rules are the same at every tier. A tier changes your number of daily spins and your referral share.</p>
 
 <p><a href="/register?src=blog_casinovasgaming-xp-leveling-explained&amp;utm_source=blog&amp;utm_medium=cta&amp;utm_campaign=casinovasgaming-xp-leveling-explained">Create your free account</a> and tap Check in on day one.</p>
 <p>Casinova Gaming is for players 18+. Sweepstakes availability varies by jurisdiction; void where prohibited.</p></div></div>
@@ -625,20 +629,20 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
     <tbody>
       <tr><th>Title</th><td>Welcome to Casinova â€” How to Get Started</td><td>Welcome to Casinova Gaming: How to Get Started</td></tr>
       <tr><th>Search title</th><td>Welcome to Casinova â€” Getting Started Guide</td><td>Welcome to Casinova Gaming: How to Get Started | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>How to register, create game accounts, deposit, and earn VIP rewards at Casinova Gaming.</td><td>Start at Casinova in seven steps: create an account, upload ID, deposit by card, load $5 to $500 with a 100% first-deposit match, play, redeem.</td></tr>
-      <tr><th>Summary</th><td>Create your account, request a game desk, deposit, and start playing with VIP rewards.</td><td>To get started at Casinova Gaming, create a free account, deposit by card, open a live game such as Juwa or Game Vault, create your game login and load $5 to $500 from your wallet. The amount you load from your first deposit is matched 100%, and from your second 50%. Upload a government ID early, because every redeem needs an approved ID.</td></tr>
+      <tr><th>Search description</th><td>How to register, create game accounts, deposit, and earn VIP rewards at Casinova Gaming.</td><td>Start at Casinova in seven steps: create an account, upload ID, deposit at the site checkout, load $5 to $500 with a 100% first-deposit match, play.</td></tr>
+      <tr><th>Summary</th><td>Create your account, request a game desk, deposit, and start playing with VIP rewards.</td><td>To get started at Casinova Gaming, create a free account, deposit through the site checkout, open a live game such as Juwa or Game Vault, create your game login and load $5 to $500 from your wallet. The amount you load from your first deposit is matched 100%, and from your second 50%. Upload a government ID early, because every redeem needs an approved ID.</td></tr>
       <tr><th>Tags</th><td>getting started, casinova guide</td><td>getting started, casinova guide</td></tr>
-      <tr><th>Length</th><td>81 words</td><td>1048 words</td></tr>
+      <tr><th>Length</th><td>81 words</td><td>1139 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
     <div><h3>Corrections made after fact-check</h3><ul><li>Payment wording corrected; money is credited &quot;after the payment is confirmed&quot;.</li><li>Bonus table restated in load terms ($20 loaded, $20 bonus).</li><li>Dashboard described accurately: wallet and VIP tier there, a panel on each game's page.</li><li>Removed &quot;usually finished long before you need it&quot; and the referral share.</li><li>Game Vault no longer called &quot;slots-heavy&quot;.</li></ul></div>
     <div><h3>Statements the code cannot confirm</h3><ul><li>Which payment methods the live checkout shows, and the deposit amounts it offers.</li><li>Whether any manual approval step remains on deposits.</li></ul></div>
-    <div><h3>Questions for you</h3><ul><li>The current title contains broken characters; the new title uses a colon.</li><li>Old post said 'Submit a deposit request, wait for approval'. The rewrite describes card checkout with the wallet credited after the payment is confirmed. Correct for all deposits today?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.</li><li>Step 2 says deposits, logins and loads work before ID approval and only redeem is locked (taken from the published ID guide). Confirm still true.</li><li>Old post mentioned 'better support and bonuses' at higher VIP tiers. Tiers do not change the deposit bonus, so I left that out.</li></ul></div>
+    <div><h3>Questions for you</h3><ul><li>The current title contains broken characters; the new title uses a colon.</li><li>Old post said 'Submit a deposit request, wait for approval'. The rewrite describes card checkout with the wallet credited after the payment is confirmed. Correct for all deposits today?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?</li><li>The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.</li><li>Step 2 says deposits, logins and loads work before ID approval and only redeem is locked (taken from the published ID guide). Confirm still true.</li><li>Old post mentioned 'better support and bonuses' at higher VIP tiers. Tiers do not change the deposit bonus, so I left that out.</li></ul></div>
   </div>
   <div class="cols">
     <div><h3>Before (live now, as stored)</h3><pre>&lt;p&gt;Casinova is your premium gaming desk for Juwa, Game Vault, fish tables, and more.&lt;/p&gt;&lt;h2&gt;1. Create an account&lt;/h2&gt;&lt;p&gt;Register with email, confirm if required, then complete your profile.&lt;/p&gt;&lt;h2&gt;2. Request a game account&lt;/h2&gt;&lt;p&gt;Open any live game page and create or load your platform account from the wallet panel.&lt;/p&gt;&lt;h2&gt;3. Deposit &amp;amp; play&lt;/h2&gt;&lt;p&gt;Submit a deposit request, wait for approval, then load credits into your game.&lt;/p&gt;&lt;h2&gt;4. Earn VIP&lt;/h2&gt;&lt;p&gt;Points unlock Silver, Gold, and Platinum perks with better support and bonuses.&lt;/p&gt;</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>To get started at Casinova Gaming, create a free account, deposit by card, open a live game such as Juwa or Game Vault, create your game login and load $5 to $500 from your wallet. The amount you load from your first deposit is matched 100%, and from your second 50%. Upload a government ID early, because every redeem needs an approved ID.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>To get started at Casinova Gaming, create a free account, deposit through the site checkout, open a live game such as Juwa or Game Vault, create your game login and load $5 to $500 from your wallet. The amount you load from your first deposit is matched 100%, and from your second 50%. Upload a government ID early, because every redeem needs an approved ID.</p>
 
 <h2>Before you sign up</h2>
 <p>Casinova Gaming is a sweepstakes gaming platform, not a licensed casino. It is for adults 18 and over, and availability varies by jurisdiction, so check the rules where you live first. Outcomes in every game are based on chance. Only deposit money you can afford to lose.</p>
@@ -649,8 +653,8 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 <h2>Step 2: Upload your ID</h2>
 <p>You can deposit, load and play before your ID is checked, but redeem stays locked until it is approved. The review is done by a person, so the time depends on the queue. Uploading on day one means the check is not what holds up your first redeem. The <a href="/blog/casinova-id-verification-guide">ID verification guide</a> explains what photo to take and why uploads get rejected.</p>
 
-<h2>Step 3: Deposit by card</h2>
-<p>Open Deposit in your dashboard, choose one of the amounts shown and pay at checkout. Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered. Pay only through the checkout on the site, never to a personal handle because a message asked you to. After the payment is confirmed, the money shows in your wallet as your Total Deposit balance. Each step is covered in the <a href="/blog/wallet-deposit-guide-casinovasgaming">card deposit guide</a>.</p>
+<h2>Step 3: Deposit through the checkout</h2>
+<p>Open Deposit in your dashboard, choose one of the amounts shown and pay at checkout. Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. Pay only through the checkout on the site, never to a personal handle because a message asked you to. After the payment is confirmed, the money shows in your wallet as your Total Deposit balance. Each step is covered in the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</p>
 
 <h2>Step 4: Pick a live game and create your login</h2>
 <p>Eight games can be loaded now:</p>
@@ -687,9 +691,9 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 <ul>
 <li><strong>Daily spin.</strong> The <a href="/spin">wheel</a> pays $1, $2, $3, $4, $7 or $10, or nothing. Bronze members get one spin per 24 hours.</li>
 <li><strong>Daily check-in.</strong> The Daily rewards page in your dashboard adds VIP points each day you tap Check in.</li>
-<li><strong>Referral code.</strong> Your Referrals page has a code to share. Each friend who signs up with it adds VIP points.</li>
+<li><strong>Referral code.</strong> Your Referrals page has a code to share. Each friend who signs up with it adds VIP points. When a player you referred makes their first completed deposit, you also receive a share of it in your Total Deposit wallet: 5% at Bronze, 10% at Silver, 15% at Gold and 25% at Platinum, set by your tier at that moment and paid once per referred player.</li>
 </ul>
-<p>VIP points move you from Bronze to Silver at 500, Gold at 2,000 and Platinum at 5,000, and a higher tier means more daily spins. The <a href="/vip">VIP page</a> lists the tiers; your own points are on the VIP Status page in your dashboard.</p>
+<p>Every confirmed deposit also adds VIP points, equal to the amount rounded to the nearest whole number. VIP points move you from Bronze to Silver at 500, Gold at 2,000 and Platinum at 5,000, and a higher tier means more daily spins and a larger referral share. The <a href="/vip">VIP page</a> lists the tiers; your own points are on the VIP Status page in your dashboard.</p>
 
 <h2>If you get stuck</h2>
 <p>Once you are logged in, the chat is available 24/7 and has an AI Assistant tab and a Real Agent tab; the dashboard also has a Messages inbox. For anything about money, choose Real Agent or Messages. The <a href="/support">support page</a> answers the common questions. And if playing stops being enjoyable, the <a href="/responsible-play">responsible play page</a> lists ways to take a break.</p>
@@ -704,7 +708,7 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
 <h3>Which game should I load first?</h3>
 <p>Slots are the simplest format to learn, so a slots app such as Cash Machine or Cash Frenzy is a gentle first load. Pick by the type of game you enjoy.</p>
 <h3>How do I pay?</h3>
-<p>By card, through the checkout in your dashboard. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</p>
+<p>Through the checkout in your dashboard. The checkout lists the methods available to you.</p>
 
 <p><a href="/register?src=blog_welcome-to-casinova&amp;utm_source=blog&amp;utm_medium=cta&amp;utm_campaign=welcome-to-casinova">Create your free account</a> and take your first daily spin while your ID is in review.</p>
 <p>Casinova Gaming is for players 18+. Sweepstakes availability varies by jurisdiction; void where prohibited.</p></div></div>
@@ -719,10 +723,10 @@ XP doesn't just raise your level — it also moves you through [VIP tiers](/blog
     <tbody>
       <tr><th>Title</th><td>casinovasgaming vs Other Fish Table Platforms -- What Makes Us Different</td><td>How Casinova Gaming Differs From Other Fish Table Platforms</td></tr>
       <tr><th>Search title</th><td>casinovasgaming vs Other Fish Table Platforms -- What Makes Us Different | casinovasgaming</td><td>How Casinova Differs From Fish Table Platforms | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>Compare casinovasgaming to other fish table operators. All 12 games, under-1-hour account setup, transparent bonuses, rewards program and reliable payouts.</td><td>What sets Casinova Gaming apart in ways you can verify: deposits by card, published $5 to $500 load and 3x to 8x redeem rules, and ID review.</td></tr>
-      <tr><th>Summary</th><td>With dozens of fish table operators online, what sets casinovasgaming apart? Here is an honest comparison: game selection, support speed, bonus structure and payout reliability.</td><td>Casinova Gaming differs from many fish table platforms in ways you can check yourself: deposits are by card through a checkout on the site, the load and redeem rules are published and identical for every game, and every redeem requires an approved government ID and a staff review. This page lists what Casinova does, without rating any other operator, and gives you questions to ask any platform before you deposit.</td></tr>
+      <tr><th>Search description</th><td>Compare casinovasgaming to other fish table operators. All 12 games, under-1-hour account setup, transparent bonuses, rewards program and reliable payouts.</td><td>What sets Casinova Gaming apart in ways you can verify: deposits through the site checkout, published $5 to $500 load and 3x to 8x redeem rules, and ID review.</td></tr>
+      <tr><th>Summary</th><td>With dozens of fish table operators online, what sets casinovasgaming apart? Here is an honest comparison: game selection, support speed, bonus structure and payout reliability.</td><td>Casinova Gaming differs from many fish table platforms in ways you can check yourself: deposits go through a checkout on the site, the load and redeem rules are published and identical for every game, and every redeem requires an approved government ID and a staff review. This page lists what Casinova does, without rating any other operator, and gives you questions to ask any platform before you deposit.</td></tr>
       <tr><th>Tags</th><td>casinovasgaming review, best fish table platform, casinovasgaming vs other operators</td><td>casinovasgaming review, best fish table platform, casinovasgaming vs other operators</td></tr>
-      <tr><th>Length</th><td>179 words</td><td>1071 words</td></tr>
+      <tr><th>Length</th><td>179 words</td><td>1087 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -761,14 +765,14 @@ Real-time support via WhatsApp, Telegram and Messenger -- the channels you alrea
 ## 6. Reliable Payouts
 
 Payouts via CashApp, Zelle and crypto are sent promptly after request.</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming differs from many fish table platforms in ways you can check yourself: deposits are by card through a checkout on the site, the load and redeem rules are published and identical for every game, and every redeem requires an approved government ID and a staff review. This page lists what Casinova does, without rating any other operator, and gives you questions to ask any platform before you deposit.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Casinova Gaming differs from many fish table platforms in ways you can check yourself: deposits go through a checkout on the site, the load and redeem rules are published and identical for every game, and every redeem requires an approved government ID and a staff review. This page lists what Casinova does, without rating any other operator, and gives you questions to ask any platform before you deposit.</p>
 
 <h2>Why this is not a ranking</h2>
 <p>We cannot verify how other operators handle deposits, payouts or support, so we will not score them or name them. Comparison pages that do are usually guessing. What we can do is state our own rules precisely and show you where to confirm each one on the site. You can then hold any other platform to the same test.</p>
 
-<h2>1. Deposits by card, through a checkout</h2>
-<p>At Casinova you add money through the checkout in your dashboard, by card, choosing one of the amounts shown. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</p>
-<p>That has two practical effects. A card payment leaves a record with your card issuer, which a transfer to a personal payment handle does not. And it gives you a simple rule for messages that claim to be from Casinova: do not send money to a personal handle because a message asked you to. The <a href="/blog/wallet-deposit-guide-casinovasgaming">card deposit guide</a> shows the checkout step by step.</p>
+<h2>1. Deposits through the site checkout, through a checkout</h2>
+<p>At Casinova you add money through the checkout in your dashboard, choosing one of the amounts shown. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</p>
+<p>That has two practical effects. A payment made through the checkout leaves a record with the payment provider, which a transfer to a personal payment handle does not. And it gives you a simple rule for messages that claim to be from Casinova: do not send money to a personal handle because a message asked you to. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> shows the checkout step by step.</p>
 
 <h2>2. Published load and redeem rules</h2>
 <p>The numbers are the same for every live game and every VIP tier:</p>
@@ -817,9 +821,9 @@ Payouts via CashApp, Zelle and crypto are sent promptly after request.</pre></di
 
 <h2>FAQ</h2>
 <h3>Is Casinova Gaming better than other fish table platforms?</h3>
-<p>We do not rank other operators because we cannot verify their practices. What we can state is our own: deposits by card through a checkout, published load and redeem rules, and ID review on every redeem.</p>
+<p>We do not rank other operators because we cannot verify their practices. What we can state is our own: deposits through a checkout on the site, published load and redeem rules, and ID review on every redeem.</p>
 <h3>How do deposits work at Casinova?</h3>
-<p>By card, through the checkout in your dashboard, in the amounts shown there. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</p>
+<p>Through the checkout in your dashboard, in the amounts shown there. The checkout lists the methods available to you.</p>
 <h3>How many games does Casinova have?</h3>
 <p>Eight are live and loadable now. Six more are coming soon and cannot be loaded yet.</p>
 <h3>Are the redeem rules different for each game?</h3>
@@ -841,13 +845,13 @@ Payouts via CashApp, Zelle and crypto are sent promptly after request.</pre></di
       <tr><th>Search description</th><td>Does casinovasgaming have a no-deposit bonus? Here's the honest answer, plus what's genuinely free: welcome bonus, daily rewards and referrals.</td><td>Casinova has no signup credit or promo codes. The offer is a 100% first-deposit match, 50% on the second, plus a daily spin worth $1 to $10 or nothing.</td></tr>
       <tr><th>Summary</th><td>casinovasgaming doesn't offer a true no-deposit bonus — here's what's actually free: the welcome bonus, daily rewards and referral coins.</td><td>Not in the usual sense. Casinova Gaming has no signup credit and no promo codes. The bonus is a deposit match: 100% on your first deposit and 50% on your second, applied to the amount you load into a game. The daily spin can add $1 to $10, or nothing, to your wallet without a deposit.</td></tr>
       <tr><th>Tags</th><td>sweepstakes no deposit bonus, free sweepstakes coins</td><td>sweepstakes no deposit bonus, free sweepstakes coins</td></tr>
-      <tr><th>Length</th><td>317 words</td><td>1002 words</td></tr>
+      <tr><th>Length</th><td>317 words</td><td>1058 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
     <div><h3>Corrections made after fact-check</h3><ul><li>Reframed: no signup credit and no promo code; the daily spin can add $1 to $10 or nothing without a deposit.</li><li>Removed every &quot;$5 deposit&quot; example; examples are now &quot;$5 loaded from a first deposit&quot;.</li><li>&quot;One wallet and no second currency&quot; replaced with the two dollar balances.</li><li>Referral share row removed.</li></ul></div>
     <div><h3>Statements the code cannot confirm</h3><ul><li>Which payment methods the live checkout shows, and the deposit amounts it offers.</li><li>How the match is applied when a first deposit is loaded in parts.</li></ul></div>
-    <div><h3>Questions for you</h3><ul><li>Old post claimed a 250-coin welcome bonus, 100 coins per daily claim, 1,000 coins per referral, streak milestones up to 15,000 coins and a 50% bonus on the first deposit. None exist; removed.</li><li>Framing used: no signup credit and no promo code, but the daily spin can add $1 to $10 to the wallet without a deposit. Is that the framing you want across the site?</li><li>Can spin winnings be loaded into a game with no deposit history at all, once the wallet reaches $5? The post says yes, following the published daily spin post. Please confirm.</li><li>The post says a spin needs 'an account, not a deposit'. Is anything else required before a first spin, such as a verified email, phone or ID?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.</li><li>If a first deposit is loaded in several parts, is every part matched 100% until that deposit is used up, or only the first load? The post says the match applies to the amount you load and points readers to the load guide.</li><li>The post says the referral code is the only code on the site and that Casinova issues no bonus codes. Confirm the checkout page shows no coupon box.</li><li>Tag 'free sweepstakes coins' kept from the old post; Casinova has no coins. Remove if you prefer.</li><li>The repo defines a separate redeem rule (7x to 15x) for loads from the bonus balance. Does any part of the deposit match fall under that rule? The post states only 3x.</li></ul></div>
+    <div><h3>Questions for you</h3><ul><li>Old post claimed a 250-coin welcome bonus, 100 coins per daily claim, 1,000 coins per referral, streak milestones up to 15,000 coins and a 50% bonus on the first deposit. None exist; removed.</li><li>Framing used: no signup credit and no promo code, but the daily spin can add $1 to $10 to the wallet without a deposit. Is that the framing you want across the site?</li><li>Can spin winnings be loaded into a game with no deposit history at all, once the wallet reaches $5? The post says yes, following the published daily spin post. Please confirm.</li><li>The post says a spin needs 'an account, not a deposit'. Is anything else required before a first spin, such as a verified email, phone or ID?</li><li>Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.</li><li>If a first deposit is loaded in several parts, is every part matched 100% until that deposit is used up, or only the first load? The post says the match applies to the amount you load and points readers to the load guide.</li><li>The post says the referral code is the only code on the site and that Casinova issues no bonus codes. Confirm the checkout page shows no coupon box.</li><li>Tag 'free sweepstakes coins' kept from the old post; Casinova has no coins. Remove if you prefer.</li><li>The repo defines a separate redeem rule (7x to 15x) for loads from the bonus balance. Does any part of the deposit match fall under that rule? The post states only 3x.</li></ul></div>
   </div>
   <div class="cols">
     <div><h3>Before (live now, as stored)</h3><pre>casinovasgaming doesn't offer a true &quot;no deposit&quot; bonus — like nearly every sweepstakes platform, playing with real credits requires funding your wallet first. But there are genuinely free ways to earn coins and XP without depositing, and it's worth knowing what those actually are before searching for a no-deposit promo that doesn't exist here.
@@ -886,9 +890,10 @@ Your first deposit also qualifies for a [50% bonus](/blog/50-percent-first-depos
 <tr><td>Second deposit match</td><td>Yes</td><td>50% of the amount you load</td></tr>
 <tr><td>Daily spin</td><td>No</td><td>$1, $2, $3, $4, $7 or $10 added to your wallet, or nothing</td></tr>
 <tr><td>Daily check-in and spin mission</td><td>No</td><td>VIP points only, no cash value</td></tr>
+<tr><td>Referral share</td><td>Not from you</td><td>5%, 10%, 15% or 25% of a referred player's first completed deposit, by your VIP tier, credited to your Total Deposit wallet once per referred player</td></tr>
 </tbody>
 </table>
-<p>There is nothing after the second deposit match.</p>
+<p>There is nothing after the second deposit match. Every confirmed deposit also adds VIP points, equal to the amount rounded to the nearest whole number; they count toward your tier and have no cash value.</p>
 
 <h2>The deposit match in numbers</h2>
 <p>The match follows the order of your deposits, not the game you choose, and it is applied to what you load. Loads run from $5 to $500.</p>
@@ -898,7 +903,7 @@ Your first deposit also qualifies for a [50% bonus](/blog/50-percent-first-depos
 <li>$50 loaded from a second deposit: $25 bonus.</li>
 <li>$50 loaded from a third deposit: no bonus.</li>
 </ul>
-<p>Deposits themselves are made in the amounts shown at checkout, by card. Because the first match is the largest and happens once, it is worth deciding your budget before the first deposit and not after. That is not a reason to deposit more than you planned. The <a href="/blog/maximize-fish-table-bonus">deposit bonus guide</a> and the <a href="/blog/deposit-amounts-and-limits-casinova">limits guide</a> go through the details.</p>
+<p>Deposits themselves are made in the amounts shown at checkout. Because the first match is the largest and happens once, it is worth deciding your budget before the first deposit and not after. That is not a reason to deposit more than you planned. The <a href="/blog/maximize-fish-table-bonus">deposit bonus guide</a> and the <a href="/blog/deposit-amounts-and-limits-casinova">limits guide</a> go through the details.</p>
 
 <h2>The daily spin: no deposit needed, but small</h2>
 <p>The <a href="/spin">daily spin</a> is the closest thing Casinova has to something for nothing. You need an account, not a deposit. Bronze members get one spin per 24 hours, Silver two, Gold and Platinum three. The wheel has cash segments of $1, $2, $3, $4, $7 and $10 and segments that pay nothing, and a blank is a normal result.</p>
@@ -948,9 +953,9 @@ Your first deposit also qualifies for a [50% bonus](/blog/50-percent-first-depos
       <tr><th>Title</th><td>Fish Table Sweepstakes Games — The Complete Guide</td><td>Fish Table Sweepstakes Games Explained</td></tr>
       <tr><th>Search title</th><td>Fish Table Sweepstakes Games — The Complete Guide | casinovasgaming</td><td>Fish Table Sweepstakes Games Explained | Casinova Gaming</td></tr>
       <tr><th>Search description</th><td>Fish table sweepstakes games explained: how the legal sweepstakes model works, the casinovasgaming game lineup, and how to start playing in minutes.</td><td>Fish table sweepstakes games are chance-based shooters on a sweepstakes platform. See which live Casinova games have them and how loads and redeems work.</td></tr>
-      <tr><th>Summary</th><td>What fish table sweepstakes games are, how the legal sweepstakes model works, and how to start playing any game in the casinovasgaming lineup.</td><td>Fish table sweepstakes games are arcade-style shooters, where you fire at fish that each carry a credit value, offered on a platform that runs under a sweepstakes model and not as a licensed casino. At Casinova Gaming, fish games sit inside live apps such as Juwa, Game Vault and Vegas Sweeps. You deposit by card, load $5 to $500 into the app, and can redeem once the game balance reaches 3x the load.</td></tr>
+      <tr><th>Summary</th><td>What fish table sweepstakes games are, how the legal sweepstakes model works, and how to start playing any game in the casinovasgaming lineup.</td><td>Fish table sweepstakes games are arcade-style shooters, where you fire at fish that each carry a credit value, offered on a platform that runs under a sweepstakes model and not as a licensed casino. At Casinova Gaming, fish games sit inside live apps such as Juwa, Game Vault and Vegas Sweeps. You deposit through the site checkout, load $5 to $500 into the app, and can redeem once the game balance reaches 3x the load.</td></tr>
       <tr><th>Tags</th><td>fish table sweepstakes, sweepstakes fish table games</td><td>fish table sweepstakes, sweepstakes fish table games</td></tr>
-      <tr><th>Length</th><td>304 words</td><td>1104 words</td></tr>
+      <tr><th>Length</th><td>304 words</td><td>1126 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -983,7 +988,7 @@ Three things distinguish it from a regular arcade cabinet or slot: a shooting-ba
 **Which fish table game should I start with?** See [how to choose a fish table game](/blog/how-to-choose-a-fish-table-game) for a beginner-friendly breakdown.
 
 [Create your free account](/register) and load your first fish table game in minutes.</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Fish table sweepstakes games are arcade-style shooters, where you fire at fish that each carry a credit value, offered on a platform that runs under a sweepstakes model and not as a licensed casino. At Casinova Gaming, fish games sit inside live apps such as Juwa, Game Vault and Vegas Sweeps. You deposit by card, load $5 to $500 into the app, and can redeem once the game balance reaches 3x the load.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>Fish table sweepstakes games are arcade-style shooters, where you fire at fish that each carry a credit value, offered on a platform that runs under a sweepstakes model and not as a licensed casino. At Casinova Gaming, fish games sit inside live apps such as Juwa, Game Vault and Vegas Sweeps. You deposit through the site checkout, load $5 to $500 into the app, and can redeem once the game balance reaches 3x the load.</p>
 
 <h2>Two ideas in one phrase</h2>
 <p>"Fish table sweepstakes" joins a game format and a platform model, and it helps to separate them.</p>
@@ -1020,7 +1025,7 @@ Three things distinguish it from a regular arcade cabinet or slot: a shooting-ba
 <h2>How the Casinova side works</h2>
 <ol>
 <li><strong>Create a free account</strong> and verify your email.</li>
-<li><strong>Deposit by card</strong> through the checkout in your dashboard, choosing one of the amounts shown. Cash App, Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
+<li><strong>Deposit through the checkout</strong> through the checkout in your dashboard, choosing one of the amounts shown. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
 <li><strong>Open a live game and create your game login</strong> from the panel on its page.</li>
 <li><strong>Load $5 to $500.</strong> The amount you load from your first deposit is matched 100%, and from your second 50%. See <a href="/blog/how-to-load-credits-from-wallet">how to load credits</a>.</li>
 <li><strong>Play</strong> in the provider's app or web player.</li>
@@ -1067,7 +1072,7 @@ Three things distinguish it from a regular arcade cabinet or slot: a shooting-ba
       <tr><th>Search description</th><td>New to fish table games? This complete beginner guide explains how they work, which game to start with, and how to claim a 50% first deposit bonus at casinovasgaming.</td><td>New to fish table games? What the screen shows, what you control, the $5 to $500 load and 3x redeem rules at Casinova, and a first session plan.</td></tr>
       <tr><th>Summary</th><td>Never played a fish table game before? This guide covers exactly what they are, how they work, which one to start with, and how to claim your first deposit bonus.</td><td>A fish table game is a shared shooting game: every shot costs a bet you set, and a fish pays a multiple of that bet if your shot takes it. As a beginner, learn three things first: the bet-per-shot control, how quickly a balance moves, and the load and redeem rules. Outcomes are decided by the game software, so plan a first session as entertainment with a fixed budget.</td></tr>
       <tr><th>Tags</th><td>beginner fish table guide, fish table games explained, how fish table games work</td><td>beginner fish table guide, fish table games explained, how fish table games work</td></tr>
-      <tr><th>Length</th><td>251 words</td><td>1179 words</td></tr>
+      <tr><th>Length</th><td>251 words</td><td>1206 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1125,7 +1130,7 @@ Every new player gets a 50% bonus on their first deposit. Deposit $50 and start 
 <ol>
 <li><strong>Create a Casinova account</strong> and confirm your email from the link we send.</li>
 <li><strong>Upload your ID early.</strong> Redeem needs an approved government ID, and the <a href="/blog/casinova-id-verification-guide">ID guide</a> explains what to send. Doing it first means it is not the thing you wait on later.</li>
-<li><strong>Deposit by card.</strong> Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts.</li>
+<li><strong>Deposit through the checkout on the site.</strong> Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts.</li>
 <li><strong>Pick a live game that has fish tables.</strong> Five live games list fish games in their mix: <a href="/games/game-vault">Game Vault</a>, <a href="/games/juwa">Juwa</a>, <a href="/games/mr-all-in-one">MR All In One</a>, <a href="/games/vegas-sweeps">Vegas Sweeps</a> and <a href="/games/gameroom">Gameroom</a>.</li>
 <li><strong>Create the game login</strong> from that game's page, then use Load to move $5 to $500 from your wallet into the game. The <a href="/blog/how-to-load-credits-from-wallet">load guide</a> walks through the panel.</li>
 </ol>
@@ -1189,7 +1194,7 @@ Every new player gets a 50% bonus on their first deposit. Deposit $50 and start 
       <tr><th>Search description</th><td>We rank all 12 casinovasgaming fish table and sweepstakes games. Find the best game for your play style, bonus appetite and experience level.</td><td>Five live Casinova games include fish games: Game Vault, Juwa, MR All In One, Vegas Sweeps and Gameroom. An unranked list with each stated mix.</td></tr>
       <tr><th>Summary</th><td>We rank all 12 casinovasgaming fish table and sweepstakes games by payout style, bonus frequency and beginner-friendliness.</td><td>Five live games at Casinova Gaming list fish games in their mix: Game Vault, Juwa, MR All In One, Vegas Sweeps and Gameroom. We do not rank them, because the providers publish no odds or other comparable figures, and the Casinova terms are identical for all of them. This page describes each by its stated mix of game types so you can choose by what you want to play.</td></tr>
       <tr><th>Tags</th><td>fish table games, best sweepstakes games, fish table online 2025</td><td>fish table games, best sweepstakes games, fish table online</td></tr>
-      <tr><th>Length</th><td>183 words</td><td>988 words</td></tr>
+      <tr><th>Length</th><td>183 words</td><td>991 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1260,7 +1265,7 @@ Here's how our 12 games stack up across three criteria: consistency (how steady 
 
 <h2>What is identical in every live game</h2>
 <ul>
-<li><strong>Loads:</strong> $5 minimum, $500 maximum per load, from one Casinova wallet. Deposits are by card.</li>
+<li><strong>Loads:</strong> $5 minimum, $500 maximum per load, from one Casinova wallet. Deposits go through the checkout on the site.</li>
 <li><strong>Deposit match:</strong> 100% on your first deposit and 50% on your second, applied when you load. Nothing after that.</li>
 <li><strong>Redeem:</strong> opens when the game balance reaches 3x the load, capped at 8x the load in total, with an approved government ID and a staff review. We do not promise a payout time.</li>
 <li><strong>Not published:</strong> odds or payout percentages, for any game. There are no promo codes.</li>
@@ -1289,7 +1294,7 @@ Here's how our 12 games stack up across three criteria: consistency (how steady 
 <h3>Can I play Fire Kirin or Orion Stars at Casinova?</h3>
 <p>Not yet. Both are coming soon and cannot be loaded. The live games whose mix includes fish games are Game Vault, Juwa, MR All In One, Vegas Sweeps and Gameroom.</p>
 <h3>Do I need a separate deposit for each game?</h3>
-<p>No. One card deposit goes into your Casinova wallet, and you load any live game from it, $5 to $500 at a time. Each game has its own login and its own panel.</p></div></div>
+<p>No. One deposit goes into your Casinova wallet, and you load any live game from it, $5 to $500 at a time. Each game has its own login and its own panel.</p></div></div>
   </div>
 </section>
 
@@ -1403,7 +1408,7 @@ Across every game above, the pattern is the same: hold your highest cannon power
       <tr><th>Search description</th><td>Searching for Fish Em Up? It's not in the casinovasgaming lineup — play Fire Kirin, Juwa, Orion Stars and more fish table games instead, free account today.</td><td>Fish Em Up is a game Casinova does not offer. See the five live games that include fish games, how loading works, and the 3x and 8x redeem rules.</td></tr>
       <tr><th>Summary</th><td>Fish Em Up isn't part of the casinovasgaming catalog — here are the closest fish table games you can actually play, like Fire Kirin and Juwa.</td><td>Fish Em Up is not a game Casinova Gaming offers, and you cannot create an account for it or load it here. If you searched the name because you want a fish shooting game, five live games at Casinova list fish games in their mix: Game Vault, Juwa, MR All In One, Vegas Sweeps and Gameroom, each loadable from one wallet with $5 to $500 loads.</td></tr>
       <tr><th>Tags</th><td>fish em up, play fish em up, fish table games online</td><td>fish em up, play fish em up, fish table games online</td></tr>
-      <tr><th>Length</th><td>284 words</td><td>886 words</td></tr>
+      <tr><th>Length</th><td>284 words</td><td>915 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1469,7 +1474,7 @@ Every fish table game here shares one wallet — fund it once by CashApp, Zelle 
 <h2>How starting works at Casinova</h2>
 <ol>
 <li><strong>Create a Casinova account</strong> and confirm your email from the link we send.</li>
-<li><strong>Deposit by card.</strong> Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
+<li><strong>Deposit through the checkout on the site.</strong> Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
 <li><strong>Open a live game page and tap Create Account.</strong> Your game login appears in the panel on that page when it is ready.</li>
 <li><strong>Load $5 to $500</strong> from your wallet into the game. The <a href="/blog/how-to-load-credits-from-wallet">load guide</a> covers the panel.</li>
 <li><strong>Play</strong> in the provider's app or web player using the login from the panel.</li>
@@ -1493,7 +1498,7 @@ Every fish table game here shares one wallet — fund it once by CashApp, Zelle 
 <h3>Will Casinova add Fish Em Up?</h3>
 <p>We have nothing to announce. The games currently marked coming soon are Orion Stars, Fire Kirin, Panda Master, Vblink, Milky Way and Ultrapanda, and none of those can be loaded yet.</p>
 <h3>How do I pay at Casinova?</h3>
-<p>Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered. Loads from your wallet into a game run from $5 to $500.</p></div></div>
+<p>Deposits go through the checkout on the site. The checkout lists the methods available to you. Loads from your wallet into a game run from $5 to $500.</p></div></div>
   </div>
 </section>
 
@@ -1508,7 +1513,7 @@ Every fish table game here shares one wallet — fund it once by CashApp, Zelle 
       <tr><th>Search description</th><td>Learn how to play Game Vault online at casinovasgaming. One login gives you access to fish tables, slots and arcade games — plus a 50% first deposit bonus.</td><td>How to play Game Vault online via Casinova: where the web player and app links are, how the login panel works, and the $5 to $500 load and 3x redeem rules.</td></tr>
       <tr><th>Summary</th><td>Game Vault is the only casinovasgaming game that packs fish tables, slots and arcade games into one platform. Here's everything you need to know.</td><td>To play Game Vault online through Casinova Gaming, create a Casinova account, open the Game Vault page, create your game login in the panel, load $5 to $500 from your wallet, then open the provider's web player or app download from the buttons on that page. Game Vault itself is a lobby of slots, keno and fish games run by its provider; Casinova handles the login, loads and redeems.</td></tr>
       <tr><th>Tags</th><td>game vault online, game vault sweepstakes, game vault fish table</td><td>game vault online, game vault sweepstakes, game vault fish table</td></tr>
-      <tr><th>Length</th><td>155 words</td><td>1145 words</td></tr>
+      <tr><th>Length</th><td>155 words</td><td>1171 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1573,7 +1578,7 @@ Game Vault includes:
 <ol>
 <li><strong>Create a Casinova account</strong> and confirm your email.</li>
 <li><strong>Open the Game Vault page and tap Create Account.</strong> In the panel, request your game login. The username and password appear under Your Account when the request completes. <a href="/blog/how-to-create-game-vault-account">How to create a Game Vault account</a> goes through every screen.</li>
-<li><strong>Fund your wallet by card</strong> if it is empty. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts. Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</li>
+<li><strong>Fund your wallet through the checkout</strong> if it is empty. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts. Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</li>
 <li><strong>Load.</strong> Enter $5 to $500 on the Load tab. The panel shows what will arrive in the game, including any deposit match, before you confirm.</li>
 <li><strong>Open the web player or app</strong> and sign in with the username and password from the panel.</li>
 </ol>
@@ -1609,7 +1614,7 @@ Game Vault includes:
 <h3>Where do I get a Game Vault login?</h3>
 <p>From the Game Vault page at Casinova. Tap Create Account, request the login in the panel, and the username and password appear there when the request completes. Creating the login is free.</p>
 <h3>Do I deposit inside Game Vault?</h3>
-<p>No. You deposit by card into your Casinova wallet, then use the Load tab on the Game Vault page to move $5 to $500 into the game.</p>
+<p>No. You deposit through the site checkout into your Casinova wallet, then use the Load tab on the Game Vault page to move $5 to $500 into the game.</p>
 <h3>Is Game Vault the same on the web player and the app?</h3>
 <p>Both open the same provider lobby with the same login and balance. The difference is only whether you install an app or use a browser tab.</p></div></div>
   </div>
@@ -1623,10 +1628,10 @@ Game Vault includes:
     <tbody>
       <tr><th>Title</th><td>How to Create a Game Vault Account at casinovasgaming -- Complete Guide</td><td>How to Create a Game Vault Account at Casinova Gaming</td></tr>
       <tr><th>Search title</th><td>How to Create a Game Vault Account at casinovasgaming | Complete Guide</td><td>How to Create a Game Vault Account: Every Step | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>Create your Game Vault account at casinovasgaming. One login gives you fish tables, slots and arcade. 50% first deposit bonus. Account setup within the hour.</td><td>Create a Game Vault account at Casinova: register, confirm your email, request the login in the game panel, then load $5 to $500 by card deposit.</td></tr>
+      <tr><th>Search description</th><td>Create your Game Vault account at casinovasgaming. One login gives you fish tables, slots and arcade. 50% first deposit bonus. Account setup within the hour.</td><td>Create a Game Vault account at Casinova: register, confirm your email, request the login in the game panel, then load $5 to $500 after a deposit.</td></tr>
       <tr><th>Summary</th><td>Game Vault accounts give you access to fish tables, slots and arcade games under one login. Here is how to create yours at casinovasgaming in under an hour.</td><td>To create a Game Vault account at Casinova Gaming, register a free Casinova account, confirm your email, open the Game Vault page, tap Create Account and request the login in the panel. Your Game Vault username and password appear in that panel when the request completes. Creating the login is free; you only need funds in your wallet when you load credits.</td></tr>
       <tr><th>Tags</th><td>create game vault account, game vault login, game vault sweepstakes account</td><td>create game vault account, game vault login, game vault sweepstakes account</td></tr>
-      <tr><th>Length</th><td>191 words</td><td>1099 words</td></tr>
+      <tr><th>Length</th><td>191 words</td><td>1125 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1702,7 +1707,7 @@ Step 5: We create your Game Vault account, apply your 50% first deposit bonus, a
 <h2>Step 6: fund your wallet and load</h2>
 <p>A new Game Vault login starts with no credits. To add them:</p>
 <ol>
-<li><strong>Deposit by card</strong> into your Total Deposit wallet, from the Deposit section on the game page or from your dashboard. Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
+<li><strong>Deposit through the checkout</strong> into your Total Deposit wallet, from the Deposit section on the game page or from your dashboard. Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered. See the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a>.</li>
 <li><strong>Open the Load tab</strong> in the Game Vault panel and enter an amount from $5 to $500. Amounts round to the nearest dollar.</li>
 <li><strong>Read the preview.</strong> It states what will arrive in the game, including the match: 100% on your first deposit, 50% on your second, nothing after.</li>
 <li><strong>Tap Load.</strong> The load appears under Recent activity.</li>
@@ -1722,7 +1727,7 @@ Step 5: We create your Game Vault account, apply your 50% first deposit bonus, a
 
 <h2>FAQ</h2>
 <h3>Is it free to create a Game Vault account?</h3>
-<p>Yes. Registering at Casinova and requesting a Game Vault login are both free, and requesting the login does not charge your wallet. You pay only when you deposit by card and load credits.</p>
+<p>Yes. Registering at Casinova and requesting a Game Vault login are both free, and requesting the login does not charge your wallet. You pay only when you deposit through the site checkout and load credits.</p>
 <h3>Do I have to deposit before I can create the Game Vault login?</h3>
 <p>No. You can request the login with an empty wallet. You need at least $5 in your Total Deposit wallet to load the game.</p>
 <h3>Can I choose my own Game Vault username and password?</h3>
@@ -1742,10 +1747,10 @@ Step 5: We create your Game Vault account, apply your 50% first deposit bonus, a
     <tbody>
       <tr><th>Title</th><td>How to Create a Juwa Account Online -- Fast Setup at casinovasgaming</td><td>How to Create a Juwa Account Online Through Casinova Gaming</td></tr>
       <tr><th>Search title</th><td>How to Create a Juwa Account Online in Under an Hour | casinovasgaming</td><td>How to Create a Juwa Account Online, Step by Step | Casinova Gaming</td></tr>
-      <tr><th>Search description</th><td>Step-by-step guide to creating a Juwa account online at casinovasgaming. No download, no store visit. Submit your deposit request and receive login details via WhatsApp.</td><td>Create a Juwa account online at Casinova: register, confirm your email, request the Juwa login in the game panel, then deposit by card and load $5 to $500.</td></tr>
-      <tr><th>Summary</th><td>No download needed, no store visit required. Here is the exact process to get a Juwa account online at casinovasgaming -- from payment to login in under an hour.</td><td>You can create a Juwa account online through Casinova Gaming: register a free Casinova account, confirm your email, open the Juwa page, tap Create Account and request the login in the panel. Your Juwa username and password are shown in that panel when the request completes. The login is free to create, and you load it from your wallet with $5 to $500 after a card deposit.</td></tr>
+      <tr><th>Search description</th><td>Step-by-step guide to creating a Juwa account online at casinovasgaming. No download, no store visit. Submit your deposit request and receive login details via WhatsApp.</td><td>Create a Juwa account online at Casinova: register, confirm your email, request the Juwa login in the game panel, then deposit and load $5 to $500.</td></tr>
+      <tr><th>Summary</th><td>No download needed, no store visit required. Here is the exact process to get a Juwa account online at casinovasgaming -- from payment to login in under an hour.</td><td>You can create a Juwa account online through Casinova Gaming: register a free Casinova account, confirm your email, open the Juwa page, tap Create Account and request the login in the panel. Your Juwa username and password are shown in that panel when the request completes. The login is free to create, and you load it from your wallet with $5 to $500 after a deposit.</td></tr>
       <tr><th>Tags</th><td>create juwa account online, juwa account setup, juwa login how to get</td><td>create juwa account online, juwa account setup, juwa login how to get</td></tr>
-      <tr><th>Length</th><td>180 words</td><td>1025 words</td></tr>
+      <tr><th>Length</th><td>180 words</td><td>1054 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1775,7 +1780,7 @@ Step 5: Submit and wait. You receive a reference code (e.g., WS-B7E2A3F1). Our t
 - Juwa username and password
 - Your starting credit balance (deposit plus 50% bonus on first deposit)
 - Direct support contact for any questions</pre></div>
-    <div><h3>After (proposed, rendered)</h3><div class="after"><p>You can create a Juwa account online through Casinova Gaming: register a free Casinova account, confirm your email, open the Juwa page, tap Create Account and request the login in the panel. Your Juwa username and password are shown in that panel when the request completes. The login is free to create, and you load it from your wallet with $5 to $500 after a card deposit.</p>
+    <div><h3>After (proposed, rendered)</h3><div class="after"><p>You can create a Juwa account online through Casinova Gaming: register a free Casinova account, confirm your email, open the Juwa page, tap Create Account and request the login in the panel. Your Juwa username and password are shown in that panel when the request completes. The login is free to create, and you load it from your wallet with $5 to $500 after a deposit.</p>
 
 <h2>What you need before you start</h2>
 <ul>
@@ -1783,7 +1788,7 @@ Step 5: Submit and wait. You receive a reference code (e.g., WS-B7E2A3F1). Our t
 <li>A phone number.</li>
 <li>To be 18 or older. Availability also varies by jurisdiction.</li>
 <li>A government ID, not for signing up, but for redeeming later.</li>
-<li>A card, when you are ready to deposit. Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</li>
+<li>A payment method the checkout accepts, when you are ready to deposit. Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</li>
 </ul>
 <p>You do not need to install the Juwa app first, and you do not need to message anyone for a login. The request is made from your own Casinova account.</p>
 
@@ -1803,7 +1808,7 @@ Step 5: Submit and wait. You receive a reference code (e.g., WS-B7E2A3F1). Our t
 <p>The button shows that the account is being created and you do not need to tap it again. We do not quote a time for this step. If the panel reports that it is taking longer than usual, it gives you a Cancel link so you can submit a fresh request, and <a href="/support">live chat</a> is available 24/7.</p>
 
 <h2>Loading your new Juwa account</h2>
-<p>A new login has no credits. Deposit by card into your Total Deposit wallet (the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts), then open the Load tab in the Juwa panel and enter $5 to $500. Before you confirm, the panel states exactly what will reach the game.</p>
+<p>A new login has no credits. Deposit through the checkout into your Total Deposit wallet (the <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> lists the amounts), then open the Load tab in the Juwa panel and enter $5 to $500. Before you confirm, the panel states exactly what will reach the game.</p>
 <p>Your first deposit is matched 100% at load and your second 50%. After that there is no match. A $15 first-deposit load therefore puts $30 into Juwa. There are no promo codes to enter anywhere in this process. The <a href="/blog/how-to-load-credits-from-wallet">load guide</a> and the <a href="/blog/maximize-fish-table-bonus">bonus guide</a> have the detail.</p>
 
 <h2>Signing in to Juwa</h2>
@@ -1824,7 +1829,7 @@ Step 5: Submit and wait. You receive a reference code (e.g., WS-B7E2A3F1). Our t
 <h3>Can I create a Juwa account online without visiting a store?</h3>
 <p>Yes. At Casinova the Juwa login is requested from the Juwa page inside your own account, and the username and password are shown in the panel on that page when the request completes.</p>
 <h3>Is creating a Juwa account free?</h3>
-<p>Yes. Registering at Casinova and requesting the Juwa login cost nothing and do not charge your wallet. You spend money only when you deposit by card and load credits, from $5 to $500 per load.</p>
+<p>Yes. Registering at Casinova and requesting the Juwa login cost nothing and do not charge your wallet. You spend money only when you deposit through the site checkout and load credits, from $5 to $500 per load.</p>
 <h3>How will I receive my Juwa username and password?</h3>
 <p>They appear in the Juwa Account panel on the Juwa page at Casinova, under Your Account. You can reveal and copy them there at any time, and the My Games page in your dashboard links back to the panel.</p>
 <h3>Do I need to upload ID to get a Juwa account?</h3>
@@ -1843,7 +1848,7 @@ Step 5: Submit and wait. You receive a reference code (e.g., WS-B7E2A3F1). Our t
       <tr><th>Search description</th><td>Complete guide to playing Juwa online at casinovasgaming. Learn the rules, bonus rounds, winning strategies and how to claim your 50% first deposit bonus.</td><td>What the Juwa fish table game is, how a fish room works, and how to get a Juwa login, load $5 to $500 and redeem at 3x through Casinova Gaming.</td></tr>
       <tr><th>Summary</th><td>Juwa is one of the fastest fish table games online. Here's everything you need to know: how to get started, how to win, and how to claim your bonus.</td><td>Juwa is a mobile app with fish games, slots and table-style games. At Casinova Gaming it is live: you create a Juwa login from the Juwa page, load $5 to $500 from your wallet, and play in the provider's app. Outcomes are chance-based and the provider publishes no odds, so the useful things to learn are how a fish room works and how the load and redeem rules apply.</td></tr>
       <tr><th>Tags</th><td>juwa, juwa game, fish table</td><td>juwa, juwa game, fish table</td></tr>
-      <tr><th>Length</th><td>165 words</td><td>1065 words</td></tr>
+      <tr><th>Length</th><td>165 words</td><td>1089 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -1904,7 +1909,7 @@ Juwa has three bonus states:
 <ol>
 <li><strong>Create a Casinova account</strong> and confirm your email.</li>
 <li><strong>Open the Juwa page and tap Create Account.</strong> Request the login in the panel; the Juwa username and password appear there when the request completes. <a href="/blog/how-to-create-juwa-account-online">How to create a Juwa account</a> shows each screen.</li>
-<li><strong>Deposit by card</strong> into your wallet. Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</li>
+<li><strong>Deposit through the checkout</strong> into your wallet. Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</li>
 <li><strong>Load $5 to $500</strong> from the Load tab in the Juwa panel.</li>
 <li><strong>Open Juwa</strong> from the buttons on the Juwa page and sign in with the login from your panel. See the <a href="/blog/how-to-play-casinova-on-mobile">mobile guide</a> for phones.</li>
 </ol>
@@ -1959,7 +1964,7 @@ Juwa has three bonus states:
       <tr><th>Search description</th><td>Twin Happiness, Smashing Sevens Win Ways, Survivor and Family Feud aren't on casinovasgaming — see the closest slot games you can actually play here.</td><td>Twin Happiness, Smashing Sevens, Survivor and Family Feud are titles Casinova does not offer. See which live games list slots, and the load rules.</td></tr>
       <tr><th>Summary</th><td>Twin Happiness, Smashing Sevens Win Ways, Survivor and Family Feud are LuckyTap slots not on casinovasgaming — here's what to play instead.</td><td>Twin Happiness, Smashing Sevens Win Ways, Survivor and Family Feud under the LuckyTap name are third-party titles that Casinova Gaming does not offer. You cannot create an account for them or load them here. If you want reel-based slots, Cash Machine and Cash Frenzy are listed at Casinova as slots apps, Mafia as slots and arcade, and Game Vault and Vegas Sweeps list slots alongside keno and fish games.</td></tr>
       <tr><th>Tags</th><td>twin happiness slot, smashing sevens win ways, survivor luckytap, family feud luckytap</td><td>twin happiness slot, smashing sevens win ways, survivor luckytap, family feud luckytap</td></tr>
-      <tr><th>Length</th><td>282 words</td><td>961 words</td></tr>
+      <tr><th>Length</th><td>282 words</td><td>988 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2025,7 +2030,7 @@ None of the LuckyTap titles above are available through casinovasgaming, so ther
 <h2>How it works at Casinova</h2>
 <ol>
 <li><strong>Create a Casinova account</strong> and confirm your email.</li>
-<li><strong>Deposit by card.</strong> Deposits are by card. Cash App, Zelle, Venmo, PayPal and crypto are not offered.</li>
+<li><strong>Deposit through the checkout on the site.</strong> Deposits go through the checkout on the site. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</li>
 <li><strong>Open a live game page and tap Create Account.</strong> Your login for that game appears in the panel when it is ready.</li>
 <li><strong>Load $5 to $500</strong> from your wallet. The <a href="/blog/how-to-load-credits-from-wallet">load guide</a> shows the panel.</li>
 <li><strong>Play</strong> in the provider's app or web player, and redeem from the same panel when you qualify.</li>
@@ -2206,7 +2211,7 @@ Fish table games have variance cycles. If you've just hit a big Boss fish, expec
       <tr><th>Search description</th><td>Learn how to play Fire Kirin online at casinovasgaming. Create your account, claim your 50% first deposit bonus, and get tips to win big on the #1 fish table game.</td><td>Fire Kirin is coming soon at Casinova Gaming and cannot be loaded yet. What kind of game it is, why Juwa is the closest live match, and the load rules.</td></tr>
       <tr><th>Summary</th><td>Everything you need to know about Fire Kirin: how the game works, how to create an account, and how to maximize your 50% first deposit bonus.</td><td>Fire Kirin is coming soon at Casinova Gaming, which means it cannot be loaded and Casinova is not issuing Fire Kirin logins. No launch date has been announced. The closest game you can load today is Juwa, a live app whose lineup includes fish games.</td></tr>
       <tr><th>Tags</th><td>fire kirin, fish table, beginner guide</td><td>fire kirin, fish table, coming soon</td></tr>
-      <tr><th>Length</th><td>261 words</td><td>843 words</td></tr>
+      <tr><th>Length</th><td>261 words</td><td>867 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2278,7 +2283,7 @@ Ready to play? [Create your Fire Kirin account →](/games/fire-kirin)</pre></di
 <h2>The load rules, if and when Fire Kirin opens</h2>
 <p>Nothing below is special to Fire Kirin. These are the rules that apply to every live game today, so they are the best guide to what loading looks like at Casinova.</p>
 <ol>
-<li><strong>Deposit by card.</strong> Deposits are by card, through a payment partner, into one Casinova wallet. Cash App, Zelle and crypto are not offered.</li>
+<li><strong>Deposit through the checkout on the site.</strong> Deposits go through a payment partner's checkout into one Casinova wallet. The checkout lists the methods available to you; right now those are card, Apple Pay, Google Pay, Cash App and Chime. Zelle, Venmo, PayPal and crypto are not offered.</li>
 <li><strong>Load a live game.</strong> You move $5 to $500 per load from the wallet into a game account. See <a href="/blog/how-to-load-credits-from-wallet">how to load credits from your wallet</a>.</li>
 <li><strong>Deposit match.</strong> Your first deposit is matched 100% and your second 50%, applied when the game is loaded. There is no match after the second deposit. The match follows the order of your deposits, not the game you choose.</li>
 <li><strong>Redeem.</strong> Redeem opens when the in-game balance reaches 3x the load and is capped at 8x the load. It needs an approved government ID and every redeem is reviewed by staff. We do not promise a payout time. Details are in <a href="/blog/how-to-redeem-winnings-fast">how to redeem</a>.</li>
@@ -2310,7 +2315,7 @@ Ready to play? [Create your Fire Kirin account →](/games/fire-kirin)</pre></di
       <tr><th>Search description</th><td>Learn how to play Orion Stars online. Create an account at casinovasgaming, claim your 50% bonus and discover the stellar jackpots in this space fish table game.</td><td>Orion Stars is coming soon at Casinova Gaming and cannot be loaded yet. See what kind of app it is and which live games, led by Gameroom, come closest.</td></tr>
       <tr><th>Summary</th><td>Orion Stars brings constellation jackpots and stellar multipliers to the fish table genre. Here's how to play and win.</td><td>Orion Stars is coming soon at Casinova Gaming. It cannot be loaded and Casinova is not issuing Orion Stars logins. There is no launch date. Our game list files it under Arcade, the same category as Gameroom, which is live and is the closest match you can load today.</td></tr>
       <tr><th>Tags</th><td>orion stars, orion stars online, fish table</td><td>orion stars, orion stars online, coming soon</td></tr>
-      <tr><th>Length</th><td>184 words</td><td>823 words</td></tr>
+      <tr><th>Length</th><td>184 words</td><td>824 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2377,7 +2382,7 @@ Orion Stars is a space-themed fish table game where catching constellation fish 
 <h2>The rules, if and when Orion Stars opens</h2>
 <p>There is no Orion Stars rulebook to publish. What we can show you is the set of rules that apply to every live game today, which you can learn now on any of them.</p>
 <ul>
-<li><strong>One wallet, card deposits.</strong> Deposits are by card into a single wallet, and you load a game from it. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> covers the steps.</li>
+<li><strong>One wallet, deposits.</strong> Deposits go through the site checkout into a single wallet, and you load a game from it. The <a href="/blog/wallet-deposit-guide-casinovasgaming">deposit guide</a> covers the steps.</li>
 <li><strong>Loads of $5 to $500.</strong> Amounts round to the nearest dollar at load.</li>
 <li><strong>Deposit match by deposit order.</strong> 100% on your first deposit, 50% on your second, none after, applied when you load. It does not depend on which game you pick.</li>
 <li><strong>Redeem at 3x, capped at 8x.</strong> The in-game balance has to reach 3x the load before redeem opens, and total redeems are capped at 8x the load. An approved government ID is required and staff review every redeem. No payout time is promised.</li>
@@ -2411,7 +2416,7 @@ Orion Stars is a space-themed fish table game where catching constellation fish 
       <tr><th>Search description</th><td>Complete guide to Panda Master fish table game online. Learn Boss strategies, multiplier tips and how to create your Panda Master account at casinovasgaming.</td><td>Panda Master is coming soon at Casinova Gaming and cannot be loaded yet. Fish table habits you can practice on Juwa now, plus the load and redeem rules.</td></tr>
       <tr><th>Summary</th><td>Panda Master is a bamboo forest fish table game with powerful Boss encounters and sudden multiplier bursts. Here's how to win.</td><td>Panda Master is coming soon at Casinova Gaming, so there is no way to get started with it here yet: it cannot be loaded and Casinova is not issuing Panda Master logins. No launch date is known. What you can do now is learn the fish table habits that carry over to any fish game, on Juwa, the closest live match.</td></tr>
       <tr><th>Tags</th><td>panda master online, panda master fish table, panda master game guide</td><td>panda master online, panda master fish table, panda master game guide</td></tr>
-      <tr><th>Length</th><td>209 words</td><td>867 words</td></tr>
+      <tr><th>Length</th><td>209 words</td><td>869 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2470,7 +2475,7 @@ Panda Master sets its fish table in a bamboo forest environment. The visual them
 <h2>The rules, if and when Panda Master opens</h2>
 <p>These are the rules that apply to every live game today:</p>
 <ul>
-<li>Deposits are by card, into one Casinova wallet.</li>
+<li>Deposits go through the site checkout into one Casinova wallet.</li>
 <li>Loads are $5 to $500 each.</li>
 <li>The deposit match is 100% on your first deposit and 50% on your second, applied at load, with nothing after that.</li>
 <li>Redeem opens at 3x the load, is capped at 8x, needs an approved government ID and is reviewed by staff. There is no payout-time promise. See the <a href="/blog/casinova-id-verification-guide">ID verification guide</a>.</li>
@@ -2504,7 +2509,7 @@ Panda Master sets its fish table in a bamboo forest environment. The visual them
       <tr><th>Search description</th><td>Play Milky Way fish table online at casinovasgaming. Learn the Galactic Storm bonus mechanic and get strategies to maximize your credits on this space-themed game.</td><td>Milky Way is coming soon at Casinova Gaming and not loadable yet. What the space-themed app is, the closest live games, and where Vblink stands.</td></tr>
       <tr><th>Summary</th><td>Milky Way is a space fish table game where galactic multipliers rain down during bonus storms. Here's everything you need to know.</td><td>Milky Way is coming soon at Casinova Gaming: it cannot be loaded, Casinova is not issuing Milky Way logins, and no launch date has been announced. It is listed under the category Space as a space-themed app with slots and fish games, so it is not purely a fish table. The closest live game is Game Vault, whose lobby also has slots and fish games.</td></tr>
       <tr><th>Tags</th><td>milky way game, milky way fish table, milky way online</td><td>milky way game, milky way fish table, milky way online</td></tr>
-      <tr><th>Length</th><td>190 words</td><td>798 words</td></tr>
+      <tr><th>Length</th><td>190 words</td><td>800 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2569,7 +2574,7 @@ Random timed events trigger a Galactic Storm: every catch is multiplied by 2×�
 <table>
 <thead><tr><th>Rule</th><th>What applies</th></tr></thead>
 <tbody>
-<tr><td>Deposits</td><td>By card, into one Casinova wallet</td></tr>
+<tr><td>Deposits</td><td>Through the site checkout, into one Casinova wallet</td></tr>
 <tr><td>Load size</td><td>$5 minimum, $500 maximum per load</td></tr>
 <tr><td>Deposit match</td><td>100% on the first deposit, 50% on the second, none after, applied at load</td></tr>
 <tr><td>Redeem threshold</td><td>In-game balance at least 3x the load</td></tr>
@@ -2606,7 +2611,7 @@ Random timed events trigger a Galactic Storm: every catch is multiplied by 2×�
       <tr><th>Search description</th><td>Play Ultrapanda at casinovasgaming — fish table shooting plus slot-style bonus rounds. How it works, strategy basics, and how to get started.</td><td>Ultrapanda is coming soon at Casinova Gaming and cannot be loaded yet. Compare the live games with fish and slots, and see how a load works.</td></tr>
       <tr><th>Summary</th><td>Ultrapanda blends fish table shooting with slot-style bonus rounds. Here's how it works and how to start playing at casinovasgaming.</td><td>Ultrapanda is coming soon at Casinova Gaming. It cannot be loaded and Casinova is not issuing Ultrapanda logins. No launch date has been announced. It is listed as a fish and slots app, so the live substitute depends on what else you want in the lobby: Vegas Sweeps adds keno to slots and fish games, Juwa adds table-style games.</td></tr>
       <tr><th>Tags</th><td>ultrapanda, ultrapanda online, ultrapanda game</td><td>ultrapanda, ultrapanda online, ultrapanda game</td></tr>
-      <tr><th>Length</th><td>305 words</td><td>735 words</td></tr>
+      <tr><th>Length</th><td>305 words</td><td>739 words</td></tr>
     </tbody>
   </table>
   <div class="notes">
@@ -2674,7 +2679,7 @@ Ultrapanda qualifies for the [50% first deposit bonus](/blog/50-percent-first-de
 <p>This is how a load works in a live game. They are the rules that apply to every live game today, so they are the best guide to what to expect if and when Ultrapanda opens.</p>
 <ol>
 <li><strong>Sign up at Casinova.</strong> This is your platform account, separate from any game login.</li>
-<li><strong>Deposit by card.</strong> The money lands in one wallet.</li>
+<li><strong>Deposit through the checkout on the site.</strong> The money lands in one wallet.</li>
 <li><strong>Get a game login.</strong> Press Create Account on the live game's page; the login is shown in that page's panel once it is ready.</li>
 <li><strong>Load $5 to $500.</strong> If this is your first deposit it is matched 100% at load; your second is matched 50%; later deposits are not matched.</li>
 <li><strong>Play</strong> with that login.</li>

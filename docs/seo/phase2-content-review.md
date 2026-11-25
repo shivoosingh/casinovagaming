@@ -8,10 +8,8 @@ Title: Casinova Leaderboard Guide: How Rankings Are Calculated
 
 - The old post described daily/weekly/monthly/all-time boards ranked by XP, with a top-10 achievement bonus. None of that exists on the site: there is one all-time top-50 table by VIP points. Confirm no period boards or prizes are planned before this goes live.
 - The leaderboard page says 'Sign in to track your rank' but there is no personal rank display, only the points total on the dashboard VIP Status page. The post sends members outside the top 50 there. Should the page wording change?
-- The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.
 - Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?
 - The post publishes exact VIP point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. The published VIP tiers post keeps these vague. OK to publish the exact numbers?
-- Points from a spin prize are added to the total but the tier label is not recalculated at that moment, so a member can pass a threshold and still show the old tier until their next check-in. The post does not mention this; flagging for a fix.
 - Tag 'leaderboard rewards' kept from the old post even though rank pays no reward. Remove it if you prefer.
 
 ## casinovasgaming-next-generation-gaming-platform
@@ -20,7 +18,6 @@ Title: Casinova Gaming: How the Platform Works, End to End
 
 - Old post claimed: XP/level tracking, VIP multipliers up to 2x, a 40% uncapped referral reward, a weekly leaderboard prize pool, CashApp/Zelle/crypto deposits, a 20% deposit bonus, $2 to $3 Free Play and Happy Hour. None are supported by the site; all removed.
 - The slug says 'next-generation gaming platform'. I dropped that claim from the title because it cannot be verified. OK?
-- The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.
 - Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?
 - Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.
 - The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.
@@ -51,11 +48,9 @@ Title: Casinova Gaming vs Online Casinos: What Is the Difference?
 Title: Casinova XP and Levels Explained: VIP Points and Tiers
 
 - There is no XP or level system on the site; only VIP points and tiers exist. The old post's XP curve, streak milestones, Weekly Chest, Monthly Vault and coin bonuses were all invented. The rewrite says so and covers VIP points. Consider whether this slug should eventually redirect to the VIP tiers post.
-- The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.
 - Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?
 - The post publishes exact point values: check-in 5 to 11 by streak, 5 for the spin mission, 10 per $1 of spin prize. OK to publish? If the values change, the post goes stale.
 - The public VIP page shows '+50 game request' and 'Monthly Activity Bonus +200' lines that are not implemented. The post does not repeat them. Remove them from the VIP page?
-- Points from a spin prize are added to the total but the tier label is not recalculated at that moment, so a member can pass a threshold and keep the old tier label until the next check-in.
 - I wrote that nothing removes points for inactivity (no decay found). Confirm there is no manual or database-side points reset.
 - The post says the check-in and mission use the UTC calendar day, while the published daily spin post describes the spin window as a rolling 24 hours. Confirm both descriptions.
 
@@ -66,7 +61,6 @@ Title: Welcome to Casinova Gaming: How to Get Started
 - The current title contains broken characters; the new title uses a colon.
 - Old post said 'Submit a deposit request, wait for approval'. The rewrite describes card checkout with the wallet credited after the payment is confirmed. Correct for all deposits today?
 - Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.
-- The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.
 - Referral points: the app awards 10 per referral but a signup trigger in the repo awards 100. The post says 'each referral adds VIP points' without a number. Which value is live?
 - The AI assistant's built-in answers and the Telegram promo text name payment methods and cashout times the site does not offer. Fix or disable them.
 - Step 2 says deposits, logins and loads work before ID approval and only redeem is locked (taken from the published ID guide). Confirm still true.
@@ -92,7 +86,6 @@ Title: Sweepstakes No Deposit Bonus: Does Casinova Offer One?
 - Can spin winnings be loaded into a game with no deposit history at all, once the wallet reaches $5? The post says yes, following the published daily spin post. Please confirm.
 - The post says a spin needs 'an account, not a deposit'. Is anything else required before a first spin, such as a verified email, phone or ID?
 - Deposits are fixed checkout amounts (the code carries card amounts from $10.99 to $199.99). The post does not quote a smallest deposit. Please confirm the amounts actually shown at checkout.
-- The code does not award deposit points or the referral share on card deposits (only on the retired manual-deposit flow). Posts now omit both. Decide whether to wire them up or drop them from the VIP page.
 - If a first deposit is loaded in several parts, is every part matched 100% until that deposit is used up, or only the first load? The post says the match applies to the amount you load and points readers to the load guide.
 - The post says the referral code is the only code on the site and that Casinova issues no bonus codes. Confirm the checkout page shows no coupon box.
 - Tag 'free sweepstakes coins' kept from the old post; Casinova has no coins. Remove if you prefer.

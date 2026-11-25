@@ -14,6 +14,14 @@
       [
         "Honest limits — what Casinova does not do",
         "Honest limits: what Casinova does not do"
+      ],
+      [
+        "<strong>Card only.</strong> Deposits are by card through the partner. Cash App, Zelle, Venmo, PayPal and crypto are not offered, so anyone asking for those in Casinova's name is not us.",
+        "<strong>Checkout only.</strong> Deposits go through the payment partner's checkout on the site, which currently lists card, Apple Pay, Google Pay, Cash App and Chime. Nobody from Casinova will ask you to send money to a personal payment handle, so a message asking for that is not us."
+      ],
+      [
+        "Casinova never asks for Cash App, Zelle or crypto, and never asks for your full card number.",
+        "Casinova never asks you to send money to a personal payment handle, and never asks for your full card number."
       ]
     ]
   },
@@ -43,6 +51,152 @@
       [
         "When one goes live, the badge disappears, loads open, and we will say so",
         "If one goes live, loads open and we will say so"
+      ]
+    ]
+  },
+  {
+    "slug": "are-online-fish-table-games-safe",
+    "replace": [
+      [
+        "Casinova retired it; deposits are card checkouts only.",
+        "Casinova retired it; deposits go through the checkout on the site only."
+      ],
+      [
+        "Casinova has none. The real offer is a 100% match on your first deposit and 50% on your second, applied at load, documented in the <a href=\"/blog/maximize-fish-table-bonus\">bonus guide</a>.",
+        "Casinova has no promo codes and no signup credit. What exists is a 100% match on your first deposit and 50% on your second, applied at load, documented in the <a href=\"/blog/maximize-fish-table-bonus\">bonus guide</a>, and a <a href=\"/spin\">daily spin</a> that can add $1 to $10 to your wallet or nothing."
+      ]
+    ]
+  },
+  {
+    "slug": "wallet-deposit-guide-casinovasgaming",
+    "replace": [
+      [
+        "Card is the one deposit method we run right now.",
+        "Card is the method this guide walks through; the Deposit page also lists Apple Pay, Google Pay, Cash App and Chime."
+      ],
+      [
+        "<h3>Can I deposit with Cash App, Zelle or crypto?</h3>",
+        "<h3>Which payment methods can I use?</h3>"
+      ],
+      [
+        "Not at the moment. Card through our instant payment partner is the only deposit method. If that changes it will show on the Deposit page first.",
+        "The Deposit page lists what is available to you. Right now that is card, Apple Pay, Google Pay, Cash App and Chime, each with its own preset amounts. Zelle, Venmo, PayPal and crypto are not offered. Whatever the method, you pay on the payment partner's checkout, never by sending money to a person."
+      ],
+      [
+        "with the card option and its preset amounts",
+        "with the payment options and their preset amounts"
+      ]
+    ]
+  },
+  {
+    "slug": "referral-program-earn-coins",
+    "replace": [
+      [
+        "No. Only card deposits count toward the first and second deposit match.",
+        "No. Only deposits count toward the first and second deposit match."
+      ]
+    ]
+  },
+  {
+    "slug": "daily-rewards-coins-guide",
+    "replace": [
+      [
+        "that bonus only applies to card deposits",
+        "that bonus only applies to deposits"
+      ]
+    ]
+  },
+  {
+    "slug": "best-fish-table-games-beginners",
+    "replace": [
+      [
+        "No free play or no-deposit credits. The $5 minimum load with a 100% first-deposit match is the lowest-cost start.",
+        "There is no demo mode and no signup credit. The <a href=\"/spin\">daily spin</a> can add $1 to $10 to your wallet or nothing; otherwise the $5 minimum load with a 100% first-deposit match is the lowest-cost start."
+      ]
+    ]
+  },
+  {
+    "slug": "cash-frenzy-guide-tips",
+    "replace": [
+      [
+        "has limits and help if the numbers start moving.",
+        "has advice and a helpline number if the numbers start moving."
+      ]
+    ]
+  },
+  {
+    "slug": "deposit-amounts-and-limits-casinova",
+    "replace": [
+      [
+        "for limits and help.",
+        "for advice and a helpline number."
+      ]
+    ]
+  },
+  {
+    "slug": "fish-table-glossary",
+    "replace": [
+      [
+        "<strong>Free credits, no-deposit bonus, free play.</strong> Not offered. The smallest start is a $5 load.",
+        "<strong>Free credits, no-deposit bonus, free play.</strong> There is no signup credit, no promo code and no demo mode. The <a href=\"/spin\">daily spin</a> can add $1 to $10 to your wallet or nothing; otherwise the smallest start is a $5 load."
+      ]
+    ]
+  },
+  {
+    "slug": "game-vault-all-games-breakdown",
+    "replace": [
+      [
+        "</a> has limits and help.",
+        "</a> has advice and a helpline number."
+      ]
+    ]
+  },
+  {
+    "slug": "how-to-win-at-juwa",
+    "replace": [
+      [
+        "<strong>Free credits or codes.</strong> Casinova has none. The real bonus is the 100% first-deposit match at load.",
+        "<strong>Free credits or codes.</strong> Casinova has no promo codes and no signup credit. What exists is the 100% first-deposit match at load and a daily spin that can add $1 to $10 to your wallet or nothing."
+      ]
+    ]
+  },
+  {
+    "slug": "maximize-fish-table-bonus",
+    "replace": [
+      [
+        "There is no code to enter, no no-deposit bonus and no free credits. If you see those promised for Casinova anywhere, it is not us.",
+        "There is no code to enter and no signup credit. If you see promo codes promised for Casinova anywhere, it is not us. The one thing you can get without depositing is the <a href=\"/spin\">daily spin</a>, which can add $1 to $10 to your wallet or nothing and is not matched."
+      ]
+    ]
+  },
+  {
+    "slug": "sweeps-coins-explained",
+    "replace": [
+      [
+        "the smallest real load is $5 and there is no no-deposit credit.",
+        "the smallest real load is $5 and there is no signup credit."
+      ],
+      [
+        "There are no free sweeps coins and no no-deposit credits. The daily spin can award small wallet credits, but play uses your loaded balance.",
+        "There are no free sweeps coins and no signup credit. The daily spin can add $1 to $10 to your wallet or nothing, and play uses your loaded balance."
+      ]
+    ]
+  },
+  {
+    "slug": "what-are-sweepstakes-games",
+    "replace": [
+      [
+        "Casinova has no no-deposit credits; the smallest real load is $5.",
+        "Casinova has no demo mode and no signup credit; the smallest real load is $5, and the daily spin can add $1 to $10 to your wallet or nothing."
+      ]
+    ]
+  },
+  {
+    "slug": "what-is-a-fish-table-game",
+    "replace": [
+      [
+        "Casinova does not offer free play or no-deposit credits.",
+        "Casinova has no demo mode and no signup credit. The daily spin can add $1 to $10 to your wallet or nothing."
       ]
     ]
   }

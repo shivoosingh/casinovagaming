@@ -15,7 +15,7 @@ export const revalidate = 86400;
 /** Hand-picked guides, in the order an assistant should read them. */
 const GUIDES: { slug: string; label: string }[] = [
   { slug: "what-is-a-fish-table-game", label: "What a fish table game is" },
-  { slug: "wallet-deposit-guide-casinovasgaming", label: "How to deposit by card" },
+  { slug: "wallet-deposit-guide-casinovasgaming", label: "How to deposit" },
   { slug: "how-to-load-credits-from-wallet", label: "How to load game credits from the wallet" },
   { slug: "maximize-fish-table-bonus", label: "Deposit bonus: 100% first, 50% second" },
   { slug: "deposit-amounts-and-limits-casinova", label: "Minimum deposit and load limits" },
@@ -52,11 +52,11 @@ export async function GET() {
     "## Key facts",
     "",
     `- Type: online sweepstakes gaming platform (not a licensed casino). Players must be 18+. Availability varies by jurisdiction; void where prohibited.`,
-    `- Model: one wallet per player. Deposit by card, then load credits into a game account. Redeem from the game panel after review.`,
+    `- Model: one wallet per player. Deposit through the site checkout, then load credits into a game account. Redeem from the game panel after review.`,
     `- Deposit bonus: ${WELCOME_BONUS_PERCENT}% match on the first deposit, ${SECOND_DEPOSIT_BONUS_PERCENT}% on the second, none after. Applied when the game is loaded.`,
     `- Load limits: $${MIN_DEPOSIT} minimum, $${GAME_BONUS_RULES.maxDeposit} maximum per load. Amounts round to the nearest dollar at load.`,
     `- Redeem rules: in-game balance must reach ${GAME_BONUS_RULES.redeemMin}x the load; total redeems capped at ${GAME_BONUS_RULES.redeemMax}x the load; approved government ID required; every redeem is reviewed by an admin. No payout-time promise.`,
-    `- Payments: card only, through an instant payment partner. Cash App, Zelle, Venmo, PayPal, Chime and crypto are not offered.`,
+    `- Payments: through a payment partner's checkout on the site. Methods are listed at checkout and can change; currently card, Apple Pay, Google Pay, Cash App and Chime, each in preset amounts. Zelle, Venmo, PayPal and crypto are not offered. Casinova never asks players to send money to a personal payment handle.`,
     `- Daily spin: prizes $1, $2, $3, $4, $7, $10 or none; spins per 24h: Bronze 1, Silver 2, Gold 3, Platinum 3.`,
     `- VIP tiers (points): ${VIP_TIERS.map((t) => `${t.name} ${t.minPoints} (${Math.round(t.referralRate * 100)}% referral share)`).join(", ")}. Referral share is a percentage of a referred friend's first confirmed deposit, credited to the referrer's wallet; a referral also adds VIP points. VIP points: 1 per $1 on each confirmed deposit (minimum 1), 5 to 11 for the daily check-in, 10 per $1 of a spin prize.`,
     `- Not offered: promo codes, published odds or RTP.`,
