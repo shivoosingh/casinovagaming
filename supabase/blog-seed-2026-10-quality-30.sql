@@ -257,7 +257,7 @@ VALUES (
   'published', true, true,
   now() - interval '4 hours',
   'How to Load Game Credits From Your Wallet | Casinova Gaming',
-  'Load credits into Juwa, Game Vault or any live game from one Casinova wallet: $5 to $500 per load, how the load preview reads, and why the bonus is applied at load.'
+  'Load credits into any live game from one Casinova wallet: $5 to $500 per load, how the preview reads, and why the bonus applies at load.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -621,7 +621,7 @@ VALUES (
 <h2>How points are earned</h2>
 <ul>
 <li><strong>Referrals.</strong> 10 points for each friend who signs up with your code. Fifty referrals reach Silver on their own.</li>
-<li><strong>Activity.</strong> Game account requests and platform activity add points as shown in your dashboard. The <a href="/blog/casinovasgaming-xp-leveling-explained">XP and leveling guide</a> covers the activity side.</li>
+<li><strong>Activity.</strong> Game account requests and platform activity add points as shown in your dashboard. The <a href="/blog/referral-program-earn-coins">referral guide</a> covers how points are earned.</li>
 <li><strong>Promotions.</strong> When the <a href="/promotions">Promotions</a> page lists a points offer, the rules on that card apply.</li>
 </ul>
 <p>Your current points and the next threshold are on <a href="/vip">the VIP page</a> and in your dashboard.</p>
@@ -675,7 +675,7 @@ VALUES (
   'published', true, true,
   now() - interval '14 hours',
   'Casinova VIP Tiers Bronze to Platinum | Casinova Gaming',
-  'Casinova Gaming VIP tiers: Bronze 0, Silver 500, Gold 2,000, Platinum 5,000 points. What each tier changes (referral share, daily spins, support) and what does not.'
+  'Casinova VIP tiers: Bronze 0, Silver 500, Gold 2,000, Platinum 5,000 points. What each tier changes (referral share, spins, support) and what does not.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -994,7 +994,7 @@ VALUES (
   'published', true, true,
   now() - interval '22 hours',
   'Game Vault vs Juwa: Which to Load First | Casinova Gaming',
-  'Game Vault vs Juwa: slots-first lobby versus fish-first app, identical Casinova terms ($5 to $500 loads, 100% then 50% match, 3x redeem), and who should pick which.'
+  'Game Vault vs Juwa: slots-first lobby versus fish-first app, identical terms ($5 to $500, 100% then 50% match, 3x redeem), and who picks which.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -1158,7 +1158,7 @@ VALUES (
   'published', true, true,
   now() - interval '26 hours',
   'Game Vault vs Vegas Sweeps Compared | Casinova Gaming',
-  'Game Vault vs Vegas Sweeps at Casinova Gaming: both slots-first with keno and fish, identical load, bonus and redeem terms. Catalog depth versus casino-floor style.'
+  'Game Vault vs Vegas Sweeps: both slots-first with keno and fish, identical load, bonus and redeem terms. Catalog depth versus casino-floor style.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -1238,7 +1238,7 @@ VALUES (
   'published', true, true,
   now() - interval '28 hours',
   'Gameroom vs Game Vault: Arcade or Catalog? | Casinova Gaming',
-  'Gameroom vs Game Vault at Casinova Gaming: compact Vegas-style arcade versus deep slot catalog, same $5 to $500 loads, same 100% then 50% match, same 3x redeem rule.'
+  'Gameroom vs Game Vault: compact Vegas-style arcade versus deep slot catalog, same $5 to $500 loads, 100% then 50% match, 3x redeem.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -2135,7 +2135,7 @@ VALUES (
   'published', true, true,
   now() - interval '50 hours',
   'Are Online Fish Table Games Safe? | Casinova Gaming',
-  'Five checks that tell you whether an online fish table platform is safe, the red flags to walk away from, and how Casinova Gaming handles deposits, ID and redeems.'
+  'Five checks for whether an online fish table platform is safe, red flags to avoid, and how Casinova handles deposits, ID and redeems.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -2217,7 +2217,7 @@ VALUES (
   'published', true, true,
   now() - interval '52 hours',
   'What Is a Fish Table Game? Explained | Casinova Gaming',
-  'A plain definition of fish table games: shared table, cannon, bet per shot, bosses and rooms. How online versions work at Casinova and which live games have them.'
+  'A plain definition of fish table games: shared table, cannon, bet per shot, bosses and rooms, and which Casinova games have them.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -2401,7 +2401,7 @@ VALUES (
   'published', true, true,
   now() - interval '56 hours',
   'Best Casinova Games for Beginners, Ranked | Casinova Gaming',
-  'Eight live Casinova games ranked for beginners by learning curve, pace and variety, not odds. Why MR All In One is first, Juwa a strong second, and how to start.'
+  'Eight live Casinova games ranked for beginners by learning curve, pace and variety, not odds. Why MR All In One leads and how to start.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
@@ -2487,7 +2487,7 @@ VALUES (
   'published', true, true,
   now() - interval '58 hours',
   'How to Choose a Fish Table or Slots Game | Casinova Gaming',
-  'Four questions that pick your game at Casinova Gaming: shoot or spin, one type or several, theme or not, and load size. Identical terms make it a matter of taste.'
+  'Four questions that pick your game at Casinova: shoot or spin, one type or several, theme or not, load size. Identical terms, so it is taste.'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title, excerpt = EXCLUDED.excerpt, content = EXCLUDED.content,
