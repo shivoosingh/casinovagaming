@@ -57,7 +57,9 @@ const BANNED = [
   [/\bSpinora\b|\bWin ?Sweeps\b/i, "old brand name"],
   [/50% (first|welcome)[ -]deposit bonus/i, "wrong bonus number"],
 ];
-const PAYMENTS = /\b(cash ?app|zelle|venmo|paypal|chime|bitcoin|usdt|crypto)\b/i;
+// Methods the live checkout does NOT list. Card, Apple Pay, Google Pay, Cash App
+// and Chime are offered (checked against the checkout on 2026-11-26).
+const PAYMENTS = /\b(zelle|venmo|paypal|bitcoin|usdt|crypto)\b/i;
 const NEGATION_NEAR = /\b(not|no|never|do not|does not|are not|is not|without|instead of|retired|not offered)\b/i;
 
 function strip(html) {
