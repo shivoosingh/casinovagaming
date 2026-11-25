@@ -22,14 +22,20 @@ export type MarketingPostFull = MarketingPost & {
   updated_at?: string | null;
 };
 
-/** Rewrite legacy Spinora / WinSweeps copy to the current brand name. */
+/**
+ * Rewrite legacy Spinora / WinSweeps copy to the current brand name.
+ *
+ * "casinovasgaming" is only rewritten as a standalone word. Inside a slug
+ * (/blog/wallet-deposit-guide-casinovasgaming) it must stay as written, or the
+ * link turns into /blog/wallet-deposit-guide-Casinova Gaming and 404s.
+ */
 function brandText(value: string | null | undefined): string | null {
   if (value == null || value === "") return value ?? null;
   return value
     .replace(/spinoracasinos\.com/gi, "casinovasgaming.com")
     .replace(/Win\s*Sweeps/gi, SITE_NAME)
     .replace(/Spinora/gi, SITE_NAME)
-    .replace(/casinovasgaming(?!\.com)/g, SITE_NAME);
+    .replace(/(?<![-\w/])casinovasgaming(?![-\w]|\.com)/g, SITE_NAME);
 }
 
 function brandPost<T extends MarketingPost>(post: T): T {

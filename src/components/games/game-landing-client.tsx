@@ -35,6 +35,8 @@ interface GameLandingClientProps {
     game_username: string;
     game_password: string | null;
   } | null;
+  /** Server-rendered FAQ and guide links, shown under the game description. */
+  guides?: React.ReactNode;
 }
 
 export function GameLandingClient({
@@ -43,6 +45,7 @@ export function GameLandingClient({
   walletLoadEnabled,
   paymentMethods,
   initialGameAccount,
+  guides,
 }: GameLandingClientProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -298,6 +301,8 @@ export function GameLandingClient({
         <h2 className="sr-only">About {game.name}</h2>
         <p className="text-sm text-[#6b6d8f] leading-relaxed">{game.bio}</p>
       </section>
+
+      {guides}
 
       <section className="space-y-3">
         <div className="grid grid-cols-2 gap-3">

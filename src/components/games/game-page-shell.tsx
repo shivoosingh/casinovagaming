@@ -17,6 +17,8 @@ interface GamePageShellProps {
     game_username: string;
     game_password: string | null;
   } | null;
+  /** Server-rendered FAQ and guide links, shown under the game description. */
+  guides?: React.ReactNode;
 }
 
 export function GamePageShell({
@@ -25,6 +27,7 @@ export function GamePageShell({
   walletLoadEnabled,
   paymentMethods,
   initialGameAccount,
+  guides,
 }: GamePageShellProps) {
   const router = useRouter();
 
@@ -46,6 +49,7 @@ export function GamePageShell({
         walletLoadEnabled={walletLoadEnabled}
         paymentMethods={paymentMethods}
         initialGameAccount={initialGameAccount}
+        guides={guides}
       />
     </AppShell>
   );

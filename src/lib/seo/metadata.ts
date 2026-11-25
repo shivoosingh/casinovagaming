@@ -59,7 +59,7 @@ export const homeMetadata = createMetadata({
   title: SITE_NAME,
   documentTitle: "Casinova Gaming | Juwa, Game Vault, Fish Table & Slot Games",
   description:
-    "Play Juwa, Game Vault, Vegas Sweeps and more fish table and slot games through Casinova Gaming. One wallet, card deposits, 100% first-deposit match, VIP rewards, 24/7 live chat. 18+.",
+    "Play Juwa, Game Vault, Vegas Sweeps and more fish table and slot games. One wallet, card deposits, a 100% first-deposit match and 24/7 live chat. 18+.",
   keywords: [
     "Casinova Gaming",
     "juwa casino",

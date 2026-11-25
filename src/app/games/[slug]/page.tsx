@@ -8,6 +8,15 @@ import { GAMES, getGameBySlug } from "@/lib/games";
 import { isWalletLoadEnabledForGame } from "@/lib/game-automation/config";
 import { getMyGameAccount } from "@/lib/actions/game-loads";
 import { getActivePaymentMethods } from "@/lib/data/payments";
+import { getPublishedBlogPosts } from "@/lib/data/marketing";
+import { GameGuides } from "@/components/games/game-guides";
+import { unstable_cache } from "next/cache";
+
+// This page renders per request (it shows the signed-in player's game account),
+// so the guide list is cached rather than queried on every hit.
+const getCachedGuidePosts = unstable_cache(getPublishedBlogPosts, ["game-page-guide-posts"], {
+  revalidate: 600,
+});
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -45,9 +54,10 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   if (!game) notFound();
 
   const walletLoadEnabled = isWalletLoadEnabledForGame(game.slug);
-  const [initialGameAccount, paymentMethods] = await Promise.all([
+  const [initialGameAccount, paymentMethods, guidePosts] = await Promise.all([
     walletLoadEnabled ? getMyGameAccount(game.slug) : Promise.resolve(null),
     game.upcoming ? Promise.resolve([]) : getActivePaymentMethods(),
+    game.upcoming ? Promise.resolve([]) : getCachedGuidePosts().catch(() => []),
   ]);
 
   return (
@@ -55,6 +65,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
       <BreadcrumbSchema
         items={[
           { name: "Home", url: SITE_URL },
+          { name: "Games", url: `${SITE_URL}/games` },
           { name: game.name, url: `${SITE_URL}/games/${game.slug}` },
         ]}
       />
@@ -65,6 +76,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
         walletLoadEnabled={walletLoadEnabled}
         paymentMethods={paymentMethods}
         initialGameAccount={initialGameAccount}
+        guides={<GameGuides game={game} posts={guidePosts} />}
       />
     </>
   );

@@ -1,4 +1,4 @@
-import type { Game } from "@/lib/games";
+import { GAME_BONUS_RULES, type Game } from "@/lib/games";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
 const GAME_KEYWORDS: Record<string, string[]> = {
@@ -43,16 +43,45 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   "Fish Game": ["fish games", "fish shooting games", "fish table games", "arcade fish games"],
 };
 
-const GAME_TITLES: Record<string, string> = {
-  juwa: "Juwa Casino — Download App, Slots & Create Account",
+/**
+ * What each live game's lobby contains, in plain words. Used for the meta
+ * description and the on-page FAQ. Keep to the mix of game types only: no
+ * payout, popularity or quality claims.
+ */
+const GAME_MIX: Record<string, string> = {
+  "game-vault": "slots, keno and fish games",
+  juwa: "fish games, slots and table-style games",
+  "mr-all-in-one": "slots, fish games and keno in one app",
+  "cash-machine": "slot games",
+  "cash-frenzy": "slot games",
+  "vegas-sweeps": "slots, keno and fish games",
+  gameroom: "slots, fish games and keno",
+  mafia: "mob-themed slots and arcade games",
 };
 
-export function getGameSeoTitle(game: Game): string {
-  return GAME_TITLES[game.slug] ?? `${game.name} ${game.category} — Download & Create Account`;
+export function getGameMix(game: Game): string | null {
+  return GAME_MIX[game.slug] ?? null;
 }
 
+const GAME_TITLES: Record<string, string> = {
+  juwa: "Juwa 777 Online: Account, Download & Load",
+};
+
+/** Kept to about 42 characters so the " | Casinova Gaming" suffix still fits in 60. */
+export function getGameSeoTitle(game: Game): string {
+  // A coming-soon game has no account or download to offer yet (its page is noindex).
+  if (game.upcoming) return `${game.name}: Coming Soon`;
+  return GAME_TITLES[game.slug] ?? `${game.name} Online: Account & Download`;
+}
+
+/** Meta description: under 160 characters, built from the real load and bonus rules. */
 export function getGameSeoDescription(game: Game): string {
-  return game.bio;
+  if (game.upcoming) {
+    return `${game.name} is coming soon at ${SITE_NAME} and cannot be loaded yet. See the games you can load today.`;
+  }
+  const mix = getGameMix(game);
+  const lead = mix ? `${game.name}: ${mix}.` : `${game.name} at ${SITE_NAME}.`;
+  return `${lead} Load $${GAME_BONUS_RULES.minDeposit} to $${GAME_BONUS_RULES.maxDeposit} at ${SITE_NAME}, ${GAME_BONUS_RULES.firstTimeBonus}% match on your first deposit, ${GAME_BONUS_RULES.secondDepositBonus}% on your second. 18+.`;
 }
 
 export function getGameSeoKeywords(game: Game): string[] {

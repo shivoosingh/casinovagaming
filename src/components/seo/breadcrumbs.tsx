@@ -15,7 +15,9 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   const schemaItems = items.map((item) => ({
     name: item.name,
-    url: item.href ? `${SITE_URL}${item.href}` : SITE_URL,
+    // No href means "current page". Falling back to SITE_URL told crawlers the
+    // last crumb of every post was the homepage.
+    url: item.href ? `${SITE_URL}${item.href === "/" ? "" : item.href}` : undefined,
   }));
 
   return (

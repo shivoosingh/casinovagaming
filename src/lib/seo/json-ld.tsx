@@ -30,6 +30,7 @@ export function OrganizationSchema() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "customer support",
+          url: `${SITE_URL}/support`,
           availableLanguage: "English",
         },
       }}
@@ -51,7 +52,8 @@ export function WebsiteSchema() {
   );
 }
 
-export function BreadcrumbSchema({ items }: { items: { name: string; url: string }[] }) {
+/** A crumb with no url is the current page: schema.org lets the last item omit `item`. */
+export function BreadcrumbSchema({ items }: { items: { name: string; url?: string }[] }) {
   return (
     <JsonLd
       data={{
@@ -61,7 +63,7 @@ export function BreadcrumbSchema({ items }: { items: { name: string; url: string
           "@type": "ListItem",
           position: index + 1,
           name: item.name,
-          item: item.url,
+          ...(item.url ? { item: item.url } : {}),
         })),
       }}
     />

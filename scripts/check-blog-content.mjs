@@ -25,8 +25,17 @@ function loadEnv() {
 }
 
 const warnOnly = process.argv.includes("--warn-only");
-const env = loadEnv();
-const admin = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+// Offline mode: --offline base.json [override.json ...]. Each file is an array of
+// posts (or a Supabase CLI export with a "rows" array). Later files override earlier
+// ones by slug, so a batch of rewrites can be linted against the published set
+// without touching the database.
+const offlineAt = process.argv.indexOf("--offline");
+const onlyAt = process.argv.indexOf("--only");
+const offlineFiles =
+  offlineAt === -1
+    ? []
+    : process.argv.slice(offlineAt + 1).filter((a, i) => !a.startsWith("--") && offlineAt + 1 + i !== onlyAt + 1);
+const onlySlugs = onlyAt === -1 ? null : new Set(process.argv[onlyAt + 1].split(","));
 
 // Keep these in step with src/lib/games.ts and src/lib/seo/retired-posts.ts.
 const LIVE = ["game-vault", "juwa", "mr-all-in-one", "cash-machine", "cash-frenzy", "vegas-sweeps", "gameroom", "mafia"];
@@ -72,21 +81,36 @@ function extractFaqCount(html) {
   return (section.match(/<p[^>]*>\s*<strong>/gi) || []).length;
 }
 
-const { data, error } = await admin
-  .from("blog_posts")
-  .select("slug,title,excerpt,content,status")
-  .eq("status", "published")
-  .order("slug")
-  .limit(1000);
-if (error) {
-  console.error("query failed:", error.message);
-  process.exit(2);
+async function loadPosts() {
+  if (offlineFiles.length) {
+    const bySlug = new Map();
+    for (const file of offlineFiles) {
+      const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
+      for (const row of Array.isArray(parsed) ? parsed : parsed.rows) bySlug.set(row.slug, row);
+    }
+    return [...bySlug.values()].sort((a, b) => a.slug.localeCompare(b.slug));
+  }
+  const env = loadEnv();
+  const admin = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+  const { data, error } = await admin
+    .from("blog_posts")
+    .select("slug,title,excerpt,content,seo_title,seo_description,status")
+    .eq("status", "published")
+    .order("slug")
+    .limit(1000);
+  if (error) {
+    console.error("query failed:", error.message);
+    process.exit(2);
+  }
+  return data;
 }
+const data = await loadPosts();
 const published = new Set(data.map((r) => r.slug));
 const findings = [];
 const warn = (slug, msg) => findings.push(`${slug}: ${msg}`);
 
 for (const row of data) {
+  if (onlySlugs && !onlySlugs.has(row.slug)) continue;
   const body = row.content ?? "";
   const text = strip(body);
   const all = `${row.title}\n${row.excerpt ?? ""}\n${text}`;
@@ -98,6 +122,14 @@ for (const row of data) {
   if (extractFaqCount(body) === 0) warn(row.slug, "no FAQ section");
   if (/[–—]/.test(all)) warn(row.slug, "em/en dash");
   if (/<script/i.test(body)) warn(row.slug, "script tag in body");
+
+  const seoTitle = (row.seo_title ?? row.title ?? "").replace(/\s*\|\s*Casinova Gaming\s*$/i, "");
+  if (seoTitle.length > 60) warn(row.slug, `seo title over 60 chars before brand suffix (${seoTitle.length})`);
+  const seoDesc = row.seo_description ?? row.excerpt ?? "";
+  if (seoDesc.length > 160) warn(row.slug, `meta description over 160 chars (${seoDesc.length})`);
+  if (seoDesc.length < 70) warn(row.slug, `meta description under 70 chars (${seoDesc.length})`);
+  if (/20(1\d|2[0-5])/.test(`${row.title} ${row.seo_title ?? ""}`)) warn(row.slug, "stale year in title");
+  if (/â€|Ã./.test(all)) warn(row.slug, "mojibake (broken character encoding)");
 
   const links = [...body.matchAll(/(?:href="|\]\()(\/[^")\s]+)/g)].map((m) => m[1]);
   const gameLinks = links.filter((l) => l.startsWith("/games/")).map((l) => l.split("/")[2].split(/[?#]/)[0]);

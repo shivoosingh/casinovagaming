@@ -8,8 +8,8 @@ import { createMetadata } from "@/lib/seo/metadata";
 const LIVE_GAMES = GAMES.filter((game) => !game.upcoming);
 
 export const metadata = createMetadata({
-  title: "All Games",
-  description: `Games you can load on Casinova now: ${LIVE_GAMES.map((game) => game.name).join(", ")}. Open a game to create your account and load it from your wallet.`,
+  title: "Sweepstakes Games You Can Load Now",
+  description: `${LIVE_GAMES.length} games you can load on Casinova Gaming today, including ${LIVE_GAMES.slice(0, 3).map((game) => game.name).join(", ")}. Create a game account and load it from one wallet.`,
   keywords: ["Casinova games", ...LIVE_GAMES.map((game) => game.name)],
   path: "/games",
 });

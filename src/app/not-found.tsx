@@ -10,6 +10,7 @@ import { SITE_NAME } from "@/lib/constants";
 export const metadata: Metadata = {
   title: `Page Not Found | ${SITE_NAME}`,
   description: "The page you were looking for does not exist on Casinova Gaming.",
+  alternates: {},
 };
 
 const LINKS = [
