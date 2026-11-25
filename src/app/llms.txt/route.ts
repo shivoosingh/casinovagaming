@@ -58,7 +58,7 @@ export async function GET() {
     `- Redeem rules: in-game balance must reach ${GAME_BONUS_RULES.redeemMin}x the load; total redeems capped at ${GAME_BONUS_RULES.redeemMax}x the load; approved government ID required; every redeem is reviewed by an admin. No payout-time promise.`,
     `- Payments: card only, through an instant payment partner. Cash App, Zelle, Venmo, PayPal, Chime and crypto are not offered.`,
     `- Daily spin: prizes $1, $2, $3, $4, $7, $10 or none; spins per 24h: Bronze 1, Silver 2, Gold 3, Platinum 3.`,
-    `- VIP tiers (points): ${VIP_TIERS.map((t) => `${t.name} ${t.minPoints} (${Math.round(t.referralRate * 100)}% referral share)`).join(", ")}. Referral share is a percentage of a referred friend's first deposit; each referral also adds 10 VIP points.`,
+    `- VIP tiers (points): ${VIP_TIERS.map((t) => `${t.name} ${t.minPoints} (${Math.round(t.referralRate * 100)}% referral share)`).join(", ")}. Referral share is a percentage of a referred friend's first confirmed deposit, credited to the referrer's wallet; a referral also adds VIP points. VIP points: 1 per $1 on each confirmed deposit (minimum 1), 5 to 11 for the daily check-in, 10 per $1 of a spin prize.`,
     `- Not offered: promo codes, published odds or RTP.`,
     `- Support: 24/7 live chat at ${SITE_URL}/support. Telegram: ${SOCIAL_LINKS.telegram}.`,
     "",

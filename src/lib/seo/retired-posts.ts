@@ -35,9 +35,19 @@ export const RETIRED_POST_REDIRECTS: Record<string, string> = {
   "orion-stars-vs-fire-kirin": "fire-kirin-orion-stars-alternatives",
   "fire-kirin-vs-game-vault": "fire-kirin-orion-stars-alternatives",
   "game-vault-vs-orion-stars": "fire-kirin-orion-stars-alternatives",
-  // 2026-11 phase 2: how-to, strategy and comparison posts for coming-soon games.
-  // Each game keeps one honest status page; these point at it. Archive SQL:
-  // supabase/blog-seed-2026-11-phase2-archive-coming-soon.sql (run with the deploy).
+};
+
+/**
+ * Phase 2 (2026-11): how-to, strategy and comparison posts for coming-soon
+ * games. Each game keeps one honest status page; these will point at it.
+ *
+ * NOT ACTIVE YET. They become redirects only when moved into
+ * RETIRED_POST_REDIRECTS, and that must happen together with
+ * supabase/blog-seed-2026-11-phase2.sql (rewrites the targets) and
+ * supabase/blog-seed-2026-11-phase2-archive-coming-soon.sql (archives these),
+ * both of which are waiting for the owner's review.
+ */
+export const PENDING_POST_REDIRECTS: Record<string, string> = {
   "how-to-win-at-fire-kirin": "fire-kirin-online",
   "how-to-create-fire-kirin-account-online": "fire-kirin-online",
   "fire-kirin-advanced-tips": "fire-kirin-online",

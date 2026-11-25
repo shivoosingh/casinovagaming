@@ -103,9 +103,11 @@ export default function VipPage() {
               </h2>
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
-                  { action: "Game Account Request", points: 50, icon: Star },
-                  { action: "Successful Referral", points: 10, icon: Users },
-                  { action: "Monthly Activity Bonus", points: 200, icon: Crown },
+                  // Each line matches a rule in code: deposits (award_deposit_rewards),
+                  // daily check-in (rewards/daily.ts), spin prizes (actions/spin.ts).
+                  { action: "Confirmed deposit", points: "1 pt per $1", icon: Star },
+                  { action: "Daily check-in", points: "5 to 11 pts", icon: Users },
+                  { action: "Daily spin prize", points: "10 pts per $1 won", icon: Crown },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -118,7 +120,7 @@ export default function VipPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-[#f0f0f5]">{item.action}</p>
-                        <p className="text-xs text-[#c9a84c] font-bold">+{item.points} pts</p>
+                        <p className="text-xs text-[#c9a84c] font-bold">{item.points}</p>
                       </div>
                     </div>
                   );

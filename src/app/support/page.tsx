@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     q: "How do referrals work?",
-    a: "Share your unique referral code. When friends sign up, you earn 10 VIP points per referral.",
+    a: "Share your unique referral code. When a friend signs up, you earn VIP points, and a share of their first deposit set by your VIP tier.",
   },
 ];
 

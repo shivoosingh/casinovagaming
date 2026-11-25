@@ -32,12 +32,18 @@ export async function POST(req: Request) {
 
     if (payload.event === "deposit.paid" && payload.data?.depositId && userId && amount > 0) {
       if (isPaidDepositStatus(payload.data.status || "paid") || payload.event === "deposit.paid") {
-        await creditPaydoraDeposit({
+        const result = await creditPaydoraDeposit({
           userId,
           amount,
           depositId: payload.data.depositId,
           referenceId: payload.data.referenceId,
         });
+        // The wallet is credited either way. If only the VIP/referral award
+        // failed, a retry is safe (nothing is credited twice) and heals it.
+        if (!result.rewardsOk) {
+          console.error("[paydora/webhook] rewards pending for", payload.data.depositId);
+          return new NextResponse("RETRY", { status: 500 });
+        }
       }
     }
 

@@ -9,7 +9,7 @@ export const HOME_FAQS = [
   },
   {
     q: "How does the VIP program work?",
-    a: "VIP points move you through Bronze, Silver, Gold, and Platinum. A successful referral adds 10 VIP points.",
+    a: "VIP points move you through Bronze, Silver, Gold, and Platinum. Confirmed deposits add 1 point per dollar, and the daily check-in, spin prizes and referrals add points too.",
   },
   {
     q: "How do I reach support?",
@@ -17,7 +17,7 @@ export const HOME_FAQS = [
   },
   {
     q: "How do referrals work?",
-    a: "Share the referral code from your Referrals page. When a friend signs up with it, you receive 10 VIP points.",
+    a: "Share the referral code from your Referrals page. When a friend signs up with it, you receive VIP points, and a share of their first deposit set by your VIP tier.",
   },
   {
     q: "How do I redeem?",

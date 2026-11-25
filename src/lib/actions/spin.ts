@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/actions/notifications";
 import {
   DAILY_SPINS_BY_TIER,
@@ -187,26 +188,48 @@ export async function spinWheel(): Promise<SpinResult> {
 
   if (prize.type === "cash" && prize.value > 0) {
     const pointsToAdd = prize.value * 10;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("vip_points")
-      .eq("id", user.id)
-      .single();
-
-    if (profile) {
-      await supabase
+    // Service role: players cannot change their own vip_points (see
+    // protect_reward_columns in supabase/fresh-migrations/040).
+    const rewardsAdmin = createAdminClient();
+    if (rewardsAdmin) {
+      const { data: profile } = await rewardsAdmin
         .from("profiles")
-        .update({ vip_points: profile.vip_points + pointsToAdd })
-        .eq("id", user.id);
+        .select("vip_points")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        await rewardsAdmin
+          .from("profiles")
+          .update({ vip_points: profile.vip_points + pointsToAdd })
+          .eq("id", user.id);
+      }
+    } else {
+      console.error("[spin] admin client unavailable; VIP points not added for", user.id);
     }
 
-    await creditUserWallet(
-      user.id,
-      prize.value,
-      "current",
-      "spin",
-      `Wheel prize: ${prize.label}`
-    );
+    // Prizes are credited by the server. The timestamp keeps the description
+    // unique: credit_system_wallet skips an exact repeat.
+    let prizeCredited = false;
+    if (rewardsAdmin) {
+      const { error: prizeError } = await rewardsAdmin.rpc("credit_system_wallet", {
+        p_user_id: user.id,
+        p_amount: prize.value,
+        p_source: "spin",
+        p_description: `Wheel prize: ${prize.label} (${new Date().toISOString()})`,
+      });
+      if (prizeError) console.error("[spin] service credit failed:", prizeError.message);
+      else prizeCredited = true;
+    }
+    if (!prizeCredited) {
+      await creditUserWallet(
+        user.id,
+        prize.value,
+        "current",
+        "spin",
+        `Wheel prize: ${prize.label}`
+      );
+    }
 
     await createNotification(
       user.id,

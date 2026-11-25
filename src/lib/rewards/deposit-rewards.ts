@@ -1,12 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { referralRateForTier, vipTierForPoints } from "@/lib/constants";
 import { createNotification } from "@/lib/actions/notifications";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { awardDepositRewardsOnce } from "@/lib/rewards/award-deposit";
 
 /**
- * After a deposit is already credited: VIP points, one active promo bonus,
- * and the referrer's first-deposit percent. Failures here must not undo the deposit.
+ * After a deposit is already credited: VIP points and the referrer's
+ * first-deposit share (both through the idempotent database award, see
+ * award-deposit.ts), then one active promo bonus. Failures here must not undo
+ * the deposit.
  */
 export async function awardDepositRewards(
   adminSession: SupabaseClient,
@@ -15,30 +17,11 @@ export async function awardDepositRewards(
   const amount = Math.round(input.amount * 100) / 100;
   if (amount <= 0) return;
 
+  await awardDepositRewardsOnce(input.depositId);
+
   const admin = createAdminClient();
   if (!admin) return;
-
-  await addVipPoints(admin, input.userId, Math.max(1, Math.round(amount)));
   await creditActivePromotion(adminSession, admin, input);
-  await creditReferralFirstDeposit(adminSession, admin, input.userId, amount, input.depositId);
-}
-
-async function addVipPoints(
-  admin: NonNullable<ReturnType<typeof createAdminClient>>,
-  userId: string,
-  points: number
-) {
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("vip_points")
-    .eq("id", userId)
-    .maybeSingle();
-  if (!profile) return;
-  const next = Number(profile.vip_points ?? 0) + points;
-  await admin
-    .from("profiles")
-    .update({ vip_points: next, vip_tier: vipTierForPoints(next) })
-    .eq("id", userId);
 }
 
 async function creditActivePromotion(
@@ -92,66 +75,6 @@ async function creditActivePromotion(
     input.userId,
     "Promotion bonus added",
     `$${bonus.toFixed(2)} from ${promo.title} was added to your Total Deposit wallet.`,
-    "success"
-  );
-}
-
-async function creditReferralFirstDeposit(
-  adminSession: SupabaseClient,
-  admin: NonNullable<ReturnType<typeof createAdminClient>>,
-  userId: string,
-  amount: number,
-  depositId: string
-) {
-  const { count } = await admin
-    .from("deposit_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("status", "completed");
-  if ((count ?? 0) !== 1) return;
-
-  const { data: player } = await admin
-    .from("profiles")
-    .select("referred_by")
-    .eq("id", userId)
-    .maybeSingle();
-  if (!player?.referred_by) return;
-
-  const marker = `referred user ${userId}`;
-  const { data: already } = await admin
-    .from("wallet_transactions")
-    .select("id")
-    .eq("user_id", player.referred_by)
-    .eq("source", "referral_bonus")
-    .ilike("description", `%${marker}%`)
-    .maybeSingle();
-  if (already) return;
-
-  const { data: referrer } = await admin
-    .from("profiles")
-    .select("vip_tier")
-    .eq("id", player.referred_by)
-    .maybeSingle();
-
-  const bonus = Math.round(amount * referralRateForTier(referrer?.vip_tier) * 100) / 100;
-  if (bonus <= 0) return;
-
-  const { error } = await adminSession.rpc("credit_wallet", {
-    p_user_id: player.referred_by,
-    p_amount: bonus,
-    p_wallet_type: "current",
-    p_source: "referral_bonus",
-    p_description: `Referral bonus $${bonus.toFixed(2)} from first deposit ${depositId} (${marker})`,
-  });
-  if (error) {
-    console.error("[referral] bonus credit:", error.message);
-    return;
-  }
-
-  await createNotification(
-    player.referred_by,
-    "Referral bonus",
-    `$${bonus.toFixed(2)} was added to your Total Deposit wallet from a friend's first deposit.`,
     "success"
   );
 }

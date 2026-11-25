@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { awardDepositRewardsOnce } from "@/lib/rewards/award-deposit";
 
 const ALLOWED_METHODS = new Set(["paypal", "chime", "cashapp", "bitcoin", "usdt", "venmo"]);
 
@@ -74,11 +75,16 @@ async function ensureDepositRequest(
 
   const { data: existing } = await admin
     .from("deposit_requests")
-    .select("id")
+    .select("id, status")
     .eq("proof_url", proof)
     .maybeSingle();
 
   if (existing?.id) {
+    // A refunded deposit is marked rejected. A late or repeated "paid"
+    // notification must not flip it back to completed (and so make it
+    // eligible for rewards again).
+    if (existing.status === "rejected") return existing.id as string;
+
     const { error } = await admin
       .from("deposit_requests")
       .update({
@@ -88,11 +94,36 @@ async function ensureDepositRequest(
       })
       .eq("id", existing.id);
     if (error) throw new Error(error.message);
-    return;
+    return existing.id as string;
   }
 
-  const { error } = await admin.from("deposit_requests").insert(row);
-  if (error) throw new Error(error.message);
+  const { data: inserted, error } = await admin
+    .from("deposit_requests")
+    .insert(row)
+    .select("id")
+    .single();
+  if (!error && inserted?.id) return inserted.id as string;
+
+  // Unique index on the provider id: another request for the same payment
+  // inserted the row a moment ago. Use that row instead of failing.
+  if (error?.code === "23505") {
+    const { data: raced } = await admin
+      .from("deposit_requests")
+      .select("id")
+      .eq("proof_url", proof)
+      .maybeSingle();
+    if (raced?.id) return raced.id as string;
+  }
+  throw new Error(error?.message ?? "Could not record the deposit");
+}
+
+/**
+ * VIP points and referral share for a credited card deposit. Idempotent, so it
+ * is also called on the duplicate path: a retry heals an award that failed.
+ */
+async function awardRewards(depositRequestId: string) {
+  const result = await awardDepositRewardsOnce(depositRequestId);
+  return result.status !== "failed";
 }
 
 async function applyWalletCredit(
@@ -180,14 +211,15 @@ export async function creditPaydoraDeposit(input: {
 }) {
   const admin = createAdminClient();
   if (!admin) throw new Error("Admin client unavailable");
-  if (!input.userId || input.amount <= 0 || !input.depositId) return { credited: false };
+  if (!input.userId || input.amount <= 0 || !input.depositId) return { credited: false, rewardsOk: true };
 
   const amount = Math.round(input.amount * 100) / 100;
   const marker = input.depositId;
 
   if (await alreadyApplied(admin, input.userId, marker)) {
-    await ensureDepositRequest(admin, { ...input, amount });
-    return { credited: false, duplicate: true };
+    const depositRequestId = await ensureDepositRequest(admin, { ...input, amount });
+    const rewardsOk = await awardRewards(depositRequestId);
+    return { credited: false, duplicate: true, rewardsOk };
   }
 
   const methodName = input.methodName?.trim() || "Paydora";
@@ -200,7 +232,7 @@ export async function creditPaydoraDeposit(input: {
     description,
   });
 
-  await ensureDepositRequest(admin, { ...input, amount });
+  const depositRequestId = await ensureDepositRequest(admin, { ...input, amount });
 
   await admin.from("notifications").insert({
     user_id: input.userId,
@@ -210,7 +242,9 @@ export async function creditPaydoraDeposit(input: {
     is_read: false,
   });
 
-  return { credited: true, newBalance };
+  const rewardsOk = await awardRewards(depositRequestId);
+
+  return { credited: true, newBalance, rewardsOk };
 }
 
 export async function reversePaydoraDeposit(input: {
