@@ -69,8 +69,7 @@ Each rewrite is 745 to 1,196 words, opens with a direct answer, ends with an FAQ
 | B | Game cards show hard-coded player counts (for example 25,053), labelled "display stat" in the admin page | Looks like invented social proof; removing it is a UI change |
 | C | `/support` shows `support@casinovagaming.com`, which is a different domain from casinovasgaming.com (no "s") | I cannot tell whether that mailbox is real |
 | D | `/support` and `/contact` promise "Average response under 5 minutes" | Unverified claim |
-| E | The default game login uses a password equal to the username (stated in the panel UI) | Security weakness in the product, outside SEO scope. I removed the two places a rewrite would have published it |
-| F | Spin prizes and completed game requests add VIP points without updating the tier | Product bug found while reading the code |
+| F | VIP points and the referral share were not paid on card deposits | Fixed 2026-11-26, see `docs/rewards/deposit-rewards-fix.md`. (The tier itself is kept correct by a database trigger.) |
 | G | The public leaderboard query has no role filter, so staff accounts could appear | Product behaviour |
 | H | `games.ts` defines a second redeem rule (7x to 15x, bonus wallet) while every page and `llms.txt` state 3x and 8x | Confirm which applies to a matched load |
 | I | Game pages render on every request (`force-dynamic`) with two to three database calls | Needed for the signed-in account panel; changing it risks the load flow |

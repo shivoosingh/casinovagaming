@@ -38,20 +38,15 @@ Date: 2026-11-25. These were investigated in the code only. **Nothing here has b
 
 - **Recommendation.** Keep "24/7 chat" only if you describe it accurately (an AI assistant around the clock, staff during stated hours), or confirm that staff cover is genuinely 24/7. Drop "under 5 minutes" and "instant" unless you measure them. Copy changes on visible pages: need your approval.
 
-## 5. VIP points and referral share are promised but not paid on card deposits (reward logic)
+## 5. VIP points and referral share on card deposits: fixed 2026-11-26
 
-This is the most important finding in this file.
-
-- **What the site says.** The VIP page, `llms.txt` and several posts say players earn VIP points on deposits and that a referrer receives 5% to 25% of a referred friend's first deposit.
-- **What the code does.** The function that awards both, `awardDepositRewards` (`src/lib/rewards/deposit-rewards.ts:11`), is called from one place only: `src/lib/actions/deposits.ts:183`, when an admin confirms a deposit in the old manual proof-of-payment flow. The live card flow (`src/lib/payments/paydora-wallet.ts`, `creditPaydoraDeposit`) credits the wallet through `credit_system_wallet` and does nothing else. I found no database trigger in the repo that would do it instead.
-- **Effect.** As the code stands, a card deposit earns no VIP points and pays no referral share. Players and referrers are being told otherwise.
-- **Not verified.** Whether a database function outside the repo awards them. One query against production would settle it: compare recent card deposits with the depositor's point history and the referrer's wallet credits.
-- **Related gaps:**
-  - Spin prizes and the retired game-request flow add `vip_points` without updating `vip_tier` (`src/lib/actions/spin.ts:199`, `src/lib/actions/game-requests.ts:126`), so a player can pass a threshold and keep the old tier label until their next daily check-in.
-  - The app awards 10 points per referral (`src/lib/rewards/attach-referral.ts`), but a signup trigger in `supabase/fresh-migrations/038-fix-signup.sql:34-40` awards 100. Which one is live cannot be told from the repo.
-  - The VIP page lists "Game Account Request +50" and "Monthly Activity Bonus +200" (`src/app/vip/page.tsx:106-108`). The game-request page has been removed and nothing awards a monthly bonus. It also lists benefits such as "Exclusive games access" and "Custom rewards" that no code implements.
-- **What I did.** The rewrites no longer say deposits earn points or that a referral share is paid. Nothing else was changed.
-- **Recommendation.** Decide whether the rewards are meant to exist. If yes, call the reward function from the card-deposit path (reward and wallet logic: needs your approval and a test on a small deposit). If no, remove the promises from the VIP page, `llms.txt` and the live VIP and referral posts.
+- **What was wrong.** The function that awards VIP points and the referrer's first-deposit share was only called when an admin confirmed a deposit in the old manual flow. Card deposits credited the wallet and nothing else.
+- **What changed.** Both deposit paths now call one database function that awards each deposit exactly once. Details, tests and rollback: `docs/rewards/deposit-rewards-fix.md`.
+- **Still open, your decision:**
+  - A referral made at sign-up adds 100 VIP points (database trigger `handle_new_user`), while the application constant says 10. Public copy no longer states a number. Decide which value you want.
+  - The retired game-request flow added 50 points and the VIP page used to list a "+200 monthly activity bonus" that nothing awards. Both lines are removed from the VIP page.
+  - The VIP page lists tier benefits such as "Exclusive games access", "Custom rewards" and "Dedicated account manager" that no code implements. Confirm you deliver them or remove them.
+  - 9 earlier card deposits (140 points) were never awarded. A reconciliation script is ready and has not been run.
 
 ## 6. Public leaderboard has no staff filter (product logic)
 
@@ -107,7 +102,3 @@ This is the most important finding in this file.
 - **Two balances.** The wallet card shows "Total Deposit" and "Deposit Redeem" (`src/components/wallet/wallet-card.tsx:16-17`). Approved redeems go to Deposit Redeem. I found no player-facing step that pays that balance out, so the posts do not describe one.
 - **Guests cannot chat.** The chat widget asks visitors to log in first (`src/components/chat/chat-widget.tsx:218-224`), while the support page presents live chat as open to anyone.
 - **Support page FAQ is out of date.** It still describes game requests processed "within 24 hours" (`src/app/support/page.tsx:15`).
-
-## 14. Default game login passwords
-
-Covered separately in `S:\casinovas\security-notes\game-login-passwords.md`, which is kept outside the repository. Nothing about it is published in any post.

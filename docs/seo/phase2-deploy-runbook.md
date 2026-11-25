@@ -1,5 +1,7 @@
 # Phase 2: deploy, verify and roll back
 
+> Update 2026-11-26: the phase 2 **code** went to production together with the reward fix (`docs/rewards/deposit-rewards-fix.md`). Still not applied: the article SQL, the archive SQL and the ten redirects. The redirects now sit in `PENDING_POST_REDIRECTS` in `src/lib/seo/retired-posts.ts`; move them into `RETIRED_POST_REDIRECTS` and redeploy when you approve the article SQL, then follow steps 3 and 5 below.
+
 Nothing in this file has been run. Every step that changes production needs the owner's explicit go-ahead.
 
 Paths assume the worktree `S:\casinovas\Casinova-seo` on branch `seo-phase2`. The Vercel project is linked in `S:\casinovas\Casinova` (run `vercel` commands from there). `<REF>` is the Supabase project ref for Casinova.

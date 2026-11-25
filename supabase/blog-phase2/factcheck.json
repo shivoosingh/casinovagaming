@@ -69,7 +69,7 @@
   "how-to-create-game-vault-account": {
     "verdict": "corrected",
     "corrections": [
-      "Security: removed every description of how default usernames and passwords are generated.",
+      "Removed the description of how a generated login is formed; the post says only that the login appears in the panel.",
       "\"Own login\" is described as the pencil button, which is how it appears on phones.",
       "Google and Facebook sign-in are no longer named as available.",
       "Payment and Responsible Play wording corrected."
@@ -82,7 +82,7 @@
   "how-to-create-juwa-account-online": {
     "verdict": "corrected",
     "corrections": [
-      "Security: removed the generated-login comparison table and every description of generated credentials.",
+      "Removed the generated-login comparison table; the post says only that the login appears in the panel.",
       "\"Live chat is open around the clock if you would rather have someone look\" became \"live chat is available 24/7\", without implying a person answers.",
       "Google and Facebook sign-in are no longer named as available.",
       "Free-credits, payment and Responsible Play wording corrected."
