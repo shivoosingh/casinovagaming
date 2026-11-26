@@ -51,7 +51,7 @@ const socialItems = [
 export function SocialLinks({ className = "" }: { className?: string }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {socialItems.map((item) => (
+      {socialItems.filter((item) => /^https?:\/\//.test(item.href)).map((item) => (
         <a
           key={item.name}
           href={item.href}

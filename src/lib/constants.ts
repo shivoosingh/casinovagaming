@@ -89,9 +89,8 @@ export const SOCIAL_LINKS = {
   facebook:
     process.env.NEXT_PUBLIC_FACEBOOK_URL ||
     "https://www.facebook.com/share/18mJGKyMNq/?mibextid=wwXIfr",
-  instagram:
-    process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
-    "https://www.instagram.com/casinovagaming/",
+  // The old @casinovagaming profile is unavailable; set NEXT_PUBLIC_INSTAGRAM_URL when a real one exists.
+  instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "",
   // Old @spinora09 brand link removed; set NEXT_PUBLIC_TIKTOK_URL when the real profile is ready.
   tiktok: process.env.NEXT_PUBLIC_TIKTOK_URL || "",
   // Unset until a real business number exists; empty strings are filtered out of the footer and schema.
